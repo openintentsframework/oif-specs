@@ -35,9 +35,7 @@ paths:
           description: Inputs cannot satisfy requested outputs
   /offchain/v1/submit-intent:
     post:
-      tags: [intent]
-      summary: Submit Intent
-      description: Submit a previously quoted, signed order for execution.
+      summary: Submit a previously quoted, signed order for execution.
       requestBody:
         required: true
         content:
