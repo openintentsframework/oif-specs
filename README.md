@@ -9,7 +9,7 @@ It includes:
 
 ## Repository structure
 
-- `specs/offchain/openapi.yaml`: OpenAPI 3.0 specification covering Get Quote and Submit Intent endpoints
+- `specs/openapi.yaml`: OpenAPI 3.0 specification covering Get Quote and Submit Intent endpoints
 - `schemas/typescript/get-quote.ts`: TypeScript interfaces for Get Quote request/response
 - `schemas/typescript/intent.ts`: TypeScript interfaces for Submit Intent request/response
 - `docs/references.md`: Curated external references to related off-chain APIs and intent protocols
@@ -21,7 +21,7 @@ This repository defines two endpoints:
 - Get Quote: quote generation for requested outputs based on available inputs
 - Submit Intent: submit a previously quoted, signed order for execution
 
-Authoritative schema: `specs/offchain/openapi.yaml`
+Authoritative schema: `specs/openapi.yaml`
 
 TypeScript-friendly interfaces are provided in `schemas/typescript/`:
 
@@ -32,9 +32,7 @@ TypeScript-friendly interfaces are provided in `schemas/typescript/`:
 
 Use any of the following online viewers. After this repo is public, you can point them directly to the raw `openapi.yaml` URL; until then, copy-paste the YAML content into the viewer.
 
-- Swagger Editor: open `https://editor.swagger.io/` and paste the contents of `specs/offchain/openapi.yaml`.
-- Redocly Viewer: open `https://redocly.github.io/redoc/` and use the URL parameter once hosted, for example `https://redocly.github.io/redoc/?url=RAW_OPENAPI_YAML_URL`.
-- Swagger UI Live: open `https://petstore.swagger.io/` and use the URL parameter once hosted, for example `https://petstore.swagger.io/?url=RAW_OPENAPI_YAML_URL`.
+- Swagger Editor: open `https://editor.swagger.io/` and paste the contents of `specs/openapi.yaml`.
 
 No local server is required.
 
