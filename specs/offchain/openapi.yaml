@@ -15,9 +15,7 @@ tags:
 paths:
   /offchain/v1/get-quote:
     post:
-      tags: [quote]
-      summary: Get Quote
-      description: Generate executable quotes for requested outputs given available inputs.
+      summary: Generate executable quotes for requested outputs given available inputs.
       requestBody:
         required: true
         content:
