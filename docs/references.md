@@ -1,19 +1,19 @@
-### External references: related off-chain APIs and intent protocols
+### External references: related APIs and intent protocols
 
-Below is a curated list of external APIs and docs that are relevant to OIF's off-chain quote and intent standards. These are for inspiration and comparison; they are not normative for OIF.
+Below is a curated list of external APIs and docs that are relevant to OIF's quote and intent standards. These are for inspiration and comparison; they are not normative for OIF.
 
 - Across Protocol — API Reference: `https://docs.across.to/reference/api-reference#api-endpoints`
   - Focus: cross-chain bridge quotes, relays, fees and ETA
   - Relevance: quote semantics, response fields (validity, fees, timing)
   
 - CoW Protocol — Orderbook API: `https://docs.cow.fi/cow-protocol/reference/apis/orderbook`
-  - Focus: off-chain orderbook, EIP-712 signing, solver-based settlement
-  - Relevance: off-chain orders, typed data, quote-to-order lifecycle
+  - Focus: orderbook API, EIP-712 signing, solver-based settlement
+  - Relevance: signed orders, typed data, quote-to-order lifecycle
 
 
 - Relay — Get Quote API: `https://docs.relay.link/references/api/get-quote`
   - Focus: cross-chain quote retrieval for intents
-  - Relevance: off-chain quoting, provider identity, validity windows
+  - Relevance: quoting, provider identity, validity windows
 
 - Stargate — Transfer Quotes API: `https://docs.stargate.finance/developers/api-docs/transfer-quotes`
   - Focus: bridging transfer quotes

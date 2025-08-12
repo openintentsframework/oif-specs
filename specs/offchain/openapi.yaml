@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
-  title: OIF Off-chain API
+  title: OIF API
   version: 0.1.0
   description: |
-    Off-chain API specifications for OIF protocol covering quote generation and intent submission.
+    API specifications for OIF protocol covering quote generation and intent submission.
     Amount fields are strings representing integers (e.g., uint256) to preserve precision across transports.
 servers:
   - url: https://api.example.com
@@ -13,7 +13,7 @@ tags:
   - name: intent
     description: Intent submission
 paths:
-  /offchain/v1/get-quote:
+  /v1/get-quote:
     post:
       summary: Generate executable quotes for requested outputs given available inputs.
       requestBody:
@@ -33,7 +33,7 @@ paths:
           description: Malformed request
         '422':
           description: Inputs cannot satisfy requested outputs
-  /offchain/v1/submit-intent:
+  /v1/submit-intent:
     post:
       summary: Submit a previously quoted, signed order for execution.
       requestBody:
@@ -67,7 +67,7 @@ components:
 
     AssetLockReference:
       type: object
-      description: Reference to a lock in an off-chain or on-chain locking system
+      description: Reference to a lock in a locking system
       properties:
         kind:
           type: string

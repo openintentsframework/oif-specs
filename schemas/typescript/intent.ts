@@ -1,5 +1,5 @@
 /*
- * Off-chain Intent Submission API TypeScript interfaces
+ * Intent Submission API TypeScript interfaces
  */
 
 export interface IntentRequest {

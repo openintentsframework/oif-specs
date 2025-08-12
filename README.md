@@ -3,7 +3,7 @@
 This repository is the canonical, versioned source of truth for OIF protocol standards and specifications.
 
 It includes:
-- Off-chain API standards for Get Quote and Submit Intent
+- API standards for Get Quote and Submit Intent
 - Machine-readable OpenAPI schemas
 - Language-friendly TypeScript interfaces for client/server implementation
 
@@ -14,9 +14,9 @@ It includes:
 - `schemas/typescript/intent.ts`: TypeScript interfaces for Submit Intent request/response
 - `docs/references.md`: Curated external references to related off-chain APIs and intent protocols
 
-## Off-chain API standards
+## API standards
 
-This repository defines two off-chain endpoints:
+This repository defines two endpoints:
 
 - Get Quote: quote generation for requested outputs based on available inputs
 - Submit Intent: submit a previously quoted, signed order for execution

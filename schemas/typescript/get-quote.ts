@@ -1,5 +1,5 @@
 /*
- * Off-chain Quote API TypeScript interfaces
+ * Quote API TypeScript interfaces
  * These interfaces model the request/response payloads for the OIF Get Quote API.
  */
 
