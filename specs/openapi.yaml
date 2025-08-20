@@ -139,6 +139,9 @@ components:
           description: Minimum validity timestamp (seconds)
         preference:
           $ref: '#/components/schemas/QuotePreference'
+        fillerPerformsOpen:
+          type: boolean
+          description: If true, request the filler to perform the open on the source chain (may entail additional gas fees)
       required: [user, availableInputs, requestedOutputs]
 
     Eip712Order:

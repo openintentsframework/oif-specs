@@ -49,6 +49,8 @@ export interface GetQuoteRequest {
   /** Minimum validity timestamp (seconds). */
   minValidUntil?: number;
   preference?: QuotePreference;
+  /** If true, request the filler to perform the open on the source chain (may entail additional gas fees). */
+  fillerPerformsOpen?: boolean;
 }
 
 export interface Eip712Order {
@@ -121,6 +123,8 @@ export interface GetQuoteRequest {
   }>;
   minValidUntil?: number;
   preference?: 'price' | 'speed' | 'input-priority' | 'trust-minimization';
+  /** If true, request the filler to perform the open on the source chain (may entail additional gas fees). */
+  fillerPerformsOpen?: boolean;
 }
 
 export interface EIP712OrderEnvelope {
