@@ -120,6 +120,24 @@ components:
       type: string
       enum: [price, speed, input-priority, trust-minimization]
 
+    FailureHandlingMode:
+      type: string
+      description: Base failure handling mode
+      enum: [retry, refund-instant, refund-claim, needs-new-signature]
+
+    FailureHandling:
+      description: How the provider handles failures during execution
+      oneOf:
+        - $ref: '#/components/schemas/FailureHandlingMode'
+        - type: object
+          properties:
+            partialFill:
+              type: boolean
+              description: Whether partial execution may occur
+            remainder:
+              $ref: '#/components/schemas/FailureHandlingMode'
+          required: [remainder]
+
     GetQuoteRequest:
       type: object
       properties:
@@ -198,6 +216,8 @@ components:
           type: string
         provider:
           type: string
+        failureHandling:
+          $ref: '#/components/schemas/FailureHandling'
       required: [orders, details, quoteId, provider]
 
     GetQuoteResponse:

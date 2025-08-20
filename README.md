@@ -28,6 +28,24 @@ TypeScript-friendly interfaces are provided in `schemas/typescript/`:
 - `schemas/typescript/get-quote.ts`
 - `schemas/typescript/intent.ts`
 
+### Failure handling semantics
+
+Providers may include an optional `failureHandling` field on each quote to indicate how execution failures are managed. It supports:
+
+- A simple mode: `retry`, `refund-instant`, `refund-claim`, `needs-new-signature`.
+- A structured form to combine partial fills with a remainder policy:
+
+```json
+{
+  "failureHandling": {
+    "partialFill": true,
+    "remainder": "refund-claim"
+  }
+}
+```
+
+In the object form, `partialFill` defaults to false if omitted; `remainder` is required and uses a simple mode.
+
 ## How to view the OpenAPI without running anything locally
 
 Use any of the following online viewers. After this repo is public, you can point them directly to the raw `openapi.yaml` URL; until then, copy-paste the YAML content into the viewer.

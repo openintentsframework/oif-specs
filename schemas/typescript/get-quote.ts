@@ -41,6 +41,26 @@ export type QuotePreference =
   | 'input-priority'
   | 'trust-minimization';
 
+/**
+ * Failure handling policy. For backward compatibility, simple modes can be
+ * provided as a string. To express partial fills in combination with a
+ * remainder policy, use the object form.
+ */
+export type FailureHandlingMode =
+  | 'retry'
+  | 'refund-instant'
+  | 'refund-claim'
+  | 'needs-new-signature';
+
+export type FailureHandling =
+  | FailureHandlingMode
+  | {
+      /** Whether partial execution may occur. Defaults to false if omitted. */
+      partialFill?: boolean;
+      /** How the missing portion is handled if a partial fill occurs. */
+      remainder: FailureHandlingMode;
+    };
+
 export interface GetQuoteRequest {
   user: Address;
   /** Order of inputs is significant if preference is 'input-priority'. */
@@ -83,6 +103,8 @@ export interface Quote {
   eta?: number;
   quoteId: string;
   provider: string;
+  /** How this provider handles failures during execution. */
+  failureHandling?: FailureHandling;
 }
 
 export interface GetQuoteResponse {
@@ -154,6 +176,8 @@ export interface GetQuoteResponse {
     eta?: number;
     quoteId: string;
     provider: string;
+    /** How this provider handles failures during execution. */
+    failureHandling?: FailureHandling;
   }>;
 }
 
