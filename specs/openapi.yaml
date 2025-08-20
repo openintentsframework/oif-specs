@@ -120,6 +120,29 @@ components:
       type: string
       enum: [price, speed, input-priority, trust-minimization]
 
+    OriginSubmissionMode:
+      type: string
+      description: Preference for who submits the origin transaction
+      enum: [user, protocol]
+
+    OriginAuthorizationScheme:
+      type: string
+      description: Preferred authorization scheme when provider submits
+      enum: [erc-4337, permit2, erc20-permit, eip-3009]
+
+    OriginSubmissionPreference:
+      type: object
+      description: Preference for origin submission (gasless vs user-submitted)
+      properties:
+        mode:
+          $ref: '#/components/schemas/OriginSubmissionMode'
+        schemes:
+          type: array
+          description: Acceptable authorization schemes when mode is 'protocol'
+          items:
+            $ref: '#/components/schemas/OriginAuthorizationScheme'
+      required: [mode]
+
     GetQuoteRequest:
       type: object
       properties:
@@ -139,6 +162,8 @@ components:
           description: Minimum validity timestamp (seconds)
         preference:
           $ref: '#/components/schemas/QuotePreference'
+        originSubmission:
+          $ref: '#/components/schemas/OriginSubmissionPreference'
       required: [user, availableInputs, requestedOutputs]
 
     Eip712Order:
@@ -198,6 +223,14 @@ components:
           type: string
         provider:
           type: string
+        originSubmission:
+          type: object
+          description: Plan for how origin submission will be handled for this quote
+          properties:
+            mode:
+              $ref: '#/components/schemas/OriginSubmissionMode'
+            scheme:
+              $ref: '#/components/schemas/OriginAuthorizationScheme'
       required: [orders, details, quoteId, provider]
 
     GetQuoteResponse:

@@ -41,6 +41,27 @@ export type QuotePreference =
   | 'input-priority'
   | 'trust-minimization';
 
+export type OriginSubmissionMode = 'user' | 'protocol';
+export type OriginAuthorizationScheme =
+  | 'erc-4337'
+  | 'permit2'
+  | 'erc20-permit'
+  | 'eip-3009';
+
+/**
+ * Preference for how the origin transaction should be submitted.
+ * If omitted, the provider may choose either based on capabilities.
+ */
+export interface OriginSubmissionPreference {
+  /**
+   * 'user' means the requester intends to handle origin submission (may pay gas or use their own abstraction).
+   * 'protocol' means the requester prefers the protocol/provider to submit (gasless for the user).
+   */
+  mode: OriginSubmissionMode;
+  /** Optional list of acceptable authorization schemes if protocol submission is requested. */
+  schemes?: OriginAuthorizationScheme[];
+}
+
 export interface GetQuoteRequest {
   user: Address;
   /** Order of inputs is significant if preference is 'input-priority'. */
@@ -49,6 +70,8 @@ export interface GetQuoteRequest {
   /** Minimum validity timestamp (seconds). */
   minValidUntil?: number;
   preference?: QuotePreference;
+  /** Optional preference indicating whether the user wants protocol-submitted (gasless) execution. */
+  originSubmission?: OriginSubmissionPreference;
 }
 
 export interface Eip712Order {
@@ -73,6 +96,13 @@ export interface QuoteDetails {
   >;
 }
 
+export interface OriginSubmissionPlan {
+  /** Mode the provider expects to use for origin submission. */
+  mode: OriginSubmissionMode;
+  /** Selected authorization scheme if applicable (e.g., when mode is 'protocol'). */
+  scheme?: OriginAuthorizationScheme;
+}
+
 export interface Quote {
   /** One or more EIP-712 compliant orders. */
   orders: Eip712Order[];
@@ -83,6 +113,8 @@ export interface Quote {
   eta?: number;
   quoteId: string;
   provider: string;
+  /** Plan for how origin submission will be handled for this quote. */
+  originSubmission?: OriginSubmissionPlan;
 }
 
 export interface GetQuoteResponse {
@@ -121,6 +153,10 @@ export interface GetQuoteRequest {
   }>;
   minValidUntil?: number;
   preference?: 'price' | 'speed' | 'input-priority' | 'trust-minimization';
+  originSubmission?: {
+    mode: 'user' | 'protocol';
+    schemes?: Array<'erc-4337' | 'permit2' | 'erc20-permit' | 'eip-3009'>;
+  };
 }
 
 export interface EIP712OrderEnvelope {
@@ -154,6 +190,10 @@ export interface GetQuoteResponse {
     eta?: number;
     quoteId: string;
     provider: string;
+    originSubmission?: {
+      mode: 'user' | 'protocol';
+      scheme?: 'erc-4337' | 'permit2' | 'erc20-permit' | 'eip-3009';
+    };
   }>;
 }
 
