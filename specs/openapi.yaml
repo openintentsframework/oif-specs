@@ -120,6 +120,14 @@ components:
       type: string
       enum: [price, speed, input-priority, trust-minimization]
 
+    OrderType:
+      type: string
+      description: |
+        Generic order type discriminator. Current recognized values:
+        - 'swap-exact-input': input amounts are exact; output amounts in requestedOutputs are minimums.
+        - 'swap-exact-output': output amounts are exact; input amounts in availableInputs are maximums.
+        This field is open-ended and future order types may be introduced without breaking changes.
+
     GetQuoteRequest:
       type: object
       properties:
@@ -139,7 +147,9 @@ components:
           description: Minimum validity timestamp (seconds)
         preference:
           $ref: '#/components/schemas/QuotePreference'
-      required: [user, availableInputs, requestedOutputs]
+        orderType:
+          $ref: '#/components/schemas/OrderType'
+      required: [user, availableInputs, requestedOutputs, orderType]
 
     Eip712Order:
       type: object

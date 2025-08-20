@@ -28,6 +28,27 @@ TypeScript-friendly interfaces are provided in `schemas/typescript/`:
 - `schemas/typescript/get-quote.ts`
 - `schemas/typescript/intent.ts`
 
+### Order types and exactness
+
+Requests must include an `orderType` string to indicate how intents and amounts should be interpreted. The API is open-ended for future order types; current recognized values are:
+
+- `swap-exact-input`: available input amounts are exact; requested output amounts are minimums (at least this amount, subject to slippage).
+- `swap-exact-output`: requested output amounts are exact; available input amounts are maximums (spend up to this amount).
+
+Example request shape (abridged):
+
+```json
+{
+  "user": "0x...",
+  "availableInputs": [{ "user": "0x...", "asset": "0xTokenIn", "amount": "1000000000000000000" }],
+  "requestedOutputs": [{ "receiver": "0x...", "asset": "0xTokenOut", "amount": "990000000000000000" }],
+  "orderType": "swap-exact-input",
+  "preference": "price"
+}
+```
+
+See `components.schemas.OrderType` in `specs/openapi.yaml` for the authoritative definition.
+
 ## How to view the OpenAPI without running anything locally
 
 Use any of the following online viewers. After this repo is public, you can point them directly to the raw `openapi.yaml` URL; until then, copy-paste the YAML content into the viewer.

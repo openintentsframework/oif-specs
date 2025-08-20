@@ -41,6 +41,15 @@ export type QuotePreference =
   | 'input-priority'
   | 'trust-minimization';
 
+/**
+ * Generic order type discriminator.
+ * Current recognized values:
+ * - 'swap-exact-input': input amounts are exact; output amounts in requestedOutputs are minimums.
+ * - 'swap-exact-output': output amounts are exact; input amounts in availableInputs are maximums.
+ * The API is open-ended and future order types may be introduced without breaking changes.
+ */
+export type OrderType = string;
+
 export interface GetQuoteRequest {
   user: Address;
   /** Order of inputs is significant if preference is 'input-priority'. */
@@ -49,6 +58,8 @@ export interface GetQuoteRequest {
   /** Minimum validity timestamp (seconds). */
   minValidUntil?: number;
   preference?: QuotePreference;
+  /** See OrderType for semantics regarding exact-input vs exact-output. */
+  orderType: OrderType;
 }
 
 export interface Eip712Order {
@@ -121,6 +132,12 @@ export interface GetQuoteRequest {
   }>;
   minValidUntil?: number;
   preference?: 'price' | 'speed' | 'input-priority' | 'trust-minimization';
+  /**
+   * Generic order type discriminator. Current recognized values:
+   * - 'swap-exact-input': input amounts are exact; requested output amounts are minimums.
+   * - 'swap-exact-output': output amounts are exact; available input amounts are maximums.
+   */
+  orderType: string;
 }
 
 export interface EIP712OrderEnvelope {
