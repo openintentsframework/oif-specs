@@ -3,30 +3,41 @@
 This repository is the canonical, versioned source of truth for OIF protocol standards and specifications.
 
 It includes:
-- API standards for Get Quote and Submit Intent
+- API standards for Quote and Intent submission
 - Machine-readable OpenAPI schemas
 - Language-friendly TypeScript interfaces for client/server implementation
 
 ## Repository structure
 
-- `specs/openapi.yaml`: OpenAPI 3.0 specification covering Get Quote and Submit Intent endpoints
-- `schemas/typescript/get-quote.ts`: TypeScript interfaces for Get Quote request/response
-- `schemas/typescript/intent.ts`: TypeScript interfaces for Submit Intent request/response
+- `specs/openapi.yaml`: OpenAPI 3.0 specification covering Quote and Intent endpoints
+- `schemas/typescript/quote.ts`: TypeScript interfaces for Quote request/response
+- `schemas/typescript/intent.ts`: TypeScript interfaces for Intent request/response
 - `docs/references.md`: Curated external references to related off-chain APIs and intent protocols
 
 ## API standards
 
 This repository defines two endpoints:
 
-- Get Quote: quote generation for requested outputs based on available inputs
-- Submit Intent: submit a previously quoted, signed order for execution
+- Quote: quote generation for requested outputs based on available inputs
+- Intent: submit a previously quoted, signed order for execution
 
 Authoritative schema: `specs/openapi.yaml`
 
 TypeScript-friendly interfaces are provided in `schemas/typescript/`:
 
-- `schemas/typescript/get-quote.ts`
+- `schemas/typescript/quote.ts`
 - `schemas/typescript/intent.ts`
+
+## Generating OpenAPI from TypeScript
+
+The OpenAPI specification is auto-generated from TypeScript schemas. To regenerate:
+
+```bash
+npm install
+npm run generate:openapi
+```
+
+The TypeScript schemas in `schemas/typescript/types.ts` are the source of truth. The generation script preserves all API metadata, descriptions, and structure while ensuring type consistency.
 
 ## How to view the OpenAPI without running anything locally
 
@@ -43,7 +54,7 @@ The specs follow semantic versioning at the file level. Backwards-compatible cha
 ## Contributing
 
 - Propose changes via pull request with rationale and, where applicable, example payloads.
-- Keep OpenAPI and TypeScript interfaces in sync.
+- Modify TypeScript schemas in `schemas/typescript/types.ts` and run `npm run generate:openapi` to update the OpenAPI spec.
 - Favor explicit types and self-explanatory naming. Avoid ambiguous or protocol-specific jargon without a definition.
 
 ## License

@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: OIF API
   version: 0.1.0
-  description: |
+  description: |-
     API specifications for OIF protocol covering quote generation and intent submission.
     Amount fields are strings representing integers (e.g., uint256) to preserve precision across transports.
 servers:
@@ -13,7 +13,7 @@ tags:
   - name: intent
     description: Intent submission
 paths:
-  /v1/get-quote:
+  /v1/quote:
     post:
       summary: Generate executable quotes for requested outputs given available inputs.
       requestBody:
@@ -33,7 +33,7 @@ paths:
           description: Malformed request
         '422':
           description: Inputs cannot satisfy requested outputs
-  /v1/submit-intent:
+  /v1/intent:
     post:
       summary: Submit a previously quoted, signed order for execution.
       requestBody:
@@ -53,114 +53,165 @@ paths:
           description: Malformed request
         '422':
           description: Invalid signature or order
-
 components:
   schemas:
     Address:
       type: string
       description: ERC-7930 interoperable address
-
     Amount:
       type: string
       description: Integer encoded as a string to preserve precision (e.g., uint256)
-      pattern: '^[0-9]+$'
-
+      pattern: ^[0-9]+$
     AssetLockReference:
       type: object
       description: Reference to a lock in a locking system
       properties:
         kind:
           type: string
-          enum: [the-compact, rhinestone]
+          description: Lock type identifier
+          enum:
+            - the-compact
+            - rhinestone
         params:
+          $ref: '#/components/schemas/Record<string,unknown>'
           description: Lock-specific parameters
-      required: [kind]
-
+      required:
+        - kind
     AvailableInput:
       type: object
+      description: Available input from a user
       properties:
-        user:
-          $ref: '#/components/schemas/Address'
-        asset:
-          $ref: '#/components/schemas/Address'
         amount:
           $ref: '#/components/schemas/Amount'
+        asset:
+          $ref: '#/components/schemas/Address'
         lock:
           $ref: '#/components/schemas/AssetLockReference'
-      required: [user, asset, amount]
-
-    RequestedOutput:
-      type: object
-      properties:
-        receiver:
-          $ref: '#/components/schemas/Address'
-        asset:
-          $ref: '#/components/schemas/Address'
-        amount:
-          $ref: '#/components/schemas/Amount'
-        calldata:
-          type: string
-          description: Optional calldata describing how the receiver will consume the output
-      required: [receiver, asset, amount]
-
-    RequestedOutputDetails:
-      type: object
-      properties:
         user:
           $ref: '#/components/schemas/Address'
-        asset:
-          $ref: '#/components/schemas/Address'
-        amount:
-          $ref: '#/components/schemas/Amount'
-        calldata:
-          type: string
-      required: [user, asset, amount]
-
-    QuotePreference:
-      type: string
-      enum: [price, speed, input-priority, trust-minimization]
-
-    GetQuoteRequest:
-      type: object
-      properties:
-        user:
-          $ref: '#/components/schemas/Address'
-        availableInputs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AvailableInput'
-          description: Order of inputs is significant if preference is 'input-priority'
-        requestedOutputs:
-          type: array
-          items:
-            $ref: '#/components/schemas/RequestedOutput'
-        minValidUntil:
-          type: number
-          description: Minimum validity timestamp (seconds)
-        preference:
-          $ref: '#/components/schemas/QuotePreference'
-      required: [user, availableInputs, requestedOutputs]
-
+      required:
+        - amount
+        - asset
+        - user
     Eip712Order:
       type: object
       description: EIP-712 typed data for execution
       properties:
         domain:
           $ref: '#/components/schemas/Address'
+        message:
+          $ref: '#/components/schemas/Record<string,unknown>'
         primaryType:
           type: string
-        message:
-          type: object
-          additionalProperties: true
-      required: [domain, primaryType, message]
-
-    QuoteDetails:
+          description: Primary type of the EIP-712 message
+      required:
+        - domain
+        - message
+        - primaryType
+    GetQuoteRequest:
       type: object
+      description: Request for generating quotes
       properties:
+        availableInputs:
+          type: array
+          description: Order of inputs is significant if preference is 'input-priority'
+          items:
+            $ref: '#/components/schemas/AvailableInput'
+        minValidUntil:
+          type: number
+          description: Minimum validity timestamp (seconds)
+        preference:
+          $ref: '#/components/schemas/QuotePreference'
         requestedOutputs:
           type: array
+          description: Requested outputs for the quote
           items:
-            $ref: '#/components/schemas/RequestedOutputDetails'
+            $ref: '#/components/schemas/RequestedOutput'
+        user:
+          $ref: '#/components/schemas/Address'
+      required:
+        - availableInputs
+        - requestedOutputs
+        - user
+    GetQuoteResponse:
+      type: object
+      description: Response containing generated quotes
+      properties:
+        quotes:
+          type: array
+          description: Array of generated quotes
+          items:
+            $ref: '#/components/schemas/Quote'
+      required:
+        - quotes
+    IntentRequest:
+      type: object
+      description: Request to submit an intent
+      properties:
+        order:
+          $ref: '#/components/schemas/Record<string,unknown>'
+          description: EIP-712 typed data for a gasless cross-chain order
+        provider:
+          type: string
+          description: Provider identifier
+        quoteId:
+          type: string
+          description: Optional quote identifier from a prior Get Quote response
+        signature:
+          $ref: '#/components/schemas/Record<string,unknown>'
+      required:
+        - order
+        - provider
+        - signature
+    IntentResponse:
+      type: object
+      description: Response from intent submission
+      properties:
+        message:
+          type: string
+          description: Optional message for additional details on status
+        order:
+          $ref: '#/components/schemas/Record<string,unknown>'
+        orderId:
+          type: string
+          description: Assigned order identifier if accepted
+        status:
+          type: string
+          description: Human/machine readable status string
+      required:
+        - status
+    Quote:
+      type: object
+      description: Quote information
+      properties:
+        details:
+          $ref: '#/components/schemas/QuoteDetails'
+        eta:
+          type: number
+          description: Estimated time of arrival (seconds)
+        orders:
+          type: array
+          description: EIP-712 orders for execution
+          items:
+            $ref: '#/components/schemas/Eip712Order'
+        provider:
+          type: string
+          description: Provider identifier
+        quoteId:
+          type: string
+          description: Unique quote identifier
+        validUntil:
+          type: number
+          description: Quote validity timestamp (seconds)
+      required:
+        - details
+        - orders
+        - provider
+        - quoteId
+    QuoteDetails:
+      type: object
+      description: Detailed information about a quote
+      properties:
         availableInputs:
           type: array
           items:
@@ -174,67 +225,62 @@ components:
                 $ref: '#/components/schemas/Amount'
               lockType:
                 type: string
-                enum: [the-compact]
+                enum:
+                  - the-compact
                 description: If empty, the asset needs to be escrowed
-            required: [user, asset, amount]
-      required: [requestedOutputs, availableInputs]
-
-    Quote:
-      type: object
-      properties:
-        orders:
+            required:
+              - user
+              - asset
+              - amount
+        requestedOutputs:
           type: array
+          description: Requested outputs in the quote
           items:
-            $ref: '#/components/schemas/Eip712Order'
-        details:
-          $ref: '#/components/schemas/QuoteDetails'
-        validUntil:
-          type: number
-          description: Quote validity timestamp (seconds)
-        eta:
-          type: number
-          description: Estimated time of arrival (seconds)
-        quoteId:
-          type: string
-        provider:
-          type: string
-      required: [orders, details, quoteId, provider]
-
-    GetQuoteResponse:
+            $ref: '#/components/schemas/RequestedOutputDetails'
+      required:
+        - availableInputs
+        - requestedOutputs
+    QuotePreference:
+      type: string
+      enum:
+        - price
+        - speed
+        - input-priority
+        - trust-minimization
+    Record<string,unknown>:
       type: object
-      properties:
-        quotes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Quote'
-      required: [quotes]
-
-    IntentRequest:
+      additionalProperties: true
+    RequestedOutput:
       type: object
+      description: Requested output for a receiver
       properties:
-        order:
-          type: object
-          additionalProperties: true
-          description: EIP-712 typed data for a gasless cross-chain order
-        signature:
-          type: object
-          additionalProperties: true
-        quoteId:
+        amount:
+          $ref: '#/components/schemas/Amount'
+        asset:
+          $ref: '#/components/schemas/Address'
+        calldata:
           type: string
-        provider:
-          type: string
-      required: [order, signature, provider]
-
-    IntentResponse:
+          description: Optional calldata describing how the receiver will consume the output
+        receiver:
+          $ref: '#/components/schemas/Address'
+      required:
+        - amount
+        - asset
+        - receiver
+    RequestedOutputDetails:
       type: object
+      description: Detailed information about requested outputs
       properties:
-        orderId:
+        amount:
+          $ref: '#/components/schemas/Amount'
+        asset:
+          $ref: '#/components/schemas/Address'
+        calldata:
           type: string
-          description: Assigned order identifier if accepted
-        status:
-          type: string
-        message:
-          type: string
-      required: [status]
-
-
+          description: Optional calldata
+        user:
+          $ref: '#/components/schemas/Address'
+      required:
+        - amount
+        - asset
+        - user
