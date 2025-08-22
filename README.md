@@ -10,8 +10,8 @@ It includes:
 ## Repository structure
 
 - `specs/openapi.yaml`: OpenAPI 3.0 specification covering Quote and Intent endpoints
-- `schemas/typescript/quote.ts`: TypeScript interfaces for Quote request/response
-- `schemas/typescript/intent.ts`: TypeScript interfaces for Intent request/response
+- `schemas/typescript/types.ts`: TypeScript interfaces for all OIF protocol types
+- `schemas/typescript/schemas.generated.ts`: Auto-generated Zod schemas from TypeScript types
 - `docs/references.md`: Curated external references to related off-chain APIs and intent protocols
 
 ## API standards
@@ -23,21 +23,21 @@ This repository defines two endpoints:
 
 Authoritative schema: `specs/openapi.yaml`
 
-TypeScript-friendly interfaces are provided in `schemas/typescript/`:
-
-- `schemas/typescript/quote.ts`
-- `schemas/typescript/intent.ts`
+TypeScript-friendly interfaces are provided in `schemas/typescript/types.ts`
 
 ## Generating OpenAPI from TypeScript
 
-The OpenAPI specification is auto-generated from TypeScript schemas. To regenerate:
+The OpenAPI specification is auto-generated from TypeScript types using a TypeScript → Zod → OpenAPI pipeline. To regenerate:
 
 ```bash
 npm install
 npm run generate:openapi
 ```
 
-The TypeScript schemas in `schemas/typescript/types.ts` are the source of truth. The generation script preserves all API metadata, descriptions, and structure while ensuring type consistency.
+The TypeScript types in `schemas/typescript/types.ts` are the source of truth. The generation process:
+1. `ts-to-zod` converts TypeScript types to Zod schemas with validation
+2. `@asteasolutions/zod-to-openapi` converts Zod schemas to OpenAPI specification
+3. JSDoc annotations (@description, @pattern, @example) are preserved throughout the pipeline
 
 ## How to view the OpenAPI without running anything locally
 

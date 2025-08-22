@@ -7,18 +7,23 @@
 
 /**
  * ERC-7930 interoperable address
- * @pattern ^0x[a-fA-F0-9]+:[a-fA-F0-9]+$|^0x[a-fA-F0-9]{40}$
+ * @description ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+ * @pattern ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+ * @example "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045@eip155:1#4CA88C9C"
  */
 export type Address = string;
 
 /**
  * Integer encoded as a string to preserve precision (e.g., uint256)
+ * @description Integer encoded as a string to preserve precision (e.g., uint256)
  * @pattern ^[0-9]+$
+ * @example "1000000000000000000"
  */
 export type Amount = string;
 
 /**
  * Reference to a lock in a locking system
+ * @description Reference to a lock in a locking system
  */
 export interface AssetLockReference {
   /** Lock type identifier */
@@ -31,6 +36,7 @@ export interface AssetLockReference {
 
 /**
  * Available input from a user
+ * @description Available input from a user
  */
 export interface AvailableInput {
   /** User address */
@@ -45,6 +51,7 @@ export interface AvailableInput {
 
 /**
  * Requested output for a receiver
+ * @description Requested output for a receiver
  */
 export interface RequestedOutput {
   /** Receiver address */
@@ -59,6 +66,7 @@ export interface RequestedOutput {
 
 /**
  * Detailed information about requested outputs
+ * @description Detailed information about requested outputs
  */
 export interface RequestedOutputDetails {
   /** User address */
@@ -73,6 +81,7 @@ export interface RequestedOutputDetails {
 
 /**
  * Quote preference type
+ * @description Quote preference type
  */
 export type QuotePreference =
   | "price"
@@ -82,6 +91,7 @@ export type QuotePreference =
 
 /**
  * Request for generating quotes
+ * @description Request for generating quotes
  */
 export interface GetQuoteRequest {
   /** User requesting the quote */
@@ -98,6 +108,7 @@ export interface GetQuoteRequest {
 
 /**
  * EIP-712 typed data for execution
+ * @description EIP-712 typed data for execution
  */
 export interface Eip712Order {
   /** Domain for the EIP-712 order */
@@ -110,6 +121,7 @@ export interface Eip712Order {
 
 /**
  * Detailed information about a quote
+ * @description Detailed information about a quote
  */
 export interface QuoteDetails {
   /** Requested outputs in the quote */
@@ -129,6 +141,7 @@ export interface QuoteDetails {
 
 /**
  * Quote information
+ * @description Quote information
  */
 export interface Quote {
   /** EIP-712 orders for execution */
@@ -147,6 +160,7 @@ export interface Quote {
 
 /**
  * Response containing generated quotes
+ * @description Response containing generated quotes
  */
 export interface GetQuoteResponse {
   /** Array of generated quotes */
@@ -157,6 +171,7 @@ export interface GetQuoteResponse {
 
 /**
  * Request to submit an intent
+ * @description Request to submit an intent
  */
 export interface IntentRequest {
   /** EIP-712 typed data for a gasless cross-chain order */
@@ -171,6 +186,7 @@ export interface IntentRequest {
 
 /**
  * Response from intent submission
+ * @description Response from intent submission
  */
 export interface IntentResponse {
   /** Assigned order identifier if accepted */
