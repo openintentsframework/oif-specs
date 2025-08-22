@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: OIF API
   version: 0.1.0
-  description: |
+  description: |-
     API specifications for OIF protocol covering quote generation and intent submission.
     Amount fields are strings representing integers (e.g., uint256) to preserve precision across transports.
 servers:
@@ -12,229 +12,759 @@ tags:
     description: Quote generation
   - name: intent
     description: Intent submission
-paths:
-  /v1/get-quote:
-    post:
-      summary: Generate executable quotes for requested outputs given available inputs.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GetQuoteRequest'
-      responses:
-        '200':
-          description: Quotes successfully generated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetQuoteResponse'
-        '400':
-          description: Malformed request
-        '422':
-          description: Inputs cannot satisfy requested outputs
-  /v1/submit-intent:
-    post:
-      summary: Submit a previously quoted, signed order for execution.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/IntentRequest'
-      responses:
-        '200':
-          description: Intent accepted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IntentResponse'
-        '400':
-          description: Malformed request
-        '422':
-          description: Invalid signature or order
-
 components:
   schemas:
     Address:
       type: string
-      description: ERC-7930 interoperable address
-
+      pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+      description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
     Amount:
       type: string
+      pattern: ^[0-9]+$
       description: Integer encoded as a string to preserve precision (e.g., uint256)
-      pattern: '^[0-9]+$'
-
     AssetLockReference:
       type: object
-      description: Reference to a lock in a locking system
       properties:
         kind:
-          type: string
-          enum: [the-compact, rhinestone]
+          anyOf:
+            - type: string
+              enum:
+                - the-compact
+            - type: string
+              enum:
+                - rhinestone
         params:
-          description: Lock-specific parameters
-      required: [kind]
-
+          type: object
+          additionalProperties:
+            nullable: true
+      required:
+        - kind
     AvailableInput:
       type: object
       properties:
         user:
-          $ref: '#/components/schemas/Address'
+          type: string
+          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
         asset:
-          $ref: '#/components/schemas/Address'
+          type: string
+          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
         amount:
-          $ref: '#/components/schemas/Amount'
+          type: string
+          pattern: ^[0-9]+$
+          description: Integer encoded as a string to preserve precision (e.g., uint256)
         lock:
-          $ref: '#/components/schemas/AssetLockReference'
-      required: [user, asset, amount]
-
+          type: object
+          properties:
+            kind:
+              anyOf:
+                - type: string
+                  enum:
+                    - the-compact
+                - type: string
+                  enum:
+                    - rhinestone
+            params:
+              type: object
+              additionalProperties:
+                nullable: true
+          required:
+            - kind
+      required:
+        - user
+        - asset
+        - amount
     RequestedOutput:
       type: object
       properties:
         receiver:
-          $ref: '#/components/schemas/Address'
+          type: string
+          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
         asset:
-          $ref: '#/components/schemas/Address'
+          type: string
+          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
         amount:
-          $ref: '#/components/schemas/Amount'
+          type: string
+          pattern: ^[0-9]+$
+          description: Integer encoded as a string to preserve precision (e.g., uint256)
         calldata:
           type: string
-          description: Optional calldata describing how the receiver will consume the output
-      required: [receiver, asset, amount]
-
+      required:
+        - receiver
+        - asset
+        - amount
     RequestedOutputDetails:
       type: object
       properties:
         user:
-          $ref: '#/components/schemas/Address'
+          type: string
+          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
         asset:
-          $ref: '#/components/schemas/Address'
+          type: string
+          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
         amount:
-          $ref: '#/components/schemas/Amount'
+          type: string
+          pattern: ^[0-9]+$
+          description: Integer encoded as a string to preserve precision (e.g., uint256)
         calldata:
           type: string
-      required: [user, asset, amount]
-
+      required:
+        - user
+        - asset
+        - amount
     QuotePreference:
-      type: string
-      enum: [price, speed, input-priority, trust-minimization]
-
+      anyOf:
+        - type: string
+          enum:
+            - price
+        - type: string
+          enum:
+            - speed
+        - type: string
+          enum:
+            - input-priority
+        - type: string
+          enum:
+            - trust-minimization
+      description: Quote preference type
     GetQuoteRequest:
       type: object
       properties:
         user:
-          $ref: '#/components/schemas/Address'
-        availableInputs:
-          type: array
-          items:
-            $ref: '#/components/schemas/AvailableInput'
-          description: Order of inputs is significant if preference is 'input-priority'
-        requestedOutputs:
-          type: array
-          items:
-            $ref: '#/components/schemas/RequestedOutput'
-        minValidUntil:
-          type: number
-          description: Minimum validity timestamp (seconds)
-        preference:
-          $ref: '#/components/schemas/QuotePreference'
-      required: [user, availableInputs, requestedOutputs]
-
-    Eip712Order:
-      type: object
-      description: EIP-712 typed data for execution
-      properties:
-        domain:
-          $ref: '#/components/schemas/Address'
-        primaryType:
           type: string
-        message:
-          type: object
-          additionalProperties: true
-      required: [domain, primaryType, message]
-
-    QuoteDetails:
-      type: object
-      properties:
-        requestedOutputs:
-          type: array
-          items:
-            $ref: '#/components/schemas/RequestedOutputDetails'
+          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
         availableInputs:
           type: array
           items:
             type: object
             properties:
               user:
-                $ref: '#/components/schemas/Address'
+                type: string
+                pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
               asset:
-                $ref: '#/components/schemas/Address'
+                type: string
+                pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
               amount:
-                $ref: '#/components/schemas/Amount'
+                type: string
+                pattern: ^[0-9]+$
+                description: Integer encoded as a string to preserve precision (e.g., uint256)
+              lock:
+                type: object
+                properties:
+                  kind:
+                    anyOf:
+                      - type: string
+                        enum:
+                          - the-compact
+                      - type: string
+                        enum:
+                          - rhinestone
+                  params:
+                    type: object
+                    additionalProperties:
+                      nullable: true
+                required:
+                  - kind
+            required:
+              - user
+              - asset
+              - amount
+        requestedOutputs:
+          type: array
+          items:
+            type: object
+            properties:
+              receiver:
+                type: string
+                pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+              asset:
+                type: string
+                pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+              amount:
+                type: string
+                pattern: ^[0-9]+$
+                description: Integer encoded as a string to preserve precision (e.g., uint256)
+              calldata:
+                type: string
+            required:
+              - receiver
+              - asset
+              - amount
+        minValidUntil:
+          type: number
+        preference:
+          anyOf:
+            - type: string
+              enum:
+                - price
+            - type: string
+              enum:
+                - speed
+            - type: string
+              enum:
+                - input-priority
+            - type: string
+              enum:
+                - trust-minimization
+          description: Quote preference type
+      required:
+        - user
+        - availableInputs
+        - requestedOutputs
+    Eip712Order:
+      type: object
+      properties:
+        domain:
+          type: string
+          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+        primaryType:
+          type: string
+        message:
+          type: object
+          additionalProperties:
+            nullable: true
+      required:
+        - domain
+        - primaryType
+        - message
+    QuoteDetails:
+      type: object
+      properties:
+        requestedOutputs:
+          type: array
+          items:
+            type: object
+            properties:
+              user:
+                type: string
+                pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+              asset:
+                type: string
+                pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+              amount:
+                type: string
+                pattern: ^[0-9]+$
+                description: Integer encoded as a string to preserve precision (e.g., uint256)
+              calldata:
+                type: string
+            required:
+              - user
+              - asset
+              - amount
+        availableInputs:
+          type: array
+          items:
+            type: object
+            properties:
+              user:
+                type: string
+                pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+              asset:
+                type: string
+                pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+              amount:
+                type: string
+                pattern: ^[0-9]+$
+                description: Integer encoded as a string to preserve precision (e.g., uint256)
               lockType:
                 type: string
-                enum: [the-compact]
-                description: If empty, the asset needs to be escrowed
-            required: [user, asset, amount]
-      required: [requestedOutputs, availableInputs]
-
+                enum:
+                  - the-compact
+            required:
+              - user
+              - asset
+              - amount
+      required:
+        - requestedOutputs
+        - availableInputs
     Quote:
       type: object
       properties:
         orders:
           type: array
           items:
-            $ref: '#/components/schemas/Eip712Order'
+            type: object
+            properties:
+              domain:
+                type: string
+                pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+              primaryType:
+                type: string
+              message:
+                type: object
+                additionalProperties:
+                  nullable: true
+            required:
+              - domain
+              - primaryType
+              - message
         details:
-          $ref: '#/components/schemas/QuoteDetails'
+          type: object
+          properties:
+            requestedOutputs:
+              type: array
+              items:
+                type: object
+                properties:
+                  user:
+                    type: string
+                    pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                    description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                  asset:
+                    type: string
+                    pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                    description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                  amount:
+                    type: string
+                    pattern: ^[0-9]+$
+                    description: Integer encoded as a string to preserve precision (e.g., uint256)
+                  calldata:
+                    type: string
+                required:
+                  - user
+                  - asset
+                  - amount
+            availableInputs:
+              type: array
+              items:
+                type: object
+                properties:
+                  user:
+                    type: string
+                    pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                    description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                  asset:
+                    type: string
+                    pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                    description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                  amount:
+                    type: string
+                    pattern: ^[0-9]+$
+                    description: Integer encoded as a string to preserve precision (e.g., uint256)
+                  lockType:
+                    type: string
+                    enum:
+                      - the-compact
+                required:
+                  - user
+                  - asset
+                  - amount
+          required:
+            - requestedOutputs
+            - availableInputs
         validUntil:
           type: number
-          description: Quote validity timestamp (seconds)
         eta:
           type: number
-          description: Estimated time of arrival (seconds)
         quoteId:
           type: string
         provider:
           type: string
-      required: [orders, details, quoteId, provider]
-
+      required:
+        - orders
+        - details
+        - quoteId
+        - provider
     GetQuoteResponse:
       type: object
       properties:
         quotes:
           type: array
           items:
-            $ref: '#/components/schemas/Quote'
-      required: [quotes]
-
+            type: object
+            properties:
+              orders:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    domain:
+                      type: string
+                      pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                      description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                    primaryType:
+                      type: string
+                    message:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                  required:
+                    - domain
+                    - primaryType
+                    - message
+              details:
+                type: object
+                properties:
+                  requestedOutputs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user:
+                          type: string
+                          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                        asset:
+                          type: string
+                          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                        amount:
+                          type: string
+                          pattern: ^[0-9]+$
+                          description: Integer encoded as a string to preserve precision (e.g., uint256)
+                        calldata:
+                          type: string
+                      required:
+                        - user
+                        - asset
+                        - amount
+                  availableInputs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user:
+                          type: string
+                          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                        asset:
+                          type: string
+                          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                        amount:
+                          type: string
+                          pattern: ^[0-9]+$
+                          description: Integer encoded as a string to preserve precision (e.g., uint256)
+                        lockType:
+                          type: string
+                          enum:
+                            - the-compact
+                      required:
+                        - user
+                        - asset
+                        - amount
+                required:
+                  - requestedOutputs
+                  - availableInputs
+              validUntil:
+                type: number
+              eta:
+                type: number
+              quoteId:
+                type: string
+              provider:
+                type: string
+            required:
+              - orders
+              - details
+              - quoteId
+              - provider
+      required:
+        - quotes
     IntentRequest:
       type: object
       properties:
         order:
           type: object
-          additionalProperties: true
-          description: EIP-712 typed data for a gasless cross-chain order
+          additionalProperties:
+            nullable: true
         signature:
           type: object
-          additionalProperties: true
+          additionalProperties:
+            nullable: true
         quoteId:
           type: string
         provider:
           type: string
-      required: [order, signature, provider]
-
+      required:
+        - order
+        - signature
+        - provider
     IntentResponse:
       type: object
       properties:
         orderId:
           type: string
-          description: Assigned order identifier if accepted
         status:
           type: string
         message:
           type: string
-      required: [status]
-
-
+        order:
+          type: object
+          additionalProperties:
+            nullable: true
+      required:
+        - status
+  parameters: {}
+paths:
+  /v1/quote:
+    post:
+      summary: Generate executable quotes for requested outputs given available inputs.
+      tags:
+        - quote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: string
+                  pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                  description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                availableInputs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      user:
+                        type: string
+                        pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                        description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                      asset:
+                        type: string
+                        pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                        description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                      amount:
+                        type: string
+                        pattern: ^[0-9]+$
+                        description: Integer encoded as a string to preserve precision (e.g., uint256)
+                      lock:
+                        type: object
+                        properties:
+                          kind:
+                            anyOf:
+                              - type: string
+                                enum:
+                                  - the-compact
+                              - type: string
+                                enum:
+                                  - rhinestone
+                          params:
+                            type: object
+                            additionalProperties:
+                              nullable: true
+                        required:
+                          - kind
+                    required:
+                      - user
+                      - asset
+                      - amount
+                requestedOutputs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      receiver:
+                        type: string
+                        pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                        description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                      asset:
+                        type: string
+                        pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                        description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                      amount:
+                        type: string
+                        pattern: ^[0-9]+$
+                        description: Integer encoded as a string to preserve precision (e.g., uint256)
+                      calldata:
+                        type: string
+                    required:
+                      - receiver
+                      - asset
+                      - amount
+                minValidUntil:
+                  type: number
+                preference:
+                  anyOf:
+                    - type: string
+                      enum:
+                        - price
+                    - type: string
+                      enum:
+                        - speed
+                    - type: string
+                      enum:
+                        - input-priority
+                    - type: string
+                      enum:
+                        - trust-minimization
+                  description: Quote preference type
+              required:
+                - user
+                - availableInputs
+                - requestedOutputs
+      responses:
+        '200':
+          description: Quotes successfully generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quotes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        orders:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              domain:
+                                type: string
+                                pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                                description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                              primaryType:
+                                type: string
+                              message:
+                                type: object
+                                additionalProperties:
+                                  nullable: true
+                            required:
+                              - domain
+                              - primaryType
+                              - message
+                        details:
+                          type: object
+                          properties:
+                            requestedOutputs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  user:
+                                    type: string
+                                    pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                                    description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                                  asset:
+                                    type: string
+                                    pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                                    description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                                  amount:
+                                    type: string
+                                    pattern: ^[0-9]+$
+                                    description: Integer encoded as a string to preserve precision (e.g., uint256)
+                                  calldata:
+                                    type: string
+                                required:
+                                  - user
+                                  - asset
+                                  - amount
+                            availableInputs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  user:
+                                    type: string
+                                    pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                                    description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                                  asset:
+                                    type: string
+                                    pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                                    description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                                  amount:
+                                    type: string
+                                    pattern: ^[0-9]+$
+                                    description: Integer encoded as a string to preserve precision (e.g., uint256)
+                                  lockType:
+                                    type: string
+                                    enum:
+                                      - the-compact
+                                required:
+                                  - user
+                                  - asset
+                                  - amount
+                          required:
+                            - requestedOutputs
+                            - availableInputs
+                        validUntil:
+                          type: number
+                        eta:
+                          type: number
+                        quoteId:
+                          type: string
+                        provider:
+                          type: string
+                      required:
+                        - orders
+                        - details
+                        - quoteId
+                        - provider
+                required:
+                  - quotes
+        '400':
+          description: Malformed request
+        '422':
+          description: Inputs cannot satisfy requested outputs
+  /v1/intent:
+    post:
+      summary: Submit a previously quoted, signed order for execution.
+      tags:
+        - intent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+                signature:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+                quoteId:
+                  type: string
+                provider:
+                  type: string
+              required:
+                - order
+                - signature
+                - provider
+      responses:
+        '200':
+          description: Intent accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: string
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  order:
+                    type: object
+                    additionalProperties:
+                      nullable: true
+                required:
+                  - status
+        '400':
+          description: Malformed request
+        '422':
+          description: Invalid signature or order

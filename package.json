@@ -1,0 +1,20 @@
+{
+  "name": "oif-specs",
+  "version": "0.1.0",
+  "description": "OIF protocol standards and specifications",
+  "scripts": {
+    "generate:zod": "ts-to-zod schemas/typescript/types.ts schemas/typescript/schemas.generated.ts",
+    "generate:openapi": "npm run generate:zod && ts-node scripts/generate-openapi.ts",
+    "build": "npm run generate:openapi"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0",
+    "ts-to-zod": "^3.1.0",
+    "zod": "^3.22.0",
+    "@asteasolutions/zod-to-openapi": "^7.0.0",
+    "js-yaml": "^4.1.0",
+    "@types/js-yaml": "^4.0.5"
+  }
+}
