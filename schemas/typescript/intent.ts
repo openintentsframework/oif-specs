@@ -8,4 +8,5 @@ export {
   IntentResponse,
   FailureHandling,
   FailureHandlingMode,
+  IntentResponseStatus,
 } from "./types";

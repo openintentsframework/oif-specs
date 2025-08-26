@@ -25,9 +25,7 @@ export type Amount = string;
  * Order interpretation for swap amounts
  * @description Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.
  */
-export type OrderType =
-  | "swap-buy"
-  | "swap-sell";
+export type OrderType = "swap-buy" | "swap-sell";
 
 /**
  * Reference to a lock in a locking system
@@ -219,14 +217,28 @@ export interface IntentRequest {
 }
 
 /**
+ * Status enum for intent submission responses.
+ * @description Distinguishes between successful receipt and validation failures at the discovery stage.
+ * Note: Full validation (oracle routes, etc.) happens asynchronously after receipt.
+ */
+export enum IntentResponseStatus {
+  /** Intent received and passed basic validation, queued for full validation */
+  Received = "received",
+  /** Intent rejected due to validation failure */
+  Rejected = "rejected",
+  /** Intent processing encountered an error */
+  Error = "error",
+}
+
+/**
  * Response from intent submission
  * @description Response from intent submission
  */
 export interface IntentResponse {
   /** Assigned order identifier if accepted */
   orderId?: string;
-  /** Human/machine readable status string */
-  status: string;
+  /** Status of the intent submission */
+  status: IntentResponseStatus;
   /** Optional message for additional details on status */
   message?: string;
   /** The submitted EIP-712 typed data order */
