@@ -104,6 +104,8 @@ export interface GetQuoteRequest {
   minValidUntil?: number;
   /** Quote preference */
   preference?: QuotePreference;
+  /** If true, request the filler to perform the open on the source chain (may entail additional gas fees). */
+  fillerPerformsOpen?: boolean;
 }
 
 /**

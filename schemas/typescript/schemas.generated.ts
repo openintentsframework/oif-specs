@@ -56,6 +56,7 @@ export const getQuoteRequestSchema = z.object({
   requestedOutputs: z.array(requestedOutputSchema),
   minValidUntil: z.number().optional(),
   preference: quotePreferenceSchema.optional(),
+  fillerPerformsOpen: z.boolean().optional(),
 });
 
 export const eip712OrderSchema = z.object({
