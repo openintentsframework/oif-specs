@@ -43,7 +43,6 @@ To express user preference for gasless execution and who submits the origin tran
 
 Notes:
 - This is orthogonal to `lock` (asset state) and focuses on submission responsibility and signing surface.
-- The legacy `fillerPerformsOpen` boolean is deprecated. Prefer `originSubmission` for forward compatibility.
 
 ## Generating OpenAPI from TypeScript
 
