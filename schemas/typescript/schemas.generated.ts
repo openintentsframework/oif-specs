@@ -20,6 +20,20 @@ export const assetLockReferenceSchema = z.object({
   params: z.record(z.unknown()).optional(),
 });
 
+export const originSubmissionSchema = z.object({
+  mode: z.union([z.literal("user"), z.literal("protocol")]),
+  schemes: z
+    .array(
+      z.union([
+        z.literal("erc-4337"),
+        z.literal("permit2"),
+        z.literal("erc20-permit"),
+        z.literal("eip-3009"),
+      ]),
+    )
+    .optional(),
+});
+
 export const availableInputSchema = z.object({
   user: addressSchema,
   asset: addressSchema,
@@ -71,6 +85,7 @@ export const getQuoteRequestSchema = z.object({
   requestedOutputs: z.array(requestedOutputSchema),
   minValidUntil: z.number().optional(),
   preference: quotePreferenceSchema.optional(),
+  originSubmission: originSubmissionSchema.optional(),
   fillerPerformsOpen: z.boolean().optional(),
 });
 
@@ -111,6 +126,7 @@ export const intentRequestSchema = z.object({
   quoteId: z.string().optional(),
   provider: z.string(),
   failureHandling: failureHandlingSchema,
+  originSubmission: originSubmissionSchema.optional(),
 });
 
 export const intentResponseSchema = z.object({

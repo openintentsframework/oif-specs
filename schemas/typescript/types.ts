@@ -32,6 +32,17 @@ export interface AssetLockReference {
   params?: Record<string, unknown>;
 }
 
+/**
+ * Origin submission preference
+ * @description Explicit, forward-compatible preference for who submits the origin transaction and acceptable authorization schemes.
+ */
+export interface OriginSubmission {
+  /** Who submits the origin transaction */
+  mode: "user" | "protocol";
+  /** Acceptable signing/authorization schemes for interoperability */
+  schemes?: Array<"erc-4337" | "permit2" | "erc20-permit" | "eip-3009">;
+}
+
 // ============ Quote Types ============
 
 /**
@@ -124,7 +135,15 @@ export interface GetQuoteRequest {
   minValidUntil?: number;
   /** Quote preference */
   preference?: QuotePreference;
-  /** If true, request the filler to perform the open on the source chain (may entail additional gas fees). */
+  /**
+   * Explicit preference for submission responsibility and acceptable auth schemes.
+   * If provided, takes precedence over the legacy boolean.
+   */
+  originSubmission?: OriginSubmission;
+  /**
+   * @deprecated Legacy flag. Use originSubmission instead to specify submitter and schemes.
+   * If true, request the protocol/filler to perform the open on the source chain (may entail additional gas fees).
+   */
   fillerPerformsOpen?: boolean;
 }
 
@@ -206,6 +225,8 @@ export interface IntentRequest {
   provider: string;
   /** Failure handling policy for execution */
   failureHandling: FailureHandling;
+  /** Optional preference mirrored from quote about who submits and acceptable schemes */
+  originSubmission?: OriginSubmission;
 }
 
 /**

@@ -25,6 +25,26 @@ Authoritative schema: `specs/openapi.yaml`
 
 TypeScript-friendly interfaces are provided in `schemas/typescript/types.ts`
 
+### Origin submission preference
+
+To express user preference for gasless execution and who submits the origin transaction, use `originSubmission`:
+
+```json
+{
+  "originSubmission": {
+    "mode": "user", // or "protocol"
+    "schemes": ["erc-4337", "permit2", "erc20-permit", "eip-3009"]
+  }
+}
+```
+
+- **mode**: who is expected to submit the origin transaction.
+- **schemes**: acceptable signing/authorization schemes for interoperability.
+
+Notes:
+- This is orthogonal to `lock` (asset state) and focuses on submission responsibility and signing surface.
+- The legacy `fillerPerformsOpen` boolean is deprecated. Prefer `originSubmission` for forward compatibility.
+
 ## Generating OpenAPI from TypeScript
 
 The OpenAPI specification is auto-generated from TypeScript types using a TypeScript → Zod → OpenAPI pipeline. To regenerate:
