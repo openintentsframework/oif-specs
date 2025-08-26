@@ -1,5 +1,5 @@
 /**
- * Get Quote API TypeScript interfaces
+ * Quotes API TypeScript interfaces
  * Re-exports from centralized types file
  */
 
@@ -14,8 +14,8 @@ export {
   RequestedOutputDetails,
   QuotePreference,
   GetQuoteRequest,
+  GetQuoteResponse,
   Eip712Order,
   QuoteDetails,
   Quote,
-  GetQuoteResponse,
 } from "./types";
