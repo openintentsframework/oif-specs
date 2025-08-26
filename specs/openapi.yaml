@@ -494,10 +494,45 @@ components:
           type: string
         provider:
           type: string
+        failureHandling:
+          anyOf:
+            - type: string
+              enum:
+                - retry
+            - type: string
+              enum:
+                - refund-instant
+            - type: string
+              enum:
+                - refund-claim
+            - type: string
+              enum:
+                - needs-new-signature
+            - type: object
+              properties:
+                partialFill:
+                  type: boolean
+                remainder:
+                  anyOf:
+                    - type: string
+                      enum:
+                        - retry
+                    - type: string
+                      enum:
+                        - refund-instant
+                    - type: string
+                      enum:
+                        - refund-claim
+                    - type: string
+                      enum:
+                        - needs-new-signature
+              required:
+                - remainder
       required:
         - order
         - signature
         - provider
+        - failureHandling
     IntentResponse:
       type: object
       properties:
@@ -744,10 +779,45 @@ paths:
                   type: string
                 provider:
                   type: string
+                failureHandling:
+                  anyOf:
+                    - type: string
+                      enum:
+                        - retry
+                    - type: string
+                      enum:
+                        - refund-instant
+                    - type: string
+                      enum:
+                        - refund-claim
+                    - type: string
+                      enum:
+                        - needs-new-signature
+                    - type: object
+                      properties:
+                        partialFill:
+                          type: boolean
+                        remainder:
+                          anyOf:
+                            - type: string
+                              enum:
+                                - retry
+                            - type: string
+                              enum:
+                                - refund-instant
+                            - type: string
+                              enum:
+                                - refund-claim
+                            - type: string
+                              enum:
+                                - needs-new-signature
+                      required:
+                        - remainder
               required:
                 - order
                 - signature
                 - provider
+                - failureHandling
       responses:
         '200':
           description: Intent accepted

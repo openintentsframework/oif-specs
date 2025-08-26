@@ -50,6 +50,21 @@ export const quotePreferenceSchema = z
   ])
   .describe("Quote preference type");
 
+export const failureHandlingModeSchema = z.union([
+  z.literal("retry"),
+  z.literal("refund-instant"),
+  z.literal("refund-claim"),
+  z.literal("needs-new-signature"),
+]);
+
+export const failureHandlingSchema = z.union([
+  failureHandlingModeSchema,
+  z.object({
+    partialFill: z.boolean().optional(),
+    remainder: failureHandlingModeSchema,
+  }),
+]);
+
 export const getQuoteRequestSchema = z.object({
   user: addressSchema,
   availableInputs: z.array(availableInputSchema),
@@ -95,6 +110,7 @@ export const intentRequestSchema = z.object({
   signature: z.record(z.unknown()),
   quoteId: z.string().optional(),
   provider: z.string(),
+  failureHandling: failureHandlingSchema,
 });
 
 export const intentResponseSchema = z.object({

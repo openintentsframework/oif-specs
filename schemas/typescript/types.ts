@@ -90,6 +90,26 @@ export type QuotePreference =
   | "trust-minimization";
 
 /**
+ * Failure handling policy. For backward compatibility, simple modes can be
+ * provided as a string. To express partial fills in combination with a
+ * remainder policy, use the object form.
+ */
+export type FailureHandlingMode =
+  | "retry"
+  | "refund-instant"
+  | "refund-claim"
+  | "needs-new-signature";
+
+export type FailureHandling =
+  | FailureHandlingMode
+  | {
+      /** Whether partial execution may occur. Defaults to false if omitted. */
+      partialFill?: boolean;
+      /** How the missing portion is handled if a partial fill occurs. */
+      remainder: FailureHandlingMode;
+    };
+
+/**
  * Request for generating quotes
  * @description Request for generating quotes
  */
@@ -184,6 +204,8 @@ export interface IntentRequest {
   quoteId?: string;
   /** Provider identifier */
   provider: string;
+  /** Failure handling policy for execution */
+  failureHandling: FailureHandling;
 }
 
 /**
