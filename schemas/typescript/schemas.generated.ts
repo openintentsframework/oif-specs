@@ -15,6 +15,12 @@ export const amountSchema = z
     "Integer encoded as a string to preserve precision (e.g., uint256)",
   );
 
+export const orderTypeSchema = z
+  .union([z.literal("swap-buy"), z.literal("swap-sell")])
+  .describe(
+    'Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.',
+  );
+
 export const assetLockReferenceSchema = z.object({
   kind: z.union([z.literal("the-compact"), z.literal("rhinestone")]),
   params: z.record(z.unknown()).optional(),
@@ -69,6 +75,7 @@ export const getQuoteRequestSchema = z.object({
   user: addressSchema,
   availableInputs: z.array(availableInputSchema),
   requestedOutputs: z.array(requestedOutputSchema),
+  orderType: orderTypeSchema.optional(),
   minValidUntil: z.number().optional(),
   preference: quotePreferenceSchema.optional(),
   fillerPerformsOpen: z.boolean().optional(),

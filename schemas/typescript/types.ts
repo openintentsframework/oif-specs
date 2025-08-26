@@ -22,6 +22,14 @@ export type Address = string;
 export type Amount = string;
 
 /**
+ * Order interpretation for swap amounts
+ * @description Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.
+ */
+export type OrderType =
+  | "swap-buy"
+  | "swap-sell";
+
+/**
  * Reference to a lock in a locking system
  * @description Reference to a lock in a locking system
  */
@@ -120,6 +128,8 @@ export interface GetQuoteRequest {
   availableInputs: AvailableInput[];
   /** Requested outputs for the quote */
   requestedOutputs: RequestedOutput[];
+  /** Order type: 'swap-sell' = exact-input, 'swap-buy' = exact-output. If omitted, providers SHOULD assume 'swap-sell' for backward compatibility. */
+  orderType?: OrderType;
   /** Minimum validity timestamp in seconds */
   minValidUntil?: number;
   /** Quote preference */

@@ -18,6 +18,7 @@ const registry = new OpenAPIRegistry();
 // Register all schemas as components
 registry.register('Address', schemas.addressSchema);
 registry.register('Amount', schemas.amountSchema);
+registry.register('OrderType', schemas.orderTypeSchema);
 registry.register('AssetLockReference', schemas.assetLockReferenceSchema);
 registry.register('AvailableInput', schemas.availableInputSchema);
 registry.register('RequestedOutput', schemas.requestedOutputSchema);
