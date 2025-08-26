@@ -558,6 +558,10 @@ components:
           type: string
         status:
           type: string
+          enum:
+            - received
+            - rejected
+            - error
         message:
           type: string
         order:
@@ -566,6 +570,12 @@ components:
             nullable: true
       required:
         - status
+    IntentResponseStatus:
+      type: string
+      enum:
+        - received
+        - rejected
+        - error
   parameters: {}
 paths:
   /v1/quote:
@@ -857,6 +867,10 @@ paths:
                     type: string
                   status:
                     type: string
+                    enum:
+                      - received
+                      - rejected
+                      - error
                   message:
                     type: string
                   order:
