@@ -246,8 +246,6 @@ components:
                       - eip-3009
           required:
             - mode
-        fillerPerformsOpen:
-          type: boolean
       required:
         - user
         - availableInputs
@@ -731,8 +729,6 @@ paths:
                               - eip-3009
                   required:
                     - mode
-                fillerPerformsOpen:
-                  type: boolean
               required:
                 - user
                 - availableInputs

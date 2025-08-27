@@ -140,11 +140,6 @@ export interface GetQuoteRequest {
    * If provided, takes precedence over the legacy boolean.
    */
   originSubmission?: OriginSubmission;
-  /**
-   * @deprecated Legacy flag. Use originSubmission instead to specify submitter and schemes.
-   * If true, request the protocol/filler to perform the open on the source chain (may entail additional gas fees).
-   */
-  fillerPerformsOpen?: boolean;
 }
 
 /**

@@ -86,7 +86,6 @@ export const getQuoteRequestSchema = z.object({
   minValidUntil: z.number().optional(),
   preference: quotePreferenceSchema.optional(),
   originSubmission: originSubmissionSchema.optional(),
-  fillerPerformsOpen: z.boolean().optional(),
 });
 
 export const eip712OrderSchema = z.object({
