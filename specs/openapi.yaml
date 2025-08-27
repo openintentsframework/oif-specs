@@ -235,8 +235,35 @@ components:
               enum:
                 - trust-minimization
           description: Quote preference type
-        fillerPerformsOpen:
-          type: boolean
+        originSubmission:
+          type: object
+          properties:
+            mode:
+              anyOf:
+                - type: string
+                  enum:
+                    - user
+                - type: string
+                  enum:
+                    - protocol
+            schemes:
+              type: array
+              items:
+                anyOf:
+                  - type: string
+                    enum:
+                      - erc-4337
+                  - type: string
+                    enum:
+                      - permit2
+                  - type: string
+                    enum:
+                      - erc20-permit
+                  - type: string
+                    enum:
+                      - eip-3009
+          required:
+            - mode
       required:
         - user
         - availableInputs
@@ -546,6 +573,35 @@ components:
                         - needs-new-signature
               required:
                 - remainder
+        originSubmission:
+          type: object
+          properties:
+            mode:
+              anyOf:
+                - type: string
+                  enum:
+                    - user
+                - type: string
+                  enum:
+                    - protocol
+            schemes:
+              type: array
+              items:
+                anyOf:
+                  - type: string
+                    enum:
+                      - erc-4337
+                  - type: string
+                    enum:
+                      - permit2
+                  - type: string
+                    enum:
+                      - erc20-permit
+                  - type: string
+                    enum:
+                      - eip-3009
+          required:
+            - mode
       required:
         - order
         - signature
@@ -681,8 +737,35 @@ paths:
                       enum:
                         - trust-minimization
                   description: Quote preference type
-                fillerPerformsOpen:
-                  type: boolean
+                originSubmission:
+                  type: object
+                  properties:
+                    mode:
+                      anyOf:
+                        - type: string
+                          enum:
+                            - user
+                        - type: string
+                          enum:
+                            - protocol
+                    schemes:
+                      type: array
+                      items:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - erc-4337
+                          - type: string
+                            enum:
+                              - permit2
+                          - type: string
+                            enum:
+                              - erc20-permit
+                          - type: string
+                            enum:
+                              - eip-3009
+                  required:
+                    - mode
               required:
                 - user
                 - availableInputs
@@ -850,6 +933,35 @@ paths:
                                 - needs-new-signature
                       required:
                         - remainder
+                originSubmission:
+                  type: object
+                  properties:
+                    mode:
+                      anyOf:
+                        - type: string
+                          enum:
+                            - user
+                        - type: string
+                          enum:
+                            - protocol
+                    schemes:
+                      type: array
+                      items:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - erc-4337
+                          - type: string
+                            enum:
+                              - permit2
+                          - type: string
+                            enum:
+                              - erc20-permit
+                          - type: string
+                            enum:
+                              - eip-3009
+                  required:
+                    - mode
               required:
                 - order
                 - signature

@@ -18,4 +18,5 @@ export {
   QuoteDetails,
   Quote,
   GetQuoteResponse,
+  OriginSubmission,
 } from "./types";
