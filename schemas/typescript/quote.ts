@@ -6,6 +6,7 @@
 export {
   Address,
   Amount,
+  OrderType,
   AssetLockReference,
   AvailableInput,
   RequestedOutput,

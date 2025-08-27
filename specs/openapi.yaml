@@ -22,6 +22,15 @@ components:
       type: string
       pattern: ^[0-9]+$
       description: Integer encoded as a string to preserve precision (e.g., uint256)
+    OrderType:
+      anyOf:
+        - type: string
+          enum:
+            - swap-buy
+        - type: string
+          enum:
+            - swap-sell
+      description: Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.
     AssetLockReference:
       type: object
       properties:
@@ -200,6 +209,15 @@ components:
               - receiver
               - asset
               - amount
+        orderType:
+          anyOf:
+            - type: string
+              enum:
+                - swap-buy
+            - type: string
+              enum:
+                - swap-sell
+          description: Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.
         minValidUntil:
           type: number
         preference:
@@ -596,6 +614,10 @@ components:
           type: string
         status:
           type: string
+          enum:
+            - received
+            - rejected
+            - error
         message:
           type: string
         order:
@@ -604,6 +626,12 @@ components:
             nullable: true
       required:
         - status
+    IntentResponseStatus:
+      type: string
+      enum:
+        - received
+        - rejected
+        - error
   parameters: {}
 paths:
   /v1/quote:
@@ -683,6 +711,15 @@ paths:
                       - receiver
                       - asset
                       - amount
+                orderType:
+                  anyOf:
+                    - type: string
+                      enum:
+                        - swap-buy
+                    - type: string
+                      enum:
+                        - swap-sell
+                  description: Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.
                 minValidUntil:
                   type: number
                 preference:
@@ -942,6 +979,10 @@ paths:
                     type: string
                   status:
                     type: string
+                    enum:
+                      - received
+                      - rejected
+                      - error
                   message:
                     type: string
                   order:

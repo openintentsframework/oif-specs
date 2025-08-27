@@ -9,4 +9,5 @@ export {
   FailureHandling,
   FailureHandlingMode,
   OriginSubmission,
+  IntentResponseStatus,
 } from "./types";
