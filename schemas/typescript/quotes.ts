@@ -11,7 +11,6 @@ export {
   AssetLockReference,
   AvailableInput,
   RequestedOutput,
-  RequestedOutput as RequestedOutputRequest,
   RequestedOutputDetails,
   QuotePreference,
   GetQuoteRequest,
