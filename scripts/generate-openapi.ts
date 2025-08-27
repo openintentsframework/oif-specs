@@ -36,17 +36,26 @@ registry.register("Eip712Order", schemas.eip712OrderSchema);
 registry.register("QuoteDetails", schemas.quoteDetailsSchema);
 registry.register("Quote", schemas.quoteSchema);
 registry.register("GetQuoteResponse", schemas.getQuoteResponseSchema);
-registry.register("IntentRequest", schemas.intentRequestSchema);
-registry.register("IntentResponse", schemas.intentResponseSchema);
-registry.register("IntentResponseStatus", schemas.intentResponseStatusSchema);
+registry.register("PostOrderRequest", schemas.postOrderRequestSchema);
+registry.register("PostOrderResponse", schemas.postOrderResponseSchema);
+registry.register(
+  "PostOrderResponseStatus",
+  schemas.postOrderResponseStatusSchema
+);
+registry.register("OrderStatus", schemas.orderStatusSchema);
+registry.register("AssetAmount", schemas.assetAmountSchema);
+registry.register("SettlementType", schemas.settlementTypeSchema);
+registry.register("Settlement", schemas.settlementSchema);
+registry.register("GetOrderRequest", schemas.getOrderRequestSchema);
+registry.register("GetOrderResponse", schemas.getOrderResponseSchema);
 
 // Register API endpoints
 registry.registerPath({
   method: "post",
-  path: "/v1/quote",
+  path: "/v1/quotes",
   summary:
     "Generate executable quotes for requested outputs given available inputs.",
-  tags: ["quote"],
+  tags: ["quotes"],
   request: {
     body: {
       content: {
@@ -77,14 +86,14 @@ registry.registerPath({
 
 registry.registerPath({
   method: "post",
-  path: "/v1/intent",
+  path: "/v1/orders",
   summary: "Submit a previously quoted, signed order for execution.",
-  tags: ["intent"],
+  tags: ["orders"],
   request: {
     body: {
       content: {
         "application/json": {
-          schema: schemas.intentRequestSchema,
+          schema: schemas.postOrderRequestSchema,
         },
       },
       required: true,
@@ -92,10 +101,10 @@ registry.registerPath({
   },
   responses: {
     200: {
-      description: "Intent accepted",
+      description: "Order accepted",
       content: {
         "application/json": {
-          schema: schemas.intentResponseSchema,
+          schema: schemas.postOrderResponseSchema,
         },
       },
     },
@@ -104,6 +113,31 @@ registry.registerPath({
     },
     422: {
       description: "Invalid signature or order",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/v1/orders/{id}",
+  summary: "Get order details by ID.",
+  tags: ["orders"],
+  request: {
+    params: z.object({
+      id: z.string().describe("Order identifier"),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Order details retrieved successfully",
+      content: {
+        "application/json": {
+          schema: schemas.getOrderResponseSchema,
+        },
+      },
+    },
+    404: {
+      description: "Order not found",
     },
   },
 });
@@ -124,8 +158,8 @@ async function main() {
       },
       servers: [{ url: "https://api.example.com" }],
       tags: [
-        { name: "quote", description: "Quote generation" },
-        { name: "intent", description: "Intent submission" },
+        { name: "quotes", description: "Quote generation" },
+        { name: "orders", description: "Order management" },
       ],
     });
 

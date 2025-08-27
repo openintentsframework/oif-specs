@@ -211,13 +211,13 @@ export interface GetQuoteResponse {
   quotes: Quote[];
 }
 
-// ============ Intent Types ============
+// ============ Order Types ============
 
 /**
- * Request to submit an intent
- * @description Request to submit an intent
+ * Request to submit an order
+ * @description Request to submit an order
  */
-export interface IntentRequest {
+export interface PostOrderRequest {
   /** EIP-712 typed data for a gasless cross-chain order */
   order: Record<string, unknown>;
   /** EIP-712 signature or equivalent */
@@ -233,30 +233,117 @@ export interface IntentRequest {
 }
 
 /**
- * Status enum for intent submission responses.
+ * Status enum for order submission responses.
  * @description Distinguishes between successful receipt and validation failures at the discovery stage.
  * Note: Full validation (oracle routes, etc.) happens asynchronously after receipt.
  */
-export enum IntentResponseStatus {
-  /** Intent received and passed basic validation, queued for full validation */
+export enum PostOrderResponseStatus {
+  /** Order received and passed basic validation, queued for full validation */
   Received = "received",
-  /** Intent rejected due to validation failure */
+  /** Order rejected due to validation failure */
   Rejected = "rejected",
-  /** Intent processing encountered an error */
+  /** Order processing encountered an error */
   Error = "error",
 }
 
 /**
- * Response from intent submission
- * @description Response from intent submission
+ * Response from order submission
+ * @description Response from order submission
  */
-export interface IntentResponse {
+export interface PostOrderResponse {
   /** Assigned order identifier if accepted */
   orderId?: string;
-  /** Status of the intent submission */
-  status: IntentResponseStatus;
+  /** Status of the order submission */
+  status: PostOrderResponseStatus;
   /** Optional message for additional details on status */
   message?: string;
   /** The submitted EIP-712 typed data order */
   order?: Record<string, unknown>;
+}
+
+/**
+ * Order status enum for order tracking
+ * @description Tracks the lifecycle of an order from submission through execution
+ */
+export enum OrderStatus {
+  /** Order has been created but not yet prepared */
+  Created = "created",
+  /** Order is pending execution */
+  Pending = "pending",
+  /** Order has been executed */
+  Executed = "executed",
+  /** Order has been settled and is ready to be claimed */
+  Settled = "settled",
+  /** Order is finalized and complete (after claim confirmation) */
+  Finalized = "finalized",
+  /** Order execution failed */
+  Failed = "failed",
+}
+
+/**
+ * Asset amount representation using ERC-7930 interoperable address format
+ * @description Asset amount representation using ERC-7930 interoperable address format
+ */
+export interface AssetAmount {
+  /** Asset address in ERC-7930 interoperable format */
+  asset: Address;
+  /** Amount as a string-encoded integer */
+  amount: Amount;
+}
+
+/**
+ * Settlement mechanism types
+ * @description Settlement mechanism types
+ * TODO: Add lock types to this schema
+ */
+export enum SettlementType {
+  /** Escrow-based settlement */
+  Escrow = "escrow",
+  /** Resource lock-based settlement */
+  ResourceLock = "resourceLock",
+}
+
+/**
+ * Settlement information for an order
+ * @description Settlement information for an order
+ */
+export interface Settlement {
+  /** Settlement mechanism type */
+  type: SettlementType;
+  /** Settlement-specific data */
+  data: Record<string, unknown>;
+}
+
+/**
+ * Request to get order details
+ * @description Request to get order details by ID
+ */
+export interface GetOrderRequest {
+  /** Order identifier */
+  id: string;
+}
+
+/**
+ * Order response for API endpoints
+ * @description Complete order information returned by GET /orders/{id}
+ */
+export interface GetOrderResponse {
+  /** Unique identifier for this order */
+  id: string;
+  /** Current order status */
+  status: OrderStatus;
+  /** Timestamp when this order was created (Unix timestamp in seconds) */
+  createdAt: number;
+  /** Timestamp when this order was last updated (Unix timestamp in seconds) */
+  updatedAt: number;
+  /** Associated quote ID if available */
+  quoteId?: string;
+  /** Input asset and amount */
+  inputAmount: AssetAmount;
+  /** Output asset and amount */
+  outputAmount: AssetAmount;
+  /** Settlement information */
+  settlement: Settlement;
+  /** Transaction details if order has been executed */
+  fillTransaction?: Record<string, unknown>;
 }

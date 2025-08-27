@@ -8,10 +8,10 @@ info:
 servers:
   - url: https://api.example.com
 tags:
-  - name: quote
+  - name: quotes
     description: Quote generation
-  - name: intent
-    description: Intent submission
+  - name: orders
+    description: Order management
 components:
   schemas:
     Address:
@@ -524,7 +524,7 @@ components:
               - provider
       required:
         - quotes
-    IntentRequest:
+    PostOrderRequest:
       type: object
       properties:
         order:
@@ -607,7 +607,7 @@ components:
         - signature
         - provider
         - failureHandling
-    IntentResponse:
+    PostOrderResponse:
       type: object
       properties:
         orderId:
@@ -626,19 +626,144 @@ components:
             nullable: true
       required:
         - status
-    IntentResponseStatus:
+    PostOrderResponseStatus:
       type: string
       enum:
         - received
         - rejected
         - error
+    OrderStatus:
+      type: string
+      enum:
+        - created
+        - pending
+        - executed
+        - settled
+        - finalized
+        - failed
+    AssetAmount:
+      type: object
+      properties:
+        asset:
+          type: string
+          pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+          description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+        amount:
+          type: string
+          pattern: ^[0-9]+$
+          description: Integer encoded as a string to preserve precision (e.g., uint256)
+      required:
+        - asset
+        - amount
+    SettlementType:
+      type: string
+      enum:
+        - escrow
+        - resourceLock
+    Settlement:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - escrow
+            - resourceLock
+        data:
+          type: object
+          additionalProperties:
+            nullable: true
+      required:
+        - type
+        - data
+    GetOrderRequest:
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+        - id
+    GetOrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - created
+            - pending
+            - executed
+            - settled
+            - finalized
+            - failed
+        createdAt:
+          type: number
+        updatedAt:
+          type: number
+        quoteId:
+          type: string
+        inputAmount:
+          type: object
+          properties:
+            asset:
+              type: string
+              pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+              description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+            amount:
+              type: string
+              pattern: ^[0-9]+$
+              description: Integer encoded as a string to preserve precision (e.g., uint256)
+          required:
+            - asset
+            - amount
+        outputAmount:
+          type: object
+          properties:
+            asset:
+              type: string
+              pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+              description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+            amount:
+              type: string
+              pattern: ^[0-9]+$
+              description: Integer encoded as a string to preserve precision (e.g., uint256)
+          required:
+            - asset
+            - amount
+        settlement:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - escrow
+                - resourceLock
+            data:
+              type: object
+              additionalProperties:
+                nullable: true
+          required:
+            - type
+            - data
+        fillTransaction:
+          type: object
+          additionalProperties:
+            nullable: true
+      required:
+        - id
+        - status
+        - createdAt
+        - updatedAt
+        - inputAmount
+        - outputAmount
+        - settlement
   parameters: {}
 paths:
-  /v1/quote:
+  /v1/quotes:
     post:
       summary: Generate executable quotes for requested outputs given available inputs.
       tags:
-        - quote
+        - quotes
       requestBody:
         required: true
         content:
@@ -771,7 +896,7 @@ paths:
                 - availableInputs
                 - requestedOutputs
       responses:
-        '200':
+        "200":
           description: Quotes successfully generated
           content:
             application/json:
@@ -871,15 +996,15 @@ paths:
                         - provider
                 required:
                   - quotes
-        '400':
+        "400":
           description: Malformed request
-        '422':
+        "422":
           description: Inputs cannot satisfy requested outputs
-  /v1/intent:
+  /v1/orders:
     post:
       summary: Submit a previously quoted, signed order for execution.
       tags:
-        - intent
+        - orders
       requestBody:
         required: true
         content:
@@ -968,8 +1093,8 @@ paths:
                 - provider
                 - failureHandling
       responses:
-        '200':
-          description: Intent accepted
+        "200":
+          description: Order accepted
           content:
             application/json:
               schema:
@@ -991,7 +1116,102 @@ paths:
                       nullable: true
                 required:
                   - status
-        '400':
+        "400":
           description: Malformed request
-        '422':
+        "422":
           description: Invalid signature or order
+  /v1/orders/{id}:
+    get:
+      summary: Get order details by ID.
+      tags:
+        - orders
+      parameters:
+        - schema:
+            type: string
+            description: Order identifier
+          required: true
+          description: Order identifier
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Order details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                      - created
+                      - pending
+                      - executed
+                      - settled
+                      - finalized
+                      - failed
+                  createdAt:
+                    type: number
+                  updatedAt:
+                    type: number
+                  quoteId:
+                    type: string
+                  inputAmount:
+                    type: object
+                    properties:
+                      asset:
+                        type: string
+                        pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                        description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                      amount:
+                        type: string
+                        pattern: ^[0-9]+$
+                        description: Integer encoded as a string to preserve precision (e.g., uint256)
+                    required:
+                      - asset
+                      - amount
+                  outputAmount:
+                    type: object
+                    properties:
+                      asset:
+                        type: string
+                        pattern: ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
+                        description: ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
+                      amount:
+                        type: string
+                        pattern: ^[0-9]+$
+                        description: Integer encoded as a string to preserve precision (e.g., uint256)
+                    required:
+                      - asset
+                      - amount
+                  settlement:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - escrow
+                          - resourceLock
+                      data:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                    required:
+                      - type
+                      - data
+                  fillTransaction:
+                    type: object
+                    additionalProperties:
+                      nullable: true
+                required:
+                  - id
+                  - status
+                  - createdAt
+                  - updatedAt
+                  - inputAmount
+                  - outputAmount
+                  - settlement
+        "404":
+          description: Order not found
