@@ -6,25 +6,39 @@ export const addressSchema = z
   .string()
   .regex(/^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$/)
   .describe(
-    "ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)",
+    "ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)"
   );
 
 export const amountSchema = z
   .string()
   .regex(/^[0-9]+$/)
   .describe(
-    "Integer encoded as a string to preserve precision (e.g., uint256)",
+    "Integer encoded as a string to preserve precision (e.g., uint256)"
   );
 
 export const orderTypeSchema = z
   .union([z.literal("swap-buy"), z.literal("swap-sell")])
   .describe(
-    'Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.',
+    'Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.'
   );
 
 export const assetLockReferenceSchema = z.object({
   kind: z.union([z.literal("the-compact"), z.literal("rhinestone")]),
   params: z.record(z.unknown()).optional(),
+});
+
+export const originSubmissionSchema = z.object({
+  mode: z.union([z.literal("user"), z.literal("protocol")]),
+  schemes: z
+    .array(
+      z.union([
+        z.literal("erc-4337"),
+        z.literal("permit2"),
+        z.literal("erc20-permit"),
+        z.literal("eip-3009"),
+      ])
+    )
+    .optional(),
 });
 
 export const availableInputSchema = z.object({
@@ -79,7 +93,7 @@ export const getQuoteRequestSchema = z.object({
   orderType: orderTypeSchema.optional(),
   minValidUntil: z.number().optional(),
   preference: quotePreferenceSchema.optional(),
-  fillerPerformsOpen: z.boolean().optional(),
+  originSubmission: originSubmissionSchema.optional(),
 });
 
 export const eip712OrderSchema = z.object({
@@ -96,7 +110,7 @@ export const quoteDetailsSchema = z.object({
       asset: addressSchema,
       amount: amountSchema,
       lockType: z.literal("the-compact").optional(),
-    }),
+    })
   ),
 });
 
@@ -119,10 +133,11 @@ export const postOrderRequestSchema = z.object({
   quoteId: z.string().optional(),
   provider: z.string(),
   failureHandling: failureHandlingSchema,
+  originSubmission: originSubmissionSchema.optional(),
 });
 
 export const postOrderResponseStatusSchema = z.nativeEnum(
-  PostOrderResponseStatus,
+  PostOrderResponseStatus
 );
 
 export const postOrderResponseSchema = z.object({

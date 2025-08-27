@@ -235,8 +235,35 @@ components:
               enum:
                 - trust-minimization
           description: Quote preference type
-        fillerPerformsOpen:
-          type: boolean
+        originSubmission:
+          type: object
+          properties:
+            mode:
+              anyOf:
+                - type: string
+                  enum:
+                    - user
+                - type: string
+                  enum:
+                    - protocol
+            schemes:
+              type: array
+              items:
+                anyOf:
+                  - type: string
+                    enum:
+                      - erc-4337
+                  - type: string
+                    enum:
+                      - permit2
+                  - type: string
+                    enum:
+                      - erc20-permit
+                  - type: string
+                    enum:
+                      - eip-3009
+          required:
+            - mode
       required:
         - user
         - availableInputs
@@ -546,6 +573,35 @@ components:
                         - needs-new-signature
               required:
                 - remainder
+        originSubmission:
+          type: object
+          properties:
+            mode:
+              anyOf:
+                - type: string
+                  enum:
+                    - user
+                - type: string
+                  enum:
+                    - protocol
+            schemes:
+              type: array
+              items:
+                anyOf:
+                  - type: string
+                    enum:
+                      - erc-4337
+                  - type: string
+                    enum:
+                      - permit2
+                  - type: string
+                    enum:
+                      - erc20-permit
+                  - type: string
+                    enum:
+                      - eip-3009
+          required:
+            - mode
       required:
         - order
         - signature
@@ -806,14 +862,41 @@ paths:
                       enum:
                         - trust-minimization
                   description: Quote preference type
-                fillerPerformsOpen:
-                  type: boolean
+                originSubmission:
+                  type: object
+                  properties:
+                    mode:
+                      anyOf:
+                        - type: string
+                          enum:
+                            - user
+                        - type: string
+                          enum:
+                            - protocol
+                    schemes:
+                      type: array
+                      items:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - erc-4337
+                          - type: string
+                            enum:
+                              - permit2
+                          - type: string
+                            enum:
+                              - erc20-permit
+                          - type: string
+                            enum:
+                              - eip-3009
+                  required:
+                    - mode
               required:
                 - user
                 - availableInputs
                 - requestedOutputs
       responses:
-        '200':
+        "200":
           description: Quotes successfully generated
           content:
             application/json:
@@ -913,9 +996,9 @@ paths:
                         - provider
                 required:
                   - quotes
-        '400':
+        "400":
           description: Malformed request
-        '422':
+        "422":
           description: Inputs cannot satisfy requested outputs
   /v1/orders:
     post:
@@ -975,13 +1058,42 @@ paths:
                                 - needs-new-signature
                       required:
                         - remainder
+                originSubmission:
+                  type: object
+                  properties:
+                    mode:
+                      anyOf:
+                        - type: string
+                          enum:
+                            - user
+                        - type: string
+                          enum:
+                            - protocol
+                    schemes:
+                      type: array
+                      items:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - erc-4337
+                          - type: string
+                            enum:
+                              - permit2
+                          - type: string
+                            enum:
+                              - erc20-permit
+                          - type: string
+                            enum:
+                              - eip-3009
+                  required:
+                    - mode
               required:
                 - order
                 - signature
                 - provider
                 - failureHandling
       responses:
-        '200':
+        "200":
           description: Order accepted
           content:
             application/json:
@@ -1004,9 +1116,9 @@ paths:
                       nullable: true
                 required:
                   - status
-        '400':
+        "400":
           description: Malformed request
-        '422':
+        "422":
           description: Invalid signature or order
   /v1/orders/{id}:
     get:
@@ -1022,7 +1134,7 @@ paths:
           name: id
           in: path
       responses:
-        '200':
+        "200":
           description: Order details retrieved successfully
           content:
             application/json:
@@ -1101,5 +1213,5 @@ paths:
                   - inputAmount
                   - outputAmount
                   - settlement
-        '404':
+        "404":
           description: Order not found

@@ -3,6 +3,7 @@
 This repository is the canonical, versioned source of truth for OIF protocol standards and specifications.
 
 It includes:
+
 - API standards for Quote and Intent submission
 - Machine-readable OpenAPI schemas
 - Language-friendly TypeScript interfaces for client/server implementation
@@ -25,6 +26,26 @@ Authoritative schema: `specs/openapi.yaml`
 
 TypeScript-friendly interfaces are provided in `schemas/typescript/types.ts`
 
+### Origin submission preference
+
+To express user preference for gasless execution and who submits the origin transaction, use `originSubmission`:
+
+```json
+{
+  "originSubmission": {
+    "mode": "user", // or "protocol"
+    "schemes": ["erc-4337", "permit2", "erc20-permit", "eip-3009"]
+  }
+}
+```
+
+- **mode**: who is expected to submit the origin transaction.
+- **schemes**: acceptable signing/authorization schemes for interoperability.
+
+Notes:
+
+- This is orthogonal to `lock` (asset state) and focuses on submission responsibility and signing surface.
+
 ## Generating OpenAPI from TypeScript
 
 The OpenAPI specification is auto-generated from TypeScript types using a TypeScript → Zod → OpenAPI pipeline. To regenerate:
@@ -35,6 +56,7 @@ npm run generate:openapi
 ```
 
 The TypeScript types in `schemas/typescript/types.ts` are the source of truth. The generation process:
+
 1. `ts-to-zod` converts TypeScript types to Zod schemas with validation
 2. `@asteasolutions/zod-to-openapi` converts Zod schemas to OpenAPI specification
 3. JSDoc annotations (@description, @pattern, @example) are preserved throughout the pipeline
