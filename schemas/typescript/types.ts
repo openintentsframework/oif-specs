@@ -6,10 +6,10 @@
 // ============ Common Types ============
 
 /**
- * ERC-7930 interoperable address
- * @description ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)
- * @pattern ^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$
- * @example "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045@eip155:1#4CA88C9C"
+ * EIP-7930 interoperable address
+ * @description EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+ * @pattern ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+ * @example "0x00010000010114D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
  */
 export type Address = string;
 
@@ -281,11 +281,11 @@ export enum OrderStatus {
 }
 
 /**
- * Asset amount representation using ERC-7930 interoperable address format
- * @description Asset amount representation using ERC-7930 interoperable address format
+ * Asset amount representation using EIP-7930 interoperable address format
+ * @description Asset amount representation using EIP-7930 interoperable address format
  */
 export interface AssetAmount {
-  /** Asset address in ERC-7930 interoperable format */
+  /** Asset address in EIP-7930 interoperable format */
   asset: Address;
   /** Amount as a string-encoded integer */
   amount: Amount;

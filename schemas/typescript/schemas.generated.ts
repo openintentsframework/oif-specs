@@ -4,9 +4,9 @@ import { PostOrderResponseStatus, OrderStatus, SettlementType } from "./types";
 
 export const addressSchema = z
   .string()
-  .regex(/^0x[a-fA-F0-9]{40}(@eip155:[0-9]+#[a-fA-F0-9]{8})?$/)
+  .regex(/^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$/)
   .describe(
-    "ERC-7930 interoperable address format (address@chain#checksum or plain Ethereum address)"
+    "EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)"
   );
 
 export const amountSchema = z
