@@ -133,21 +133,26 @@ export type FailureHandling =
 export interface GetQuoteRequest {
   /** User requesting the quote */
   user: Address;
-  /** Available inputs for the quote. Order is significant if preference is 'input-priority' */
-  availableInputs: AvailableInput[];
-  /** Requested outputs for the quote */
-  requestedOutputs: RequestedOutput[];
-  /** Order type: 'swap-sell' = exact-input, 'swap-buy' = exact-output. If omitted, providers SHOULD assume 'swap-sell' for backward compatibility. */
-  orderType?: OrderType;
-  /** Minimum validity timestamp in seconds */
-  minValidUntil?: number;
-  /** Quote preference */
-  preference?: QuotePreference;
-  /**
-   * Explicit preference for submission responsibility and acceptable auth schemes.
-   * If provided, takes precedence over the legacy boolean.
-   */
-  originSubmission?: OriginSubmission;
+  
+  intent: {
+    intentType: string;
+    /** Available inputs for the quote. Order is significant if preference is 'input-priority' */
+    availableInputs: AvailableInput[];
+    /** Requested outputs for the quote */
+    requestedOutputs: RequestedOutput[];
+    /** Order type: 'swap-sell' = exact-input, 'swap-buy' = exact-output. If omitted, providers SHOULD assume 'swap-sell' for backward compatibility. */
+    orderType?: OrderType;
+    /** Minimum validity timestamp in seconds */
+    minValidUntil?: number;
+    /** Quote preference */
+    preference?: QuotePreference;
+    /**
+     * Explicit preference for submission responsibility and acceptable auth schemes.
+     * If provided, takes precedence over the legacy boolean.
+     */
+    originSubmission?: OriginSubmission;
+  }
+  supportedTypes: string[];
 }
 
 /**
@@ -183,15 +188,19 @@ export interface QuoteDetails {
   }>;
 }
 
+export interface Order {
+  type: string; // -> "oif-escrow-v0", "oif-resource-lock-v0", "across-v0", "oif-7683-v0"
+  payload: undefined;
+}
+
 /**
  * Quote information
  * @description Quote information
  */
 export interface Quote {
-  /** EIP-712 orders for execution */
-  orders: Eip712Order[];
-  /** Quote details */
-  details: QuoteDetails;
+
+  order: Order;
+
   /** Quote validity timestamp in seconds */
   validUntil?: number;
   /** Estimated time of arrival in seconds */
