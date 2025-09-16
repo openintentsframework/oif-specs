@@ -112,19 +112,9 @@ export type QuotePreference =
  * remainder policy, use the object form.
  */
 export type FailureHandlingMode =
-  | "retry"
-  | "refund-instant"
+  | "refund-automatic"
   | "refund-claim"
   | "needs-new-signature";
-
-export type FailureHandling =
-  | FailureHandlingMode
-  | {
-      /** Whether partial execution may occur. Defaults to false if omitted. */
-      partialFill?: boolean;
-      /** How the missing portion is handled if a partial fill occurs. */
-      remainder: FailureHandlingMode;
-    };
 
 /**
  * Request for generating quotes
@@ -135,7 +125,7 @@ export interface GetQuoteRequest {
   user: Address;
   
   intent: {
-    intentType: string;
+    intentType: "oif-swap" ;
     /** Available inputs for the quote. Order is significant if preference is 'input-priority' */
     availableInputs: AvailableInput[];
     /** Requested outputs for the quote */
@@ -151,47 +141,26 @@ export interface GetQuoteRequest {
      * If provided, takes precedence over the legacy boolean.
      */
     originSubmission?: OriginSubmission;
+
+    /** Failure handling policy for execution */
+    failureHandling: FailureHandlingMode;
+    partialFill?: boolean;
   }
-  supportedTypes: string[];
+  supportedTypes: string[]; // Order types supported by the provider
 }
 
-/**
- * EIP-712 typed data for execution
- * @description EIP-712 typed data for execution
- */
-export interface Eip712Order {
-  /** Domain for the EIP-712 order */
-  domain: Address;
-  /** Primary type of the EIP-712 message */
-  primaryType: string;
-  /** EIP-712 message content */
-  message: Record<string, unknown>;
+
+export type Order = OifEscrowOrder | OifResourceLockOrder
+
+export interface OifEscrowOrder {
+  type: "oif-escrow-v0";
+  payload: unknown; // Todo - define the payload for the oif-escrow-v0 order
+}
+export interface OifResourceLockOrder {
+  type: "oif-resource-lock-v0"; 
+  payload: unknown; // Todo - define the payload for the oif-resource-lock-v0 order
 }
 
-/**
- * Detailed information about a quote
- * @description Detailed information about a quote
- */
-export interface QuoteDetails {
-  /** Requested outputs in the quote */
-  requestedOutputs: RequestedOutputDetails[];
-  /** Available inputs in the quote */
-  availableInputs: Array<{
-    /** User address */
-    user: Address;
-    /** Asset address */
-    asset: Address;
-    /** Amount available */
-    amount: Amount;
-    /** Lock type - if empty, the asset needs to be escrowed */
-    lockType?: "the-compact";
-  }>;
-}
-
-export interface Order {
-  type: string; // -> "oif-escrow-v0", "oif-resource-lock-v0", "across-v0", "oif-7683-v0"
-  payload: undefined;
-}
 
 /**
  * Quote information
@@ -218,9 +187,9 @@ export interface Quote {
 export interface GetQuoteResponse {
   /** Array of generated quotes */
   quotes: Quote[];
+
 }
 
-// ============ Order Types ============
 
 /**
  * Request to submit an order
@@ -228,15 +197,11 @@ export interface GetQuoteResponse {
  */
 export interface PostOrderRequest {
   /** EIP-712 typed data for a gasless cross-chain order */
-  order: Record<string, unknown>;
+  order: Order;
   /** EIP-712 signature or equivalent */
-  signature: Record<string, unknown>;
+  signature: Uint8Array[]; // bytes array in solidity
   /** Optional quote identifier from a prior Get Quote response */
   quoteId?: string;
-  /** Provider identifier */
-  provider: string;
-  /** Failure handling policy for execution */
-  failureHandling: FailureHandling;
   /** Optional preference mirrored from quote about who submits and acceptable schemes */
   originSubmission?: OriginSubmission;
 }
