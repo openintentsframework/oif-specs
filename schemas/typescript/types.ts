@@ -175,7 +175,7 @@ export interface Quote {
   /** Estimated time of arrival in seconds */
   eta?: number;
   /** Unique quote identifier */
-  quoteId: string;
+  quoteId?: string;
   /** Provider identifier */
   provider: string;
 }
