@@ -130,7 +130,7 @@ export interface GetQuoteRequest {
     availableInputs: AvailableInput[];
     /** Requested outputs for the quote */
     requestedOutputs: RequestedOutput[];
-    /** Order type: 'swap-sell' = exact-input, 'swap-buy' = exact-output. If omitted, providers SHOULD assume 'swap-sell' for backward compatibility. */
+    /** Order type: 'swap-sell' = exact-input, 'swap-buy' = exact-output. If omitted, providers SHOULD assume 'swap-sell'. */
     orderType?: OrderType;
     /** Minimum validity timestamp in seconds */
     minValidUntil?: number;
