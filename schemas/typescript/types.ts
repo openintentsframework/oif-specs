@@ -109,9 +109,9 @@ export type FailureHandlingMode =
 export interface GetQuoteRequest {
   /** User requesting the quote */
   user: Address;
-  
+
   intent: {
-    intentType: "oif-swap" ;
+    intentType: "oif-swap";
     /** Available inputs for the quote. Order is significant if preference is 'input-priority' */
     inputs: Input[];
     /** Requested outputs for the quote */
@@ -128,8 +128,9 @@ export interface GetQuoteRequest {
      */
     originSubmission?: OriginSubmission;
 
-    /** Failure handling policy for execution */
-    failureHandling: FailureHandlingMode;
+    /** Failure handling policy for execution that the integrator supports*/
+    failureHandling?: FailureHandlingMode[];
+    /** Whether the integrator supports partial fills */
     partialFill?: boolean;
   }
   supportedTypes: string[]; // Order types supported by the provider
@@ -143,7 +144,7 @@ export interface OifEscrowOrder {
   payload: unknown; // Todo - define the payload for the oif-escrow-v0 order
 }
 export interface OifResourceLockOrder {
-  type: "oif-resource-lock-v0"; 
+  type: "oif-resource-lock-v0";
   payload: unknown; // Todo - define the payload for the oif-resource-lock-v0 order
 }
 
@@ -163,7 +164,11 @@ export interface Quote {
   /** Unique quote identifier */
   quoteId?: string;
   /** Provider identifier */
-  provider: string;
+  provider?: string;
+  /** Failure handling policy for execution*/
+  failureHandling: FailureHandlingMode;
+  /** Whether the quote supports partial fills */
+  partialFill: boolean;
 }
 
 /**
