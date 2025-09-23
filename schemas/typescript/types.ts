@@ -60,7 +60,7 @@ export interface Input {
   user: Address;
   /** Asset address */
   asset: Address;
-  /** Amount available. For exact-output orders, this is the minimum amount to receive. */
+  /** Amount available. For exact-output orders, this is the minimum amount to send. */
   amount?: Amount;
   /** Optional lock reference */
   lock?: AssetLockReference;
