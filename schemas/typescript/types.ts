@@ -25,7 +25,7 @@ export type Amount = string;
  * Order interpretation for swap amounts
  * @description Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.
  */
-export type OrderType = "swap-buy" | "swap-sell";
+export type OrderType = "exact-input" | "exact-output";
 
 /**
  * Reference to a lock in a locking system
@@ -55,13 +55,13 @@ export interface OriginSubmission {
  * Available input from a user
  * @description Available input from a user
  */
-export interface AvailableInput {
+export interface Input {
   /** User address */
   user: Address;
   /** Asset address */
   asset: Address;
-  /** Amount available */
-  amount: Amount;
+  /** Amount available. For exact-output orders, this is the minimum amount to receive. */
+  amount?: Amount;
   /** Optional lock reference */
   lock?: AssetLockReference;
 }
@@ -70,31 +70,17 @@ export interface AvailableInput {
  * Requested output for a receiver
  * @description Requested output for a receiver
  */
-export interface RequestedOutput {
+export interface Output {
   /** Receiver address */
   receiver: Address;
   /** Asset address */
   asset: Address;
-  /** Amount requested */
-  amount: Amount;
+  /** Amount requested. For exact-input orders, this is the minimum amount to receive. */
+  amount?: Amount;
   /** Optional calldata describing how the receiver will consume the output */
   calldata?: string;
 }
 
-/**
- * Detailed information about requested outputs
- * @description Detailed information about requested outputs
- */
-export interface RequestedOutputDetails {
-  /** User address */
-  user: Address;
-  /** Asset address */
-  asset: Address;
-  /** Amount requested */
-  amount: Amount;
-  /** Optional calldata */
-  calldata?: string;
-}
 
 /**
  * Quote preference type
@@ -127,10 +113,10 @@ export interface GetQuoteRequest {
   intent: {
     intentType: "oif-swap" ;
     /** Available inputs for the quote. Order is significant if preference is 'input-priority' */
-    availableInputs: AvailableInput[];
+    inputs: Input[];
     /** Requested outputs for the quote */
-    requestedOutputs: RequestedOutput[];
-    /** Order type: 'swap-sell' = exact-input, 'swap-buy' = exact-output. If omitted, providers SHOULD assume 'swap-sell'. */
+    outputs: Output[];
+    /** Order type: If omitted, providers SHOULD assume 'exact-input'. */
     orderType?: OrderType;
     /** Minimum validity timestamp in seconds */
     minValidUntil?: number;
@@ -262,7 +248,7 @@ export interface AssetAmount {
   /** Asset address in EIP-7930 interoperable format */
   asset: Address;
   /** Amount as a string-encoded integer */
-  amount: Amount;
+  amount?: Amount;
 }
 
 /**
