@@ -237,7 +237,7 @@ export type FailureHandlingMode =
  *       asset: "0x000100000101dAC17F958D2ee523a2206206994597C13D831ec7", // USDT
  *       amount: undefined // Provider will quote output amount
  *     }],
- *     orderType: "exact-input",
+ *     swapType: "exact-input",
  *     preference: "price"
  *   },
  *   supportedTypes: ["oif-escrow-v0"]
@@ -257,7 +257,7 @@ export type FailureHandlingMode =
  *       asset: "0x00010000a4b182e0B297B003493027903951655AF9d0e", // WETH on Arbitrum
  *       amount: "2000000000000000000" // Exact: 2 WETH
  *     }],
- *     orderType: "exact-output",
+ *     swapType: "exact-output",
  *     preference: "speed"
  *   },
  *   supportedTypes: ["oif-resource-lock-v0"]
@@ -273,7 +273,11 @@ export interface GetQuoteRequest {
     inputs: Input[];
     /** Requested outputs for the quote */
     outputs: Output[];
-    /** Swap type: If omitted, providers SHOULD assume 'exact-input'. */
+    /** 
+     * Swap type for the quote
+     * @description Determines which amounts are fixed vs quoted
+     * @default "exact-input" if omitted
+     */
     swapType?: SwapType;
     /** Minimum validity timestamp in seconds */
     minValidUntil?: number;
@@ -304,16 +308,27 @@ export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order | OifGe
 /**
  * Escrow-based order
  * @description Order that uses an escrow mechanism for asset custody during cross-chain transfers.
- *              Assets are held in escrow until conditions are met. Expected to use EIP-712 typed data
- *              for the payload structure.
+ *              Assets are held in escrow until conditions are met. Uses Permit2's PermitBatchWitnessTransferFrom
+ *              for efficient batch transfers with additional witness data.
  * @example
  * {
  *   type: "oif-escrow-v0",
  *   payload: {
  *     signatureType: "eip712",
- *     domain: { name: "OIF Escrow", version: "1", chainId: 1, verifyingContract: "0x..." },
- *     primaryType: "Order",
- *     message: { user: "0x00010000010174...", inputAsset: "0x000100000101A0b8...", ... }
+ *     domain: { name: "Permit2", version: "1", chainId: 1, verifyingContract: "0x000000000022D473030F116dDEE9F6B43aC78BA3" },
+ *     primaryType: "PermitBatchWitnessTransferFrom",
+ *     message: {
+ *       permitted: [
+ *         { token: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", amount: "1000000000" }
+ *       ],
+ *       spender: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *       nonce: "123",
+ *       deadline: 1700000000,
+ *       witness: {
+ *         recipient: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *         minAmountOut: "990000000"
+ *       }
+ *     }
  *   }
  * }
  */
@@ -330,27 +345,25 @@ export interface OifEscrowOrder {
 
 /**
  * Resource lock-based order
- * @description Order that uses resource locking (e.g., account abstraction modules) for asset control.
- *              Provides programmable conditions and automated execution. May use EIP-712 or EIP-3009
- *              signature schemes depending on the specific implementation.
- * @example With EIP-712:
+ * @description Order that uses resource locking for asset control, typically with The Compact
+ *              protocol for efficient batch operations and cross-chain transfers. Uses Compact
+ *              signatures (e.g., BatchCompact) for gas-efficient multi-operation authorization.
+ * @example With Compact/BatchCompact signature:
  * {
  *   type: "oif-resource-lock-v0",
  *   payload: {
  *     signatureType: "eip712",
- *     domain: { name: "OIF Resource Lock", ... },
- *     primaryType: "ResourceLockOrder",
- *     message: { lockContract: "0xabc...", unlockCondition: "0x...", ... }
- *   }
- * }
- * @example With EIP-3009 (potential future support):
- * {
- *   type: "oif-resource-lock-v0",
- *   payload: {
- *     signatureType: "eip3009",
- *     domain: { ... },
- *     primaryType: "TransferWithAuthorization",
- *     message: { from: "0x...", to: "0x...", value: "1000", ... }
+ *     domain: { name: "The Compact", version: "1", chainId: 1, verifyingContract: "0xabc..." },
+ *     primaryType: "BatchCompact",
+ *     message: {
+ *       arbiter: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       sponsor: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *       nonce: "123",
+ *       expires: 1700000000,
+ *       transfers: [
+ *         { token: "0x000100000101A0b8...", amount: "1000000000", recipient: "0x..." }
+ *       ]
+ *     }
  *   }
  * }
  */
@@ -365,19 +378,78 @@ export interface OifResourceLockOrder {
   }
 }
 
-// metadata included to verify against the nonce (hash of the order)
+/**
+ * EIP-3009 based order
+ * @description Order using EIP-3009 Transfer With Authorization standard, commonly used by
+ *              stablecoins like USDC. Includes metadata for nonce verification.
+ * @example
+ * {
+ *   type: "oif-3009-v0",
+ *   payload: {
+ *     signatureType: "eip712",
+ *     domain: { name: "USD Coin", version: "2", chainId: 1, verifyingContract: "0xA0b8..." },
+ *     primaryType: "TransferWithAuthorization",
+ *     message: {
+ *       from: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       to: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *       value: "1000000000",
+ *       validAfter: 0,
+ *       validBefore: 1700000000,
+ *       nonce: "0xabcd1234..."
+ *     }
+ *   },
+ *   metadata: {
+ *     orderHash: "0xdef456...",
+ *     chainId: 1,
+ *     tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+ *   }
+ * }
+ */
 export interface Oif3009Order {
+  /** Order type identifier for EIP-3009 transfers */
   type: "oif-3009-v0";
+  /** EIP-3009 Transfer With Authorization typed data */
   payload: {
+    /** Signature type indicator */
     signatureType: "eip712";
+    /** EIP-712 domain separator */
     domain: object;
+    /** Primary type name (typically "TransferWithAuthorization") */
     primaryType: string;
+    /** The transfer authorization message */
     message: object;
   };
+  /** Additional metadata for nonce verification and order tracking */
   metadata: object;
 }
+
+/**
+ * Generic order type
+ * @description Flexible order format that can accommodate various signature schemes and
+ *              order structures. Expects a similar structure to other order types with
+ *              signatureType and associated EIP-712 or other signature data.
+ * @example With EIP-712:
+ * {
+ *   type: "oif-generic-v0",
+ *   payload: {
+ *     signatureType: "eip712",
+ *     domain: { name: "Custom Protocol", version: "1", chainId: 1, verifyingContract: "0x..." },
+ *     primaryType: "LimitOrder",
+ *     message: {
+ *       maker: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       inputToken: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *       outputToken: "0x000100000101dAC17F958D2ee523a2206206994597C13D831ec7",
+ *       inputAmount: "1000000000",
+ *       outputAmount: "999000000",
+ *       expiry: 1700000000
+ *     }
+ *   }
+ * }
+ */
 export interface OifGenericOrder {
+  /** Order type identifier for generic orders */
   type: "oif-generic-v0";
+  /** Flexible payload structure determined by implementation */
   payload: object;
 }
 
