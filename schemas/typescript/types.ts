@@ -137,15 +137,41 @@ export interface GetQuoteRequest {
 }
 
 
-export type Order = OifEscrowOrder | OifResourceLockOrder
+export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order | OifGenericOrder
 
 export interface OifEscrowOrder {
   type: "oif-escrow-v0";
-  payload: unknown; // Todo - define the payload for the oif-escrow-v0 order
+  payload: {
+    signatureType: "eip712";
+    domain: object;
+    primaryType: string;
+    message: object;
+  }
 }
 export interface OifResourceLockOrder {
   type: "oif-resource-lock-v0";
-  payload: unknown; // Todo - define the payload for the oif-resource-lock-v0 order
+  payload: {
+    signatureType: "eip712";
+    domain: object;
+    primaryType: string;
+    message: object;
+  }
+}
+
+// metadata included to verify against the nonce (hash of the order)
+export interface Oif3009Order {
+  type: "oif-3009-v0";
+  payload: {
+    signatureType: "eip712";
+    domain: object;
+    primaryType: string;
+    message: object;
+  };
+  metadata: object;
+}
+export interface OifGenericOrder {
+  type: "oif-generic-v0";
+  payload: object;
 }
 
 
