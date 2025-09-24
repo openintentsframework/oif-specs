@@ -38,7 +38,7 @@ export type Amount = string;
  *              - "exact-output": User specifies exact output amount, provider quotes the input amount needed
  * @example "exact-input" - User has exactly 4000 USDC to swap, wants quote for how much ETH they'll receive
  * @example "exact-output" - User wants exactly 2 ETH, wants quote for how much USDC they need to provide
- * @default "exact-input" - If omitted in requests, providers should assume exact-input
+ * @default "exact-input"
  * @note Only relevant for quote requests. Direct intent submissions include both amounts.
  */
 export type SwapType = "exact-input" | "exact-output";
@@ -276,7 +276,7 @@ export interface GetQuoteRequest {
     /** 
      * Swap type for the quote
      * @description Determines which amounts are fixed vs quoted
-     * @default "exact-input" if omitted
+     * @default "exact-input"
      */
     swapType?: SwapType;
     /** Minimum validity timestamp in seconds */
