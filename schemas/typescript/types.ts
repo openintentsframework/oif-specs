@@ -41,7 +41,7 @@ export type Amount = string;
  * @default "exact-input" - If omitted in requests, providers should assume exact-input
  * @note Only relevant for quote requests. Direct intent submissions include both amounts.
  */
-export type OrderType = "exact-input" | "exact-output";
+export type SwapType = "exact-input" | "exact-output";
 
 /**
  * Reference to a lock in a locking system
@@ -273,8 +273,8 @@ export interface GetQuoteRequest {
     inputs: Input[];
     /** Requested outputs for the quote */
     outputs: Output[];
-    /** Order type: If omitted, providers SHOULD assume 'exact-input'. */
-    orderType?: OrderType;
+    /** Swap type: If omitted, providers SHOULD assume 'exact-input'. */
+    swapType?: SwapType;
     /** Minimum validity timestamp in seconds */
     minValidUntil?: number;
     /** Quote preference */
@@ -299,7 +299,7 @@ export interface GetQuoteRequest {
  * @description Represents all possible order types supported by the OIF protocol.
  *              Each order type has different security and execution characteristics.
  */
-export type Order = OifEscrowOrder | OifResourceLockOrder
+export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order | OifGenericOrder
 
 /**
  * Escrow-based order
@@ -320,8 +320,12 @@ export type Order = OifEscrowOrder | OifResourceLockOrder
 export interface OifEscrowOrder {
   /** Order type identifier for escrow-based execution */
   type: "oif-escrow-v0";
-  /** Escrow-specific order data - likely EIP-712 typed data structure */
-  payload: unknown; // Todo - define the payload for the oif-escrow-v0 order
+  payload: {
+    signatureType: "eip712";
+    domain: object;
+    primaryType: string;
+    message: object;
+  }
 }
 
 /**
@@ -353,8 +357,28 @@ export interface OifEscrowOrder {
 export interface OifResourceLockOrder {
   /** Order type identifier for resource lock-based execution */
   type: "oif-resource-lock-v0";
-  /** Resource lock-specific order data - likely EIP-712 or EIP-3009 structure */
-  payload: unknown; // Todo - define the payload for the oif-resource-lock-v0 order
+  payload: {
+    signatureType: "eip712";
+    domain: object;
+    primaryType: string;
+    message: object;
+  }
+}
+
+// metadata included to verify against the nonce (hash of the order)
+export interface Oif3009Order {
+  type: "oif-3009-v0";
+  payload: {
+    signatureType: "eip712";
+    domain: object;
+    primaryType: string;
+    message: object;
+  };
+  metadata: object;
+}
+export interface OifGenericOrder {
+  type: "oif-generic-v0";
+  payload: object;
 }
 
 
