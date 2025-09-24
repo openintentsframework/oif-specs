@@ -19,24 +19,34 @@ const OUTPUT_PATH = path.join(__dirname, "../specs/openapi.yaml");
 // Create OpenAPI registry
 const registry = new OpenAPIRegistry();
 
+// Define PostOrderRequest schema manually since it uses Uint8Array[] which ts-to-zod can't handle
+const postOrderRequestSchema = z.object({
+  order: schemas.orderSchema.describe("EIP-712 typed data for a gasless cross-chain order"),
+  signature: z.array(z.number()).describe("EIP-712 signature or equivalent as array of bytes"),
+  quoteId: z.string().optional().describe("Optional quote identifier from a prior Get Quote response"),
+  originSubmission: schemas.originSubmissionSchema.optional().describe("Optional preference mirrored from quote about who submits and acceptable schemes"),
+});
+
 // Register all schemas as components
 registry.register("Address", schemas.addressSchema);
 registry.register("Amount", schemas.amountSchema);
-registry.register("OrderType", schemas.orderTypeSchema);
+registry.register("SwapType", schemas.swapTypeSchema);
 registry.register("AssetLockReference", schemas.assetLockReferenceSchema);
-registry.register("AvailableInput", schemas.availableInputSchema);
-registry.register("RequestedOutput", schemas.requestedOutputSchema);
-registry.register(
-  "RequestedOutputDetails",
-  schemas.requestedOutputDetailsSchema
-);
+registry.register("OriginSubmission", schemas.originSubmissionSchema);
+registry.register("Input", schemas.inputSchema);
+registry.register("Output", schemas.outputSchema);
 registry.register("QuotePreference", schemas.quotePreferenceSchema);
+registry.register("FailureHandlingMode", schemas.failureHandlingModeSchema);
 registry.register("GetQuoteRequest", schemas.getQuoteRequestSchema);
-registry.register("Eip712Order", schemas.eip712OrderSchema);
-registry.register("QuoteDetails", schemas.quoteDetailsSchema);
+registry.register("OifEscrowOrder", schemas.oifEscrowOrderSchema);
+registry.register("OifResourceLockOrder", schemas.oifResourceLockOrderSchema);
+registry.register("Oif3009Order", schemas.oif3009OrderSchema);
+registry.register("OifGenericOrder", schemas.oifGenericOrderSchema);
+registry.register("Order", schemas.orderSchema);
 registry.register("Quote", schemas.quoteSchema);
 registry.register("GetQuoteResponse", schemas.getQuoteResponseSchema);
-registry.register("PostOrderRequest", schemas.postOrderRequestSchema);
+// Register the manually defined PostOrderRequest schema
+registry.register("PostOrderRequest", postOrderRequestSchema);
 registry.register("PostOrderResponse", schemas.postOrderResponseSchema);
 registry.register(
   "PostOrderResponseStatus",
@@ -93,7 +103,7 @@ registry.registerPath({
     body: {
       content: {
         "application/json": {
-          schema: schemas.postOrderRequestSchema,
+          schema: postOrderRequestSchema,
         },
       },
       required: true,

@@ -4,15 +4,31 @@
  */
 
 export {
+  // Order submission types
   PostOrderRequest,
   PostOrderResponse,
   PostOrderResponseStatus,
+  
+  // Order retrieval types
   GetOrderRequest,
   GetOrderResponse,
+  
+  // Order types
+  Order,
+  OifEscrowOrder,
+  OifResourceLockOrder,
+  Oif3009Order,
+  OifGenericOrder,
+  
+  // Order status and details
   OrderStatus,
   AssetAmount,
   Settlement,
   SettlementType,
-  FailureHandling,
+  
+  // Common types
+  Address,
+  Amount,
+  OriginSubmission,
   FailureHandlingMode,
 } from "./types";
