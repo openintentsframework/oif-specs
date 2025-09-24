@@ -397,6 +397,10 @@ components:
                   - "needs-new-signature": Requires new user signature to retry or refund
             partialFill:
               type: boolean
+            metadata:
+              type: object
+              additionalProperties:
+                nullable: true
           required:
             - intentType
             - inputs
@@ -785,6 +789,10 @@ components:
             - "needs-new-signature": Requires new user signature to retry or refund
         partialFill:
           type: boolean
+        metadata:
+          type: object
+          additionalProperties:
+            nullable: true
       required:
         - order
         - failureHandling
@@ -939,6 +947,10 @@ components:
                   - "needs-new-signature": Requires new user signature to retry or refund
               partialFill:
                 type: boolean
+              metadata:
+                type: object
+                additionalProperties:
+                  nullable: true
             required:
               - order
               - failureHandling
@@ -1464,6 +1476,10 @@ paths:
                           - "needs-new-signature": Requires new user signature to retry or refund
                     partialFill:
                       type: boolean
+                    metadata:
+                      type: object
+                      additionalProperties:
+                        nullable: true
                   required:
                     - intentType
                     - inputs
@@ -1631,6 +1647,10 @@ paths:
                             - "needs-new-signature": Requires new user signature to retry or refund
                         partialFill:
                           type: boolean
+                        metadata:
+                          type: object
+                          additionalProperties:
+                            nullable: true
                       required:
                         - order
                         - failureHandling

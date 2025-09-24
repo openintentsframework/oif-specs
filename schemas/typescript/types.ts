@@ -293,6 +293,8 @@ export interface GetQuoteRequest {
     failureHandling?: FailureHandlingMode[];
     /** Whether the integrator supports partial fills */
     partialFill?: boolean;
+    /** Metadata for the order, never required, potentiallycontains provider specific data */
+    metadata?: object;
   }
   supportedTypes: string[]; // Order types supported by the provider
 }
@@ -485,6 +487,8 @@ export interface Quote {
   failureHandling: FailureHandlingMode;
   /** Whether the quote supports partial fills */
   partialFill: boolean;
+  /** Metadata for the order, never required, potentiallycontains provider specific data */
+  metadata?: object;
 }
 
 /**

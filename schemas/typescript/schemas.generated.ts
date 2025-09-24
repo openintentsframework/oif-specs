@@ -131,6 +131,7 @@ export const getQuoteRequestSchema = z.object({
     originSubmission: originSubmissionSchema.optional(),
     failureHandling: z.array(failureHandlingModeSchema).optional(),
     partialFill: z.boolean().optional(),
+    metadata: z.record(z.any()).optional(),
   }),
   supportedTypes: z.array(z.string()),
 });
@@ -190,6 +191,7 @@ export const quoteSchema = z.object({
   provider: z.string().optional(),
   failureHandling: failureHandlingModeSchema,
   partialFill: z.boolean(),
+  metadata: z.record(z.any()).optional(),
 });
 
 export const postOrderResponseStatusSchema = z.nativeEnum(
