@@ -631,7 +631,17 @@ export enum OrderStatus {
    */
   Settled = "settled",
   /** 
-   * Order is finalized and complete (after claim confirmation)
+   * Order is partially executed
+   * @description Some transactions has been submitted to the blockchain
+   */
+  Executing = "executing",
+  /** 
+   * Order is settling and is ready to be claimed
+   * @description Some assets are available for claiming by the receiver
+   */
+  Settling = "settling",
+  /** 
+   * Order is finalized and complete (after all claims are confirmed)
    * @description All aspects of the order are complete, including claims
    */
   Finalized = "finalized",

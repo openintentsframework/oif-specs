@@ -1156,6 +1156,8 @@ components:
         - pending
         - executed
         - settled
+        - executing
+        - settling
         - finalized
         - failed
         - refunded
@@ -1215,6 +1217,8 @@ components:
             - pending
             - executed
             - settled
+            - executing
+            - settling
             - finalized
             - failed
             - refunded
@@ -1896,6 +1900,8 @@ paths:
                       - pending
                       - executed
                       - settled
+                      - executing
+                      - settling
                       - finalized
                       - failed
                       - refunded
