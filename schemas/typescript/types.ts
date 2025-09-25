@@ -640,6 +640,11 @@ export enum OrderStatus {
    * @description Order could not be executed due to errors or conditions not met
    */
   Failed = "failed",
+  /** 
+   * Order execution failed and inputs have been refunded
+   * @description Order was not filled and assets have been refunded
+   */
+   Refunded = "refunded",
 }
 
 /**
