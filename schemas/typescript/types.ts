@@ -646,11 +646,6 @@ export enum OrderStatus {
  * Asset amount representation
  * @description Combines an asset identifier with an amount, using EIP-7930 addresses for
  *              cross-chain compatibility.
- * @example
- * {
- *   asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
- *   amount: "1000000000" // 1000 USDC (6 decimals)
- * }
  * @example Cross-chain:
  * {
  *   asset: "0x00010000018903A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Polygon (chain 137 = 0x89 in hex, 0x8903 in EIP-7930)
