@@ -262,7 +262,7 @@ export type FailureHandlingMode =
  * }
  */
 export interface GetQuoteRequest {
-  /** User requesting the quote */
+  /** User requesting the quote and recipient of refund inputs in case of failures */
   user: Address;
 
   intent: {
@@ -640,6 +640,11 @@ export enum OrderStatus {
    * @description Order could not be executed due to errors or conditions not met
    */
   Failed = "failed",
+  /** 
+   * Order execution failed and inputs have been refunded
+   * @description Order was not filled and assets have been refunded
+   */
+   Refunded = "refunded",
 }
 
 /**
