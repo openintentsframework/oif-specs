@@ -302,7 +302,7 @@ export interface GetQuoteRequest {
  * @description Represents all possible order types supported by the OIF protocol.
  *              Each order type has different security and execution characteristics.
  */
-export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order | OifGenericOrder
+export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order
 
 /**
  * Escrow-based order
@@ -420,36 +420,6 @@ export interface Oif3009Order {
   };
   /** Additional metadata for nonce verification and order tracking */
   metadata: object;
-}
-
-/**
- * Generic order type
- * @description Flexible order format that can accommodate various signature schemes and
- *              order structures. Expects a similar structure to other order types with
- *              signatureType and associated EIP-712 or other signature data.
- * @example With EIP-712:
- * {
- *   type: "oif-generic-v0",
- *   payload: {
- *     signatureType: "eip712",
- *     domain: { name: "Custom Protocol", version: "1", chainId: 1, verifyingContract: "0x..." },
- *     primaryType: "LimitOrder",
- *     message: {
- *       maker: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
- *       inputToken: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
- *       outputToken: "0x000100000101dAC17F958D2ee523a2206206994597C13D831ec7",
- *       inputAmount: "1000000000",
- *       outputAmount: "999000000",
- *       expiry: 1700000000
- *     }
- *   }
- * }
- */
-export interface OifGenericOrder {
-  /** Order type identifier for generic orders */
-  type: "oif-generic-v0";
-  /** Flexible payload structure determined by implementation */
-  payload: object;
 }
 
 

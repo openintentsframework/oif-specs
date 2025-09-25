@@ -167,18 +167,8 @@ export const oif3009OrderSchema = z.object({
   metadata: z.record(z.any()),
 });
 
-export const oifGenericOrderSchema = z.object({
-  type: z.literal("oif-generic-v0"),
-  payload: z.record(z.any()),
-});
-
 export const orderSchema = z
-  .union([
-    oifEscrowOrderSchema,
-    oifResourceLockOrderSchema,
-    oif3009OrderSchema,
-    oifGenericOrderSchema,
-  ])
+  .union([oifEscrowOrderSchema, oifResourceLockOrderSchema, oif3009OrderSchema])
   .describe(
     "Represents all possible order types supported by the OIF protocol.\nEach order type has different security and execution characteristics.",
   );
