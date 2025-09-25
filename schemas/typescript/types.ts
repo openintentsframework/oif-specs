@@ -123,8 +123,8 @@ export interface Input {
   /** 
    * Amount available
    * @description For quote requests:
-   *              - exact-input: The exact amount user will provide (output amount undefined in request)
-   *              - exact-output: Undefined in request (provider quotes required input amount)
+   *              - exact-input: The exact amount user will provide
+   *              - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
    *              For direct intents: Always specified
    * @example "4000000000" - 4000 USDC for exact-input quote
    */
@@ -169,8 +169,8 @@ export interface Output {
   /** 
    * Amount requested
    * @description For quote requests:
-   *              - exact-input: Undefined in request (provider quotes output amount)
-   *              - exact-output: The exact amount user wants to receive (input amount undefined in request)
+   *              - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+   *              - exact-output: The exact amount user wants to receive
    *              For direct intents: Always specified
    * @example "2000000000000000000" - 2 ETH for exact-output quote
    */

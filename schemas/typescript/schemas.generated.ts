@@ -70,7 +70,7 @@ export const inputSchema = z.object({
   amount: amountSchema
     .optional()
     .describe(
-      "For quote requests:\n- exact-input: The exact amount user will provide (output amount undefined in request)\n- exact-output: Undefined in request (provider quotes required input amount)\nFor direct intents: Always specified",
+      "For quote requests:\n- exact-input: The exact amount user will provide\n- exact-output: minimum amount user will provide. Optional in request for open discovery of the quote\nFor direct intents: Always specified",
     ),
   lock: assetLockReferenceSchema
     .optional()
@@ -85,7 +85,7 @@ export const outputSchema = z.object({
   amount: amountSchema
     .optional()
     .describe(
-      "For quote requests:\n- exact-input: Undefined in request (provider quotes output amount)\n- exact-output: The exact amount user wants to receive (input amount undefined in request)\nFor direct intents: Always specified",
+      "For quote requests:\n- exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote\n- exact-output: The exact amount user wants to receive\nFor direct intents: Always specified",
     ),
   calldata: z
     .string()
