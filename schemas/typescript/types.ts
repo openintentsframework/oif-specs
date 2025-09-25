@@ -262,7 +262,7 @@ export type FailureHandlingMode =
  * }
  */
 export interface GetQuoteRequest {
-  /** User requesting the quote */
+  /** User requesting the quote and recipient of refund inputs in case of failures */
   user: Address;
 
   intent: {
