@@ -7,11 +7,9 @@
 
 /**
  * EIP-7930 interoperable address format
- * @description Cross-chain compatible address format per EIP-7930. Supports both plain Ethereum addresses 
- *              (0x + 40 hex chars) and version 1 encoded format (0x0001 + chain ID + address) for 
+ * @description Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for 
  *              unambiguous cross-chain identification.
- * @pattern ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
- * @example Plain Ethereum: "0x14D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
+ * @pattern ^0x0001[a-fA-F0-9]+$
  * @example Cross-chain (Ethereum mainnet): "0x00010000010114D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
  * @example Cross-chain (Polygon): "0x0001000001890314D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
  * @see https://eips.ethereum.org/EIPS/eip-7930

@@ -16,10 +16,9 @@ components:
   schemas:
     Address:
       type: string
-      pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+      pattern: ^0x0001[a-fA-F0-9]+$
       description: |-
-        Cross-chain compatible address format per EIP-7930. Supports both plain Ethereum addresses
-        (0x + 40 hex chars) and version 1 encoded format (0x0001 + chain ID + address) for
+        Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
         unambiguous cross-chain identification.
     Amount:
       type: string
@@ -108,11 +107,11 @@ components:
       properties:
         user:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: The address providing the input assets
         asset:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: The token/asset being provided as input
         amount:
           type: string
@@ -154,11 +153,11 @@ components:
       properties:
         receiver:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: The address that will receive the output assets
         asset:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: The token/asset to be received as output
         amount:
           type: string
@@ -217,10 +216,9 @@ components:
       properties:
         user:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: |-
-            Cross-chain compatible address format per EIP-7930. Supports both plain Ethereum addresses
-            (0x + 40 hex chars) and version 1 encoded format (0x0001 + chain ID + address) for
+            Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
             unambiguous cross-chain identification.
         intent:
           type: object
@@ -236,11 +234,11 @@ components:
                 properties:
                   user:
                     type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                    pattern: ^0x0001[a-fA-F0-9]+$
                     description: The address providing the input assets
                   asset:
                     type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                    pattern: ^0x0001[a-fA-F0-9]+$
                     description: The token/asset being provided as input
                   amount:
                     type: string
@@ -284,11 +282,11 @@ components:
                 properties:
                   receiver:
                     type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                    pattern: ^0x0001[a-fA-F0-9]+$
                     description: The address that will receive the output assets
                   asset:
                     type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                    pattern: ^0x0001[a-fA-F0-9]+$
                     description: The token/asset to be received as output
                   amount:
                     type: string
@@ -1165,7 +1163,7 @@ components:
       properties:
         asset:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: The token/asset identifier, may include chain information
         amount:
           type: string
@@ -1229,7 +1227,7 @@ components:
           properties:
             asset:
               type: string
-              pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+              pattern: ^0x0001[a-fA-F0-9]+$
               description: The token/asset identifier, may include chain information
             amount:
               type: string
@@ -1242,7 +1240,7 @@ components:
           properties:
             asset:
               type: string
-              pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+              pattern: ^0x0001[a-fA-F0-9]+$
               description: The token/asset identifier, may include chain information
             amount:
               type: string
@@ -1296,10 +1294,9 @@ paths:
               properties:
                 user:
                   type: string
-                  pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                  pattern: ^0x0001[a-fA-F0-9]+$
                   description: |-
-                    Cross-chain compatible address format per EIP-7930. Supports both plain Ethereum addresses
-                    (0x + 40 hex chars) and version 1 encoded format (0x0001 + chain ID + address) for
+                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
                     unambiguous cross-chain identification.
                 intent:
                   type: object
@@ -1315,11 +1312,11 @@ paths:
                         properties:
                           user:
                             type: string
-                            pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                            pattern: ^0x0001[a-fA-F0-9]+$
                             description: The address providing the input assets
                           asset:
                             type: string
-                            pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                            pattern: ^0x0001[a-fA-F0-9]+$
                             description: The token/asset being provided as input
                           amount:
                             type: string
@@ -1363,11 +1360,11 @@ paths:
                         properties:
                           receiver:
                             type: string
-                            pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                            pattern: ^0x0001[a-fA-F0-9]+$
                             description: The address that will receive the output assets
                           asset:
                             type: string
-                            pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                            pattern: ^0x0001[a-fA-F0-9]+$
                             description: The token/asset to be received as output
                           amount:
                             type: string
@@ -1910,7 +1907,7 @@ paths:
                     properties:
                       asset:
                         type: string
-                        pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                        pattern: ^0x0001[a-fA-F0-9]+$
                         description: The token/asset identifier, may include chain information
                       amount:
                         type: string
@@ -1923,7 +1920,7 @@ paths:
                     properties:
                       asset:
                         type: string
-                        pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                        pattern: ^0x0001[a-fA-F0-9]+$
                         description: The token/asset identifier, may include chain information
                       amount:
                         type: string
