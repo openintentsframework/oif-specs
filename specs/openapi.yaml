@@ -1158,6 +1158,7 @@ components:
         - settled
         - finalized
         - failed
+        - refunded
     AssetAmount:
       type: object
       properties:
@@ -1216,6 +1217,7 @@ components:
             - settled
             - finalized
             - failed
+            - refunded
         createdAt:
           type: number
         updatedAt:
@@ -1896,6 +1898,7 @@ paths:
                       - settled
                       - finalized
                       - failed
+                      - refunded
                   createdAt:
                     type: number
                   updatedAt:

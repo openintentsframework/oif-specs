@@ -757,10 +757,10 @@ export interface GetOrderRequest {
  *     type: SettlementType.Escrow,
  *     data: { escrowContract: "0x123...", claimable: true }
  *   },
- *   fillTransaction: {
+ *   fillTransaction:[ {
  *     hash: "0xabc...",
  *     blockNumber: 18500000
- *   }
+ *   }]
  * }
  */
 export interface GetOrderResponse {
