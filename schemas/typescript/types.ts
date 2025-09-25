@@ -746,11 +746,11 @@ export interface GetOrderRequest {
  *   updatedAt: 1699900100,
  *   quoteId: "quote-123-abc",
  *   inputAmount: {
- *     asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *     asset: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
  *     amount: "1000000000"
  *   },
  *   outputAmount: {
- *     asset: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+ *     asset: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb9",
  *     amount: "500000000000000000"
  *   },
  *   settlement: {
