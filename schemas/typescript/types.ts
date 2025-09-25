@@ -487,7 +487,7 @@ export interface Quote {
   failureHandling: FailureHandlingMode;
   /** Whether the quote supports partial fills */
   partialFill: boolean;
-  /** Metadata for the order, never required, potentiallycontains provider specific data */
+  /** Metadata for the order, never required, potentially contains provider specific data */
   metadata?: object;
 }
 
