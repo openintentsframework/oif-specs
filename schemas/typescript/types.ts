@@ -283,7 +283,6 @@ export interface GetQuoteRequest {
     preference?: QuotePreference;
     /**
      * Explicit preference for submission responsibility and acceptable auth schemes.
-     * If provided, takes precedence over the legacy boolean.
      */
     originSubmission?: OriginSubmission;
 
