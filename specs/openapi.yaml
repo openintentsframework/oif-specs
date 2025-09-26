@@ -435,11 +435,28 @@ components:
               type: object
               additionalProperties:
                 nullable: true
+            types:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                    - name
+                    - type
+                description: Map from type name to its field definitions, per EIP-712
+              description: Map from type name to its field definitions, per EIP-712
           required:
             - signatureType
             - domain
             - primaryType
             - message
+            - types
       required:
         - type
         - payload
@@ -467,11 +484,28 @@ components:
               type: object
               additionalProperties:
                 nullable: true
+            types:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                    - name
+                    - type
+                description: Map from type name to its field definitions, per EIP-712
+              description: Map from type name to its field definitions, per EIP-712
           required:
             - signatureType
             - domain
             - primaryType
             - message
+            - types
       required:
         - type
         - payload
@@ -499,11 +533,28 @@ components:
               type: object
               additionalProperties:
                 nullable: true
+            types:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                    - name
+                    - type
+                description: Map from type name to its field definitions, per EIP-712
+              description: Map from type name to its field definitions, per EIP-712
           required:
             - signatureType
             - domain
             - primaryType
             - message
+            - types
         metadata:
           type: object
           additionalProperties:
@@ -512,20 +563,6 @@ components:
         - type
         - payload
         - metadata
-    OifGenericOrder:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - oif-generic-v0
-        payload:
-          type: object
-          additionalProperties:
-            nullable: true
-      required:
-        - type
-        - payload
     Order:
       anyOf:
         - type: object
@@ -551,11 +588,28 @@ components:
                   type: object
                   additionalProperties:
                     nullable: true
+                types:
+                  type: object
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        type:
+                          type: string
+                      required:
+                        - name
+                        - type
+                    description: Map from type name to its field definitions, per EIP-712
+                  description: Map from type name to its field definitions, per EIP-712
               required:
                 - signatureType
                 - domain
                 - primaryType
                 - message
+                - types
           required:
             - type
             - payload
@@ -582,11 +636,28 @@ components:
                   type: object
                   additionalProperties:
                     nullable: true
+                types:
+                  type: object
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        type:
+                          type: string
+                      required:
+                        - name
+                        - type
+                    description: Map from type name to its field definitions, per EIP-712
+                  description: Map from type name to its field definitions, per EIP-712
               required:
                 - signatureType
                 - domain
                 - primaryType
                 - message
+                - types
           required:
             - type
             - payload
@@ -613,11 +684,28 @@ components:
                   type: object
                   additionalProperties:
                     nullable: true
+                types:
+                  type: object
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        type:
+                          type: string
+                      required:
+                        - name
+                        - type
+                    description: Map from type name to its field definitions, per EIP-712
+                  description: Map from type name to its field definitions, per EIP-712
               required:
                 - signatureType
                 - domain
                 - primaryType
                 - message
+                - types
             metadata:
               type: object
               additionalProperties:
@@ -626,22 +714,7 @@ components:
             - type
             - payload
             - metadata
-        - type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - oif-generic-v0
-            payload:
-              type: object
-              additionalProperties:
-                nullable: true
-          required:
-            - type
-            - payload
-      description: |-
-        Represents all possible order types supported by the OIF protocol.
-        Each order type has different security and execution characteristics.
+      description: Represents all possible order types supported by the OIF protocol. Each order type has different security and execution characteristics.
     Quote:
       type: object
       properties:
@@ -670,11 +743,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
               required:
                 - type
                 - payload
@@ -701,11 +791,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
               required:
                 - type
                 - payload
@@ -732,11 +839,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
                 metadata:
                   type: object
                   additionalProperties:
@@ -745,30 +869,19 @@ components:
                 - type
                 - payload
                 - metadata
-            - type: object
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - oif-generic-v0
-                payload:
-                  type: object
-                  additionalProperties:
-                    nullable: true
-              required:
-                - type
-                - payload
-          description: |-
-            Represents all possible order types supported by the OIF protocol.
-            Each order type has different security and execution characteristics.
+          description: Represents all possible order types supported by the OIF protocol. Each order type has different security and execution characteristics.
         validUntil:
           type: number
+          description: Quote validity timestamp in seconds
         eta:
           type: number
+          description: Estimated time of arrival in seconds
         quoteId:
           type: string
+          description: Unique quote identifier
         provider:
           type: string
+          description: Provider identifier
         failureHandling:
           anyOf:
             - type: string
@@ -780,17 +893,15 @@ components:
             - type: string
               enum:
                 - needs-new-signature
-          description: |-
-            Defines how to handle transaction failures or partial fills
-            - "refund-automatic": Automatic refund on failure without user action
-            - "refund-claim": User must claim refund manually after failure
-            - "needs-new-signature": Requires new user signature to retry or refund
+          description: Failure handling policy for execution
         partialFill:
           type: boolean
+          description: Whether the quote supports partial fills
         metadata:
           type: object
           additionalProperties:
             nullable: true
+          description: Metadata for the order, never required, potentially contains provider specific data
       required:
         - order
         - failureHandling
@@ -828,11 +939,28 @@ components:
                             type: object
                             additionalProperties:
                               nullable: true
+                          types:
+                            type: object
+                            additionalProperties:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  type:
+                                    type: string
+                                required:
+                                  - name
+                                  - type
+                              description: Map from type name to its field definitions, per EIP-712
+                            description: Map from type name to its field definitions, per EIP-712
                         required:
                           - signatureType
                           - domain
                           - primaryType
                           - message
+                          - types
                     required:
                       - type
                       - payload
@@ -859,11 +987,28 @@ components:
                             type: object
                             additionalProperties:
                               nullable: true
+                          types:
+                            type: object
+                            additionalProperties:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  type:
+                                    type: string
+                                required:
+                                  - name
+                                  - type
+                              description: Map from type name to its field definitions, per EIP-712
+                            description: Map from type name to its field definitions, per EIP-712
                         required:
                           - signatureType
                           - domain
                           - primaryType
                           - message
+                          - types
                     required:
                       - type
                       - payload
@@ -890,11 +1035,28 @@ components:
                             type: object
                             additionalProperties:
                               nullable: true
+                          types:
+                            type: object
+                            additionalProperties:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  type:
+                                    type: string
+                                required:
+                                  - name
+                                  - type
+                              description: Map from type name to its field definitions, per EIP-712
+                            description: Map from type name to its field definitions, per EIP-712
                         required:
                           - signatureType
                           - domain
                           - primaryType
                           - message
+                          - types
                       metadata:
                         type: object
                         additionalProperties:
@@ -903,30 +1065,19 @@ components:
                       - type
                       - payload
                       - metadata
-                  - type: object
-                    properties:
-                      type:
-                        type: string
-                        enum:
-                          - oif-generic-v0
-                      payload:
-                        type: object
-                        additionalProperties:
-                          nullable: true
-                    required:
-                      - type
-                      - payload
-                description: |-
-                  Represents all possible order types supported by the OIF protocol.
-                  Each order type has different security and execution characteristics.
+                description: Represents all possible order types supported by the OIF protocol. Each order type has different security and execution characteristics.
               validUntil:
                 type: number
+                description: Quote validity timestamp in seconds
               eta:
                 type: number
+                description: Estimated time of arrival in seconds
               quoteId:
                 type: string
+                description: Unique quote identifier
               provider:
                 type: string
+                description: Provider identifier
               failureHandling:
                 anyOf:
                   - type: string
@@ -938,17 +1089,15 @@ components:
                   - type: string
                     enum:
                       - needs-new-signature
-                description: |-
-                  Defines how to handle transaction failures or partial fills
-                  - "refund-automatic": Automatic refund on failure without user action
-                  - "refund-claim": User must claim refund manually after failure
-                  - "needs-new-signature": Requires new user signature to retry or refund
+                description: Failure handling policy for execution
               partialFill:
                 type: boolean
+                description: Whether the quote supports partial fills
               metadata:
                 type: object
                 additionalProperties:
                   nullable: true
+                description: Metadata for the order, never required, potentially contains provider specific data
             required:
               - order
               - failureHandling
@@ -984,11 +1133,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
               required:
                 - type
                 - payload
@@ -1015,11 +1181,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
               required:
                 - type
                 - payload
@@ -1046,11 +1229,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
                 metadata:
                   type: object
                   additionalProperties:
@@ -1059,19 +1259,6 @@ components:
                 - type
                 - payload
                 - metadata
-            - type: object
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - oif-generic-v0
-                payload:
-                  type: object
-                  additionalProperties:
-                    nullable: true
-              required:
-                - type
-                - payload
           description: EIP-712 typed data for a gasless cross-chain order
         signature:
           type: array
@@ -1533,11 +1720,28 @@ paths:
                                       type: object
                                       additionalProperties:
                                         nullable: true
+                                    types:
+                                      type: object
+                                      additionalProperties:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            name:
+                                              type: string
+                                            type:
+                                              type: string
+                                          required:
+                                            - name
+                                            - type
+                                        description: Map from type name to its field definitions, per EIP-712
+                                      description: Map from type name to its field definitions, per EIP-712
                                   required:
                                     - signatureType
                                     - domain
                                     - primaryType
                                     - message
+                                    - types
                               required:
                                 - type
                                 - payload
@@ -1564,11 +1768,28 @@ paths:
                                       type: object
                                       additionalProperties:
                                         nullable: true
+                                    types:
+                                      type: object
+                                      additionalProperties:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            name:
+                                              type: string
+                                            type:
+                                              type: string
+                                          required:
+                                            - name
+                                            - type
+                                        description: Map from type name to its field definitions, per EIP-712
+                                      description: Map from type name to its field definitions, per EIP-712
                                   required:
                                     - signatureType
                                     - domain
                                     - primaryType
                                     - message
+                                    - types
                               required:
                                 - type
                                 - payload
@@ -1595,11 +1816,28 @@ paths:
                                       type: object
                                       additionalProperties:
                                         nullable: true
+                                    types:
+                                      type: object
+                                      additionalProperties:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            name:
+                                              type: string
+                                            type:
+                                              type: string
+                                          required:
+                                            - name
+                                            - type
+                                        description: Map from type name to its field definitions, per EIP-712
+                                      description: Map from type name to its field definitions, per EIP-712
                                   required:
                                     - signatureType
                                     - domain
                                     - primaryType
                                     - message
+                                    - types
                                 metadata:
                                   type: object
                                   additionalProperties:
@@ -1608,30 +1846,19 @@ paths:
                                 - type
                                 - payload
                                 - metadata
-                            - type: object
-                              properties:
-                                type:
-                                  type: string
-                                  enum:
-                                    - oif-generic-v0
-                                payload:
-                                  type: object
-                                  additionalProperties:
-                                    nullable: true
-                              required:
-                                - type
-                                - payload
-                          description: |-
-                            Represents all possible order types supported by the OIF protocol.
-                            Each order type has different security and execution characteristics.
+                          description: Represents all possible order types supported by the OIF protocol. Each order type has different security and execution characteristics.
                         validUntil:
                           type: number
+                          description: Quote validity timestamp in seconds
                         eta:
                           type: number
+                          description: Estimated time of arrival in seconds
                         quoteId:
                           type: string
+                          description: Unique quote identifier
                         provider:
                           type: string
+                          description: Provider identifier
                         failureHandling:
                           anyOf:
                             - type: string
@@ -1643,17 +1870,15 @@ paths:
                             - type: string
                               enum:
                                 - needs-new-signature
-                          description: |-
-                            Defines how to handle transaction failures or partial fills
-                            - "refund-automatic": Automatic refund on failure without user action
-                            - "refund-claim": User must claim refund manually after failure
-                            - "needs-new-signature": Requires new user signature to retry or refund
+                          description: Failure handling policy for execution
                         partialFill:
                           type: boolean
+                          description: Whether the quote supports partial fills
                         metadata:
                           type: object
                           additionalProperties:
                             nullable: true
+                          description: Metadata for the order, never required, potentially contains provider specific data
                       required:
                         - order
                         - failureHandling
@@ -1702,11 +1927,28 @@ paths:
                               type: object
                               additionalProperties:
                                 nullable: true
+                            types:
+                              type: object
+                              additionalProperties:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    type:
+                                      type: string
+                                  required:
+                                    - name
+                                    - type
+                                description: Map from type name to its field definitions, per EIP-712
+                              description: Map from type name to its field definitions, per EIP-712
                           required:
                             - signatureType
                             - domain
                             - primaryType
                             - message
+                            - types
                       required:
                         - type
                         - payload
@@ -1733,11 +1975,28 @@ paths:
                               type: object
                               additionalProperties:
                                 nullable: true
+                            types:
+                              type: object
+                              additionalProperties:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    type:
+                                      type: string
+                                  required:
+                                    - name
+                                    - type
+                                description: Map from type name to its field definitions, per EIP-712
+                              description: Map from type name to its field definitions, per EIP-712
                           required:
                             - signatureType
                             - domain
                             - primaryType
                             - message
+                            - types
                       required:
                         - type
                         - payload
@@ -1764,11 +2023,28 @@ paths:
                               type: object
                               additionalProperties:
                                 nullable: true
+                            types:
+                              type: object
+                              additionalProperties:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    type:
+                                      type: string
+                                  required:
+                                    - name
+                                    - type
+                                description: Map from type name to its field definitions, per EIP-712
+                              description: Map from type name to its field definitions, per EIP-712
                           required:
                             - signatureType
                             - domain
                             - primaryType
                             - message
+                            - types
                         metadata:
                           type: object
                           additionalProperties:
@@ -1777,19 +2053,6 @@ paths:
                         - type
                         - payload
                         - metadata
-                    - type: object
-                      properties:
-                        type:
-                          type: string
-                          enum:
-                            - oif-generic-v0
-                        payload:
-                          type: object
-                          additionalProperties:
-                            nullable: true
-                      required:
-                        - type
-                        - payload
                   description: EIP-712 typed data for a gasless cross-chain order
                 signature:
                   type: array
