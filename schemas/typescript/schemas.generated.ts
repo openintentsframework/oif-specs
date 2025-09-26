@@ -167,23 +167,6 @@ export const oif3009OrderSchema = z.object({
   metadata: z.record(z.any()),
 });
 
-export const orderSchema = z
-  .union([oifEscrowOrderSchema, oifResourceLockOrderSchema, oif3009OrderSchema])
-  .describe(
-    "Represents all possible order types supported by the OIF protocol.\nEach order type has different security and execution characteristics.",
-  );
-
-export const quoteSchema = z.object({
-  order: orderSchema,
-  validUntil: z.number().optional(),
-  eta: z.number().optional(),
-  quoteId: z.string().optional(),
-  provider: z.string().optional(),
-  failureHandling: failureHandlingModeSchema,
-  partialFill: z.boolean(),
-  metadata: z.record(z.any()).optional(),
-});
-
 export const postOrderResponseStatusSchema = z.nativeEnum(
   PostOrderResponseStatus,
 );
@@ -235,12 +218,4 @@ export const getOrderResponseSchema = z.object({
   outputAmount: assetAmountSchema,
   settlement: settlementSchema,
   fillTransaction: z.record(z.unknown()).optional(),
-});
-
-export const getQuoteResponseSchema = z.object({
-  quotes: z
-    .array(quoteSchema)
-    .describe(
-      "List of available quotes, may be empty if no quotes are available",
-    ),
 });
