@@ -330,7 +330,8 @@ export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order | OifGe
  *         recipient: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
  *         minAmountOut: "990000000"
  *       }
- *     }
+ *     },
+ *     types: { ... }
  *   }
  * }
  */
@@ -342,6 +343,8 @@ export interface OifEscrowOrder {
     domain: object;
     primaryType: string;
     message: object;
+    /** EIP-712 types used to construct the digest */
+    types: EIP712Types;
   }
 }
 
@@ -365,7 +368,8 @@ export interface OifEscrowOrder {
  *       transfers: [
  *         { token: "0x000100000101A0b8...", amount: "1000000000", recipient: "0x..." }
  *       ]
- *     }
+ *     },
+ *     types: { ... }
  *   }
  * }
  */
@@ -377,8 +381,44 @@ export interface OifResourceLockOrder {
     domain: object;
     primaryType: string;
     message: object;
+    /** EIP-712 types used to construct the digest */
+    types: EIP712Types;
   }
 }
+
+/**
+ * EIP-712 type property
+ * @description Single field definition used inside the EIP-712 `types` map
+ * @example { name: "amount", type: "uint256" }
+ */
+export interface EIP712TypeProperty {
+  /** Field name */
+  name: string;
+  /** Solidity/EVM type */
+  type: string;
+}
+
+/**
+ * EIP-712 types mapping
+ * @description Map from type name to its field definitions, per EIP-712
+ * @example {
+ *   EIP712Domain: [
+ *     { name: "name", type: "string" },
+ *     { name: "version", type: "string" },
+ *     { name: "chainId", type: "uint256" },
+ *     { name: "verifyingContract", type: "address" }
+ *   ],
+ *   BatchCompact: [
+ *     { name: "arbiter", type: "address" },
+ *     { name: "sponsor", type: "address" },
+ *     { name: "nonce", type: "uint256" },
+ *     { name: "expires", type: "uint256" },
+ *     { name: "commitments", type: "Lock[]" },
+ *     { name: "mandate", type: "Mandate" }
+ *   ]
+ * }
+ */
+export type EIP712Types = Record<string, EIP712TypeProperty[]>;
 
 /**
  * EIP-3009 based order
@@ -398,7 +438,8 @@ export interface OifResourceLockOrder {
  *       validAfter: 0,
  *       validBefore: 1700000000,
  *       nonce: "0xabcd1234..."
- *     }
+ *     },
+ *     types: { ... }
  *   },
  *   metadata: {
  *     orderHash: "0xdef456...",
@@ -420,6 +461,8 @@ export interface Oif3009Order {
     primaryType: string;
     /** The transfer authorization message */
     message: object;
+    /** EIP-712 types used to construct the digest */
+    types: EIP712Types;
   };
   /** Additional metadata for nonce verification and order tracking */
   metadata: object;
@@ -444,7 +487,8 @@ export interface Oif3009Order {
  *       inputAmount: "1000000000",
  *       outputAmount: "999000000",
  *       expiry: 1700000000
- *     }
+ *     },
+ *     types: { ... }
  *   }
  * }
  */
@@ -452,7 +496,20 @@ export interface OifGenericOrder {
   /** Order type identifier for generic orders */
   type: "oif-generic-v0";
   /** Flexible payload structure determined by implementation */
-  payload: object;
+  payload: {
+    /** Signature type (e.g., eip712) */
+    signatureType?: string;
+    /** Domain separator for signature verification */
+    domain?: object;
+    /** The primary type for the signature message */
+    primaryType?: string;
+    /** The signature message data */
+    message?: object;
+    /** EIP-712 types used to construct the digest */
+    types?: EIP712Types;
+    /** Allow any additional properties for flexibility */
+    [key: string]: unknown;
+  };
 }
 
 

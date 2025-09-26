@@ -136,25 +136,18 @@ export const getQuoteRequestSchema = z.object({
   supportedTypes: z.array(z.string()),
 });
 
-export const oifEscrowOrderSchema = z.object({
-  type: z.literal("oif-escrow-v0"),
-  payload: z.object({
-    signatureType: z.literal("eip712"),
-    domain: z.record(z.any()),
-    primaryType: z.string(),
-    message: z.record(z.any()),
-  }),
+export const eIP712TypePropertySchema = z.object({
+  name: z.string(),
+  type: z.string(),
 });
 
-export const oifResourceLockOrderSchema = z.object({
-  type: z.literal("oif-resource-lock-v0"),
-  payload: z.object({
-    signatureType: z.literal("eip712"),
-    domain: z.record(z.any()),
-    primaryType: z.string(),
-    message: z.record(z.any()),
-  }),
-});
+export const eIP712TypesSchema = z
+  .record(
+    z
+      .array(eIP712TypePropertySchema)
+      .describe("Map from type name to its field definitions, per EIP-712"),
+  )
+  .describe("Map from type name to its field definitions, per EIP-712");
 
 export const oif3009OrderSchema = z.object({
   type: z.literal("oif-3009-v0"),
@@ -163,35 +156,22 @@ export const oif3009OrderSchema = z.object({
     domain: z.record(z.any()),
     primaryType: z.string(),
     message: z.record(z.any()),
+    types: eIP712TypesSchema,
   }),
   metadata: z.record(z.any()),
 });
 
 export const oifGenericOrderSchema = z.object({
   type: z.literal("oif-generic-v0"),
-  payload: z.record(z.any()),
-});
-
-export const orderSchema = z
-  .union([
-    oifEscrowOrderSchema,
-    oifResourceLockOrderSchema,
-    oif3009OrderSchema,
-    oifGenericOrderSchema,
-  ])
-  .describe(
-    "Represents all possible order types supported by the OIF protocol.\nEach order type has different security and execution characteristics.",
-  );
-
-export const quoteSchema = z.object({
-  order: orderSchema,
-  validUntil: z.number().optional(),
-  eta: z.number().optional(),
-  quoteId: z.string().optional(),
-  provider: z.string().optional(),
-  failureHandling: failureHandlingModeSchema,
-  partialFill: z.boolean(),
-  metadata: z.record(z.any()).optional(),
+  payload: z.record(z.unknown()).and(
+    z.object({
+      signatureType: z.string().optional(),
+      domain: z.record(z.any()).optional(),
+      primaryType: z.string().optional(),
+      message: z.record(z.any()).optional(),
+      types: eIP712TypesSchema.optional(),
+    }),
+  ),
 });
 
 export const postOrderResponseStatusSchema = z.nativeEnum(
@@ -245,6 +225,50 @@ export const getOrderResponseSchema = z.object({
   outputAmount: assetAmountSchema,
   settlement: settlementSchema,
   fillTransaction: z.record(z.unknown()).optional(),
+});
+
+export const oifEscrowOrderSchema = z.object({
+  type: z.literal("oif-escrow-v0"),
+  payload: z.object({
+    signatureType: z.literal("eip712"),
+    domain: z.record(z.any()),
+    primaryType: z.string(),
+    message: z.record(z.any()),
+    types: eIP712TypesSchema,
+  }),
+});
+
+export const oifResourceLockOrderSchema = z.object({
+  type: z.literal("oif-resource-lock-v0"),
+  payload: z.object({
+    signatureType: z.literal("eip712"),
+    domain: z.record(z.any()),
+    primaryType: z.string(),
+    message: z.record(z.any()),
+    types: eIP712TypesSchema,
+  }),
+});
+
+export const orderSchema = z
+  .union([
+    oifEscrowOrderSchema,
+    oifResourceLockOrderSchema,
+    oif3009OrderSchema,
+    oifGenericOrderSchema,
+  ])
+  .describe(
+    "Represents all possible order types supported by the OIF protocol.\nEach order type has different security and execution characteristics.",
+  );
+
+export const quoteSchema = z.object({
+  order: orderSchema,
+  validUntil: z.number().optional(),
+  eta: z.number().optional(),
+  quoteId: z.string().optional(),
+  provider: z.string().optional(),
+  failureHandling: failureHandlingModeSchema,
+  partialFill: z.boolean(),
+  metadata: z.record(z.any()).optional(),
 });
 
 export const getQuoteResponseSchema = z.object({
