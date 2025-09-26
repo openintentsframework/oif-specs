@@ -302,7 +302,7 @@ export interface GetQuoteRequest {
  * @description Represents all possible order types supported by the OIF protocol.
  *              Each order type has different security and execution characteristics.
  */
-export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order
+export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order | OifUserOpenIntentOrder
 
 /**
  * Escrow-based order
@@ -420,6 +420,66 @@ export interface Oif3009Order {
   };
   /** Additional metadata for nonce verification and order tracking */
   metadata: object;
+}
+
+
+/**
+ * User open intent order
+ * @description Order that carries a user-submitted open intent transaction for execution by a
+ *              settlement/settler contract. Includes safety checks such as required allowances
+ *              that must be satisfied prior to execution.
+ * @example
+ * {
+ *   type: "oif-user-open-v0",
+ *   openIntentTx: {
+ *     to: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *     data: "0xaaaaaaaa....", // bytes in solidity
+ *     gasRequired: "250000"
+ *   },
+ *   checks: {
+ *     allowances: [{
+ *       token: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *       user: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       spender: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *       required: "1000000000"
+ *     }]
+ *   }
+ * }
+ */
+export interface OifUserOpenIntentOrder {
+  /** Order type identifier for user open intent execution */
+  type: "oif-user-open-v0";
+  /**
+   * Open intent transaction to be executed by the settlement contract
+   * @description Encoded call with destination using EIP-7930 address format and raw calldata bytes
+   */
+  openIntentTx: {
+    /** Destination contract in EIP-7930 address format */
+    to: Address;
+    /** Raw calldata bytes for the transaction */
+    data: Uint8Array; 
+    /** Gas required for execution as a decimal string */
+    gasRequired: string;
+  };
+  /**
+   * Allowance and balance checks that must hold prior to execution
+   */
+  checks: {
+    /**
+     * Required allowances and balances
+     * @description Each item asserts that `user` has at least `required` balance andallowance for `spender` on `token`.
+     */
+    allowances: Array<{
+      /** Token address in EIP-7930 format */
+      token: Address;
+      /** User address in EIP-7930 format */
+      user: Address;
+      /** Spender/settlement contract address in EIP-7930 format */
+      spender: Address;
+      /** Required allowance amount as string-encoded integer */
+      required: Amount;
+    }>;
+  };
 }
 
 
