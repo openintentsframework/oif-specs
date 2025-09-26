@@ -10,7 +10,6 @@ Below is a curated list of external APIs and docs that are relevant to OIF's quo
   - Focus: orderbook API, EIP-712 signing, solver-based settlement
   - Relevance: signed orders, typed data, quote-to-order lifecycle
 
-
 - Relay — Get Quote API: `https://docs.relay.link/references/api/get-quote`
   - Focus: cross-chain quote retrieval for intents
   - Relevance: quoting, provider identity, validity windows

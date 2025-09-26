@@ -16,21 +16,30 @@ components:
   schemas:
     Address:
       type: string
-      pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-      description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+      pattern: ^0x0001[a-fA-F0-9]+$
+      description: |-
+        Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+        unambiguous cross-chain identification.
     Amount:
       type: string
       pattern: ^[0-9]+$
-      description: Integer encoded as a string to preserve precision (e.g., uint256)
-    OrderType:
+      description: |-
+        Token amounts are encoded as decimal strings to preserve precision for large integers
+        (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
+        satoshi for BTC, etc.). No decimals or scientific notation allowed.
+    SwapType:
       anyOf:
         - type: string
           enum:
-            - swap-buy
+            - exact-input
         - type: string
           enum:
-            - swap-sell
-      description: Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.
+            - exact-output
+      default: exact-input
+      description: |-
+        Defines which amount is fixed in a quote request when one amount is undefined.
+        - "exact-input": User specifies exact input amount, provider quotes the output amount
+        - "exact-output": User specifies exact output amount, provider quotes the input amount needed
     AssetLockReference:
       type: object
       properties:
@@ -42,27 +51,76 @@ components:
             - type: string
               enum:
                 - rhinestone
+          description: |-
+            The locking protocol to use for securing assets
+            - "the-compact": The Compact protocol for efficient cross-chain transfers
+            - "rhinestone": Rhinestone modular account abstraction framework
         params:
           type: object
           additionalProperties:
             nullable: true
+            description: Additional configuration parameters specific to the chosen lock type
+          description: Additional configuration parameters specific to the chosen lock type
       required:
         - kind
-    AvailableInput:
+    OriginSubmission:
+      type: object
+      properties:
+        mode:
+          anyOf:
+            - type: string
+              enum:
+                - user
+            - type: string
+              enum:
+                - protocol
+          description: |-
+            Determines transaction submission responsibility
+            - "user": User directly submits and pays gas
+            - "protocol": Protocol/relayer submits on user's behalf (gasless for user)
+        schemes:
+          type: array
+          items:
+            anyOf:
+              - type: string
+                enum:
+                  - erc-4337
+              - type: string
+                enum:
+                  - permit2
+              - type: string
+                enum:
+                  - erc20-permit
+              - type: string
+                enum:
+                  - eip-3009
+          description: |-
+            List of supported authorization methods for the transaction
+            - "erc-4337": Account abstraction (smart contract wallets)
+            - "permit2": Uniswap's Permit2 for token approvals
+            - "erc20-permit": EIP-2612 permit for gasless approvals
+            - "eip-3009": Transfer with authorization (e.g., USDC)
+      required:
+        - mode
+    Input:
       type: object
       properties:
         user:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+          pattern: ^0x0001[a-fA-F0-9]+$
+          description: The address providing the input assets
         asset:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+          pattern: ^0x0001[a-fA-F0-9]+$
+          description: The token/asset being provided as input
         amount:
           type: string
           pattern: ^[0-9]+$
-          description: Integer encoded as a string to preserve precision (e.g., uint256)
+          description: |-
+            For quote requests:
+            - exact-input: The exact amount user will provide
+            - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
+            For direct intents: Always specified
         lock:
           type: object
           properties:
@@ -74,58 +132,49 @@ components:
                 - type: string
                   enum:
                     - rhinestone
+              description: |-
+                The locking protocol to use for securing assets
+                - "the-compact": The Compact protocol for efficient cross-chain transfers
+                - "rhinestone": Rhinestone modular account abstraction framework
             params:
               type: object
               additionalProperties:
                 nullable: true
+                description: Additional configuration parameters specific to the chosen lock type
+              description: Additional configuration parameters specific to the chosen lock type
           required:
             - kind
+          description: Locking mechanism to use for securing the input assets
       required:
         - user
         - asset
-        - amount
-    RequestedOutput:
+    Output:
       type: object
       properties:
         receiver:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+          pattern: ^0x0001[a-fA-F0-9]+$
+          description: The address that will receive the output assets
         asset:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+          pattern: ^0x0001[a-fA-F0-9]+$
+          description: The token/asset to be received as output
         amount:
           type: string
           pattern: ^[0-9]+$
-          description: Integer encoded as a string to preserve precision (e.g., uint256)
+          description: |-
+            For quote requests:
+            - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+            - exact-output: The exact amount user wants to receive
+            For direct intents: Always specified
         calldata:
           type: string
+          description: |-
+            Encoded function call to be executed when delivering the output,
+            enabling composability with other protocols
       required:
         - receiver
         - asset
-        - amount
-    RequestedOutputDetails:
-      type: object
-      properties:
-        user:
-          type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-        asset:
-          type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-        amount:
-          type: string
-          pattern: ^[0-9]+$
-          description: Integer encoded as a string to preserve precision (e.g., uint256)
-        calldata:
-          type: string
-      required:
-        - user
-        - asset
-        - amount
     QuotePreference:
       anyOf:
         - type: string
@@ -140,281 +189,578 @@ components:
         - type: string
           enum:
             - trust-minimization
-      description: Quote preference type
+      description: |-
+        Indicates user's priority when selecting between multiple quotes
+        - "price": Optimize for best exchange rate/lowest cost
+        - "speed": Optimize for fastest execution time
+        - "input-priority": Prefer quotes that use inputs in the order specified
+        - "trust-minimization": Prefer quotes with strongest security guarantees
+    FailureHandlingMode:
+      anyOf:
+        - type: string
+          enum:
+            - refund-automatic
+        - type: string
+          enum:
+            - refund-claim
+        - type: string
+          enum:
+            - needs-new-signature
+      description: |-
+        Defines how to handle transaction failures or partial fills
+        - "refund-automatic": Automatic refund on failure without user action
+        - "refund-claim": User must claim refund manually after failure
+        - "needs-new-signature": Requires new user signature to retry or refund
     GetQuoteRequest:
       type: object
       properties:
         user:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-        availableInputs:
-          type: array
-          items:
-            type: object
-            properties:
-              user:
-                type: string
-                pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-              asset:
-                type: string
-                pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-              amount:
-                type: string
-                pattern: ^[0-9]+$
-                description: Integer encoded as a string to preserve precision (e.g., uint256)
-              lock:
-                type: object
-                properties:
-                  kind:
-                    anyOf:
-                      - type: string
-                        enum:
-                          - the-compact
-                      - type: string
-                        enum:
-                          - rhinestone
-                  params:
-                    type: object
-                    additionalProperties:
-                      nullable: true
-                required:
-                  - kind
-            required:
-              - user
-              - asset
-              - amount
-        requestedOutputs:
-          type: array
-          items:
-            type: object
-            properties:
-              receiver:
-                type: string
-                pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-              asset:
-                type: string
-                pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-              amount:
-                type: string
-                pattern: ^[0-9]+$
-                description: Integer encoded as a string to preserve precision (e.g., uint256)
-              calldata:
-                type: string
-            required:
-              - receiver
-              - asset
-              - amount
-        orderType:
-          anyOf:
-            - type: string
-              enum:
-                - swap-buy
-            - type: string
-              enum:
-                - swap-sell
-          description: Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.
-        minValidUntil:
-          type: number
-        preference:
-          anyOf:
-            - type: string
-              enum:
-                - price
-            - type: string
-              enum:
-                - speed
-            - type: string
-              enum:
-                - input-priority
-            - type: string
-              enum:
-                - trust-minimization
-          description: Quote preference type
-        originSubmission:
+          pattern: ^0x0001[a-fA-F0-9]+$
+          description: |-
+            Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+            unambiguous cross-chain identification.
+        intent:
           type: object
           properties:
-            mode:
+            intentType:
+              type: string
+              enum:
+                - oif-swap
+            inputs:
+              type: array
+              items:
+                type: object
+                properties:
+                  user:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The address providing the input assets
+                  asset:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The token/asset being provided as input
+                  amount:
+                    type: string
+                    pattern: ^[0-9]+$
+                    description: |-
+                      For quote requests:
+                      - exact-input: The exact amount user will provide
+                      - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
+                      For direct intents: Always specified
+                  lock:
+                    type: object
+                    properties:
+                      kind:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - the-compact
+                          - type: string
+                            enum:
+                              - rhinestone
+                        description: |-
+                          The locking protocol to use for securing assets
+                          - "the-compact": The Compact protocol for efficient cross-chain transfers
+                          - "rhinestone": Rhinestone modular account abstraction framework
+                      params:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                          description: Additional configuration parameters specific to the chosen lock type
+                        description: Additional configuration parameters specific to the chosen lock type
+                    required:
+                      - kind
+                    description: Locking mechanism to use for securing the input assets
+                required:
+                  - user
+                  - asset
+            outputs:
+              type: array
+              items:
+                type: object
+                properties:
+                  receiver:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The address that will receive the output assets
+                  asset:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The token/asset to be received as output
+                  amount:
+                    type: string
+                    pattern: ^[0-9]+$
+                    description: |-
+                      For quote requests:
+                      - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                      - exact-output: The exact amount user wants to receive
+                      For direct intents: Always specified
+                  calldata:
+                    type: string
+                    description: |-
+                      Encoded function call to be executed when delivering the output,
+                      enabling composability with other protocols
+                required:
+                  - receiver
+                  - asset
+            swapType:
               anyOf:
                 - type: string
                   enum:
-                    - user
+                    - exact-input
                 - type: string
                   enum:
-                    - protocol
-            schemes:
+                    - exact-output
+              default: exact-input
+              description: Determines which amounts are fixed vs quoted
+            minValidUntil:
+              type: number
+            preference:
+              anyOf:
+                - type: string
+                  enum:
+                    - price
+                - type: string
+                  enum:
+                    - speed
+                - type: string
+                  enum:
+                    - input-priority
+                - type: string
+                  enum:
+                    - trust-minimization
+              description: |-
+                Indicates user's priority when selecting between multiple quotes
+                - "price": Optimize for best exchange rate/lowest cost
+                - "speed": Optimize for fastest execution time
+                - "input-priority": Prefer quotes that use inputs in the order specified
+                - "trust-minimization": Prefer quotes with strongest security guarantees
+            originSubmission:
+              type: object
+              properties:
+                mode:
+                  anyOf:
+                    - type: string
+                      enum:
+                        - user
+                    - type: string
+                      enum:
+                        - protocol
+                  description: |-
+                    Determines transaction submission responsibility
+                    - "user": User directly submits and pays gas
+                    - "protocol": Protocol/relayer submits on user's behalf (gasless for user)
+                schemes:
+                  type: array
+                  items:
+                    anyOf:
+                      - type: string
+                        enum:
+                          - erc-4337
+                      - type: string
+                        enum:
+                          - permit2
+                      - type: string
+                        enum:
+                          - erc20-permit
+                      - type: string
+                        enum:
+                          - eip-3009
+                  description: |-
+                    List of supported authorization methods for the transaction
+                    - "erc-4337": Account abstraction (smart contract wallets)
+                    - "permit2": Uniswap's Permit2 for token approvals
+                    - "erc20-permit": EIP-2612 permit for gasless approvals
+                    - "eip-3009": Transfer with authorization (e.g., USDC)
+              required:
+                - mode
+            failureHandling:
               type: array
               items:
                 anyOf:
                   - type: string
                     enum:
-                      - erc-4337
+                      - refund-automatic
                   - type: string
                     enum:
-                      - permit2
+                      - refund-claim
                   - type: string
                     enum:
-                      - erc20-permit
-                  - type: string
-                    enum:
-                      - eip-3009
+                      - needs-new-signature
+                description: |-
+                  Defines how to handle transaction failures or partial fills
+                  - "refund-automatic": Automatic refund on failure without user action
+                  - "refund-claim": User must claim refund manually after failure
+                  - "needs-new-signature": Requires new user signature to retry or refund
+            partialFill:
+              type: boolean
+            metadata:
+              type: object
+              additionalProperties:
+                nullable: true
           required:
-            - mode
+            - intentType
+            - inputs
+            - outputs
+        supportedTypes:
+          type: array
+          items:
+            type: string
       required:
         - user
-        - availableInputs
-        - requestedOutputs
-    Eip712Order:
+        - intent
+        - supportedTypes
+    OifEscrowOrder:
       type: object
       properties:
-        domain:
+        type:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-        primaryType:
+          enum:
+            - oif-escrow-v0
+        payload:
+          type: object
+          properties:
+            signatureType:
+              type: string
+              enum:
+                - eip712
+            domain:
+              type: object
+              additionalProperties:
+                nullable: true
+            primaryType:
+              type: string
+            message:
+              type: object
+              additionalProperties:
+                nullable: true
+          required:
+            - signatureType
+            - domain
+            - primaryType
+            - message
+      required:
+        - type
+        - payload
+    OifResourceLockOrder:
+      type: object
+      properties:
+        type:
           type: string
-        message:
+          enum:
+            - oif-resource-lock-v0
+        payload:
+          type: object
+          properties:
+            signatureType:
+              type: string
+              enum:
+                - eip712
+            domain:
+              type: object
+              additionalProperties:
+                nullable: true
+            primaryType:
+              type: string
+            message:
+              type: object
+              additionalProperties:
+                nullable: true
+          required:
+            - signatureType
+            - domain
+            - primaryType
+            - message
+      required:
+        - type
+        - payload
+    Oif3009Order:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - oif-3009-v0
+        payload:
+          type: object
+          properties:
+            signatureType:
+              type: string
+              enum:
+                - eip712
+            domain:
+              type: object
+              additionalProperties:
+                nullable: true
+            primaryType:
+              type: string
+            message:
+              type: object
+              additionalProperties:
+                nullable: true
+          required:
+            - signatureType
+            - domain
+            - primaryType
+            - message
+        metadata:
           type: object
           additionalProperties:
             nullable: true
       required:
-        - domain
-        - primaryType
-        - message
-    QuoteDetails:
+        - type
+        - payload
+        - metadata
+    OifGenericOrder:
       type: object
       properties:
-        requestedOutputs:
-          type: array
-          items:
-            type: object
-            properties:
-              user:
-                type: string
-                pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-              asset:
-                type: string
-                pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-              amount:
-                type: string
-                pattern: ^[0-9]+$
-                description: Integer encoded as a string to preserve precision (e.g., uint256)
-              calldata:
-                type: string
-            required:
-              - user
-              - asset
-              - amount
-        availableInputs:
-          type: array
-          items:
-            type: object
-            properties:
-              user:
-                type: string
-                pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-              asset:
-                type: string
-                pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-              amount:
-                type: string
-                pattern: ^[0-9]+$
-                description: Integer encoded as a string to preserve precision (e.g., uint256)
-              lockType:
-                type: string
-                enum:
-                  - the-compact
-            required:
-              - user
-              - asset
-              - amount
+        type:
+          type: string
+          enum:
+            - oif-generic-v0
+        payload:
+          type: object
+          additionalProperties:
+            nullable: true
       required:
-        - requestedOutputs
-        - availableInputs
+        - type
+        - payload
+    Order:
+      anyOf:
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - oif-escrow-v0
+            payload:
+              type: object
+              properties:
+                signatureType:
+                  type: string
+                  enum:
+                    - eip712
+                domain:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+                primaryType:
+                  type: string
+                message:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+              required:
+                - signatureType
+                - domain
+                - primaryType
+                - message
+          required:
+            - type
+            - payload
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - oif-resource-lock-v0
+            payload:
+              type: object
+              properties:
+                signatureType:
+                  type: string
+                  enum:
+                    - eip712
+                domain:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+                primaryType:
+                  type: string
+                message:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+              required:
+                - signatureType
+                - domain
+                - primaryType
+                - message
+          required:
+            - type
+            - payload
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - oif-3009-v0
+            payload:
+              type: object
+              properties:
+                signatureType:
+                  type: string
+                  enum:
+                    - eip712
+                domain:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+                primaryType:
+                  type: string
+                message:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+              required:
+                - signatureType
+                - domain
+                - primaryType
+                - message
+            metadata:
+              type: object
+              additionalProperties:
+                nullable: true
+          required:
+            - type
+            - payload
+            - metadata
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - oif-generic-v0
+            payload:
+              type: object
+              additionalProperties:
+                nullable: true
+          required:
+            - type
+            - payload
+      description: |-
+        Represents all possible order types supported by the OIF protocol.
+        Each order type has different security and execution characteristics.
     Quote:
       type: object
       properties:
-        orders:
-          type: array
-          items:
-            type: object
-            properties:
-              domain:
-                type: string
-                pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-              primaryType:
-                type: string
-              message:
-                type: object
-                additionalProperties:
-                  nullable: true
-            required:
-              - domain
-              - primaryType
-              - message
-        details:
-          type: object
-          properties:
-            requestedOutputs:
-              type: array
-              items:
-                type: object
-                properties:
-                  user:
-                    type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                    description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                  asset:
-                    type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                    description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                  amount:
-                    type: string
-                    pattern: ^[0-9]+$
-                    description: Integer encoded as a string to preserve precision (e.g., uint256)
-                  calldata:
-                    type: string
-                required:
-                  - user
-                  - asset
-                  - amount
-            availableInputs:
-              type: array
-              items:
-                type: object
-                properties:
-                  user:
-                    type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                    description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                  asset:
-                    type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                    description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                  amount:
-                    type: string
-                    pattern: ^[0-9]+$
-                    description: Integer encoded as a string to preserve precision (e.g., uint256)
-                  lockType:
-                    type: string
-                    enum:
-                      - the-compact
-                required:
-                  - user
-                  - asset
-                  - amount
-          required:
-            - requestedOutputs
-            - availableInputs
+        order:
+          anyOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - oif-escrow-v0
+                payload:
+                  type: object
+                  properties:
+                    signatureType:
+                      type: string
+                      enum:
+                        - eip712
+                    domain:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                    primaryType:
+                      type: string
+                    message:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                  required:
+                    - signatureType
+                    - domain
+                    - primaryType
+                    - message
+              required:
+                - type
+                - payload
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - oif-resource-lock-v0
+                payload:
+                  type: object
+                  properties:
+                    signatureType:
+                      type: string
+                      enum:
+                        - eip712
+                    domain:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                    primaryType:
+                      type: string
+                    message:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                  required:
+                    - signatureType
+                    - domain
+                    - primaryType
+                    - message
+              required:
+                - type
+                - payload
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - oif-3009-v0
+                payload:
+                  type: object
+                  properties:
+                    signatureType:
+                      type: string
+                      enum:
+                        - eip712
+                    domain:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                    primaryType:
+                      type: string
+                    message:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                  required:
+                    - signatureType
+                    - domain
+                    - primaryType
+                    - message
+                metadata:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+              required:
+                - type
+                - payload
+                - metadata
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - oif-generic-v0
+                payload:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+              required:
+                - type
+                - payload
+          description: |-
+            Represents all possible order types supported by the OIF protocol.
+            Each order type has different security and execution characteristics.
         validUntil:
           type: number
         eta:
@@ -423,11 +769,32 @@ components:
           type: string
         provider:
           type: string
+        failureHandling:
+          anyOf:
+            - type: string
+              enum:
+                - refund-automatic
+            - type: string
+              enum:
+                - refund-claim
+            - type: string
+              enum:
+                - needs-new-signature
+          description: |-
+            Defines how to handle transaction failures or partial fills
+            - "refund-automatic": Automatic refund on failure without user action
+            - "refund-claim": User must claim refund manually after failure
+            - "needs-new-signature": Requires new user signature to retry or refund
+        partialFill:
+          type: boolean
+        metadata:
+          type: object
+          additionalProperties:
+            nullable: true
       required:
-        - orders
-        - details
-        - quoteId
-        - provider
+        - order
+        - failureHandling
+        - partialFill
     GetQuoteResponse:
       type: object
       properties:
@@ -436,79 +803,122 @@ components:
           items:
             type: object
             properties:
-              orders:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    domain:
-                      type: string
-                      pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                      description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                    primaryType:
-                      type: string
-                    message:
-                      type: object
-                      additionalProperties:
-                        nullable: true
-                  required:
-                    - domain
-                    - primaryType
-                    - message
-              details:
-                type: object
-                properties:
-                  requestedOutputs:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        user:
-                          type: string
-                          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                        asset:
-                          type: string
-                          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                        amount:
-                          type: string
-                          pattern: ^[0-9]+$
-                          description: Integer encoded as a string to preserve precision (e.g., uint256)
-                        calldata:
-                          type: string
-                      required:
-                        - user
-                        - asset
-                        - amount
-                  availableInputs:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        user:
-                          type: string
-                          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                        asset:
-                          type: string
-                          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                        amount:
-                          type: string
-                          pattern: ^[0-9]+$
-                          description: Integer encoded as a string to preserve precision (e.g., uint256)
-                        lockType:
-                          type: string
-                          enum:
-                            - the-compact
-                      required:
-                        - user
-                        - asset
-                        - amount
-                required:
-                  - requestedOutputs
-                  - availableInputs
+              order:
+                anyOf:
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - oif-escrow-v0
+                      payload:
+                        type: object
+                        properties:
+                          signatureType:
+                            type: string
+                            enum:
+                              - eip712
+                          domain:
+                            type: object
+                            additionalProperties:
+                              nullable: true
+                          primaryType:
+                            type: string
+                          message:
+                            type: object
+                            additionalProperties:
+                              nullable: true
+                        required:
+                          - signatureType
+                          - domain
+                          - primaryType
+                          - message
+                    required:
+                      - type
+                      - payload
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - oif-resource-lock-v0
+                      payload:
+                        type: object
+                        properties:
+                          signatureType:
+                            type: string
+                            enum:
+                              - eip712
+                          domain:
+                            type: object
+                            additionalProperties:
+                              nullable: true
+                          primaryType:
+                            type: string
+                          message:
+                            type: object
+                            additionalProperties:
+                              nullable: true
+                        required:
+                          - signatureType
+                          - domain
+                          - primaryType
+                          - message
+                    required:
+                      - type
+                      - payload
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - oif-3009-v0
+                      payload:
+                        type: object
+                        properties:
+                          signatureType:
+                            type: string
+                            enum:
+                              - eip712
+                          domain:
+                            type: object
+                            additionalProperties:
+                              nullable: true
+                          primaryType:
+                            type: string
+                          message:
+                            type: object
+                            additionalProperties:
+                              nullable: true
+                        required:
+                          - signatureType
+                          - domain
+                          - primaryType
+                          - message
+                      metadata:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                    required:
+                      - type
+                      - payload
+                      - metadata
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - oif-generic-v0
+                      payload:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                    required:
+                      - type
+                      - payload
+                description: |-
+                  Represents all possible order types supported by the OIF protocol.
+                  Each order type has different security and execution characteristics.
               validUntil:
                 type: number
               eta:
@@ -517,62 +927,160 @@ components:
                 type: string
               provider:
                 type: string
+              failureHandling:
+                anyOf:
+                  - type: string
+                    enum:
+                      - refund-automatic
+                  - type: string
+                    enum:
+                      - refund-claim
+                  - type: string
+                    enum:
+                      - needs-new-signature
+                description: |-
+                  Defines how to handle transaction failures or partial fills
+                  - "refund-automatic": Automatic refund on failure without user action
+                  - "refund-claim": User must claim refund manually after failure
+                  - "needs-new-signature": Requires new user signature to retry or refund
+              partialFill:
+                type: boolean
+              metadata:
+                type: object
+                additionalProperties:
+                  nullable: true
             required:
-              - orders
-              - details
-              - quoteId
-              - provider
+              - order
+              - failureHandling
+              - partialFill
+          description: List of available quotes, may be empty if no quotes are available
       required:
         - quotes
     PostOrderRequest:
       type: object
       properties:
         order:
-          type: object
-          additionalProperties:
-            nullable: true
-        signature:
-          type: object
-          additionalProperties:
-            nullable: true
-        quoteId:
-          type: string
-        provider:
-          type: string
-        failureHandling:
           anyOf:
-            - type: string
-              enum:
-                - retry
-            - type: string
-              enum:
-                - refund-instant
-            - type: string
-              enum:
-                - refund-claim
-            - type: string
-              enum:
-                - needs-new-signature
             - type: object
               properties:
-                partialFill:
-                  type: boolean
-                remainder:
-                  anyOf:
-                    - type: string
+                type:
+                  type: string
+                  enum:
+                    - oif-escrow-v0
+                payload:
+                  type: object
+                  properties:
+                    signatureType:
+                      type: string
                       enum:
-                        - retry
-                    - type: string
-                      enum:
-                        - refund-instant
-                    - type: string
-                      enum:
-                        - refund-claim
-                    - type: string
-                      enum:
-                        - needs-new-signature
+                        - eip712
+                    domain:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                    primaryType:
+                      type: string
+                    message:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                  required:
+                    - signatureType
+                    - domain
+                    - primaryType
+                    - message
               required:
-                - remainder
+                - type
+                - payload
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - oif-resource-lock-v0
+                payload:
+                  type: object
+                  properties:
+                    signatureType:
+                      type: string
+                      enum:
+                        - eip712
+                    domain:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                    primaryType:
+                      type: string
+                    message:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                  required:
+                    - signatureType
+                    - domain
+                    - primaryType
+                    - message
+              required:
+                - type
+                - payload
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - oif-3009-v0
+                payload:
+                  type: object
+                  properties:
+                    signatureType:
+                      type: string
+                      enum:
+                        - eip712
+                    domain:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                    primaryType:
+                      type: string
+                    message:
+                      type: object
+                      additionalProperties:
+                        nullable: true
+                  required:
+                    - signatureType
+                    - domain
+                    - primaryType
+                    - message
+                metadata:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+              required:
+                - type
+                - payload
+                - metadata
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - oif-generic-v0
+                payload:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+              required:
+                - type
+                - payload
+          description: EIP-712 typed data for a gasless cross-chain order
+        signature:
+          type: array
+          items:
+            type: number
+          description: EIP-712 signature or equivalent as array of bytes
+        quoteId:
+          type: string
+          description: Optional quote identifier from a prior Get Quote response
         originSubmission:
           type: object
           properties:
@@ -584,6 +1092,10 @@ components:
                 - type: string
                   enum:
                     - protocol
+              description: |-
+                Determines transaction submission responsibility
+                - "user": User directly submits and pays gas
+                - "protocol": Protocol/relayer submits on user's behalf (gasless for user)
             schemes:
               type: array
               items:
@@ -600,13 +1112,18 @@ components:
                   - type: string
                     enum:
                       - eip-3009
+              description: |-
+                List of supported authorization methods for the transaction
+                - "erc-4337": Account abstraction (smart contract wallets)
+                - "permit2": Uniswap's Permit2 for token approvals
+                - "erc20-permit": EIP-2612 permit for gasless approvals
+                - "eip-3009": Transfer with authorization (e.g., USDC)
           required:
             - mode
+          description: Optional preference mirrored from quote about who submits and acceptable schemes
       required:
         - order
         - signature
-        - provider
-        - failureHandling
     PostOrderResponse:
       type: object
       properties:
@@ -639,22 +1156,24 @@ components:
         - pending
         - executed
         - settled
+        - executing
+        - settling
         - finalized
         - failed
+        - refunded
     AssetAmount:
       type: object
       properties:
         asset:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-          description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+          pattern: ^0x0001[a-fA-F0-9]+$
+          description: The token/asset identifier, may include chain information
         amount:
           type: string
           pattern: ^[0-9]+$
-          description: Integer encoded as a string to preserve precision (e.g., uint256)
+          description: Token amount in smallest unit (wei, satoshi, etc.)
       required:
         - asset
-        - amount
     SettlementType:
       type: string
       enum:
@@ -668,10 +1187,13 @@ components:
           enum:
             - escrow
             - resourceLock
+          description: The type of settlement mechanism used for this order
         data:
           type: object
           additionalProperties:
             nullable: true
+            description: Additional parameters specific to the settlement type
+          description: Additional parameters specific to the settlement type
       required:
         - type
         - data
@@ -680,6 +1202,7 @@ components:
       properties:
         id:
           type: string
+          description: Unique ID assigned to the order upon submission
       required:
         - id
     GetOrderResponse:
@@ -694,8 +1217,11 @@ components:
             - pending
             - executed
             - settled
+            - executing
+            - settling
             - finalized
             - failed
+            - refunded
         createdAt:
           type: number
         updatedAt:
@@ -707,29 +1233,27 @@ components:
           properties:
             asset:
               type: string
-              pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-              description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+              pattern: ^0x0001[a-fA-F0-9]+$
+              description: The token/asset identifier, may include chain information
             amount:
               type: string
               pattern: ^[0-9]+$
-              description: Integer encoded as a string to preserve precision (e.g., uint256)
+              description: Token amount in smallest unit (wei, satoshi, etc.)
           required:
             - asset
-            - amount
         outputAmount:
           type: object
           properties:
             asset:
               type: string
-              pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-              description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+              pattern: ^0x0001[a-fA-F0-9]+$
+              description: The token/asset identifier, may include chain information
             amount:
               type: string
               pattern: ^[0-9]+$
-              description: Integer encoded as a string to preserve precision (e.g., uint256)
+              description: Token amount in smallest unit (wei, satoshi, etc.)
           required:
             - asset
-            - amount
         settlement:
           type: object
           properties:
@@ -738,10 +1262,13 @@ components:
               enum:
                 - escrow
                 - resourceLock
+              description: The type of settlement mechanism used for this order
             data:
               type: object
               additionalProperties:
                 nullable: true
+                description: Additional parameters specific to the settlement type
+              description: Additional parameters specific to the settlement type
           required:
             - type
             - data
@@ -773,130 +1300,203 @@ paths:
               properties:
                 user:
                   type: string
-                  pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                  description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                availableInputs:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      user:
-                        type: string
-                        pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                        description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                      asset:
-                        type: string
-                        pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                        description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                      amount:
-                        type: string
-                        pattern: ^[0-9]+$
-                        description: Integer encoded as a string to preserve precision (e.g., uint256)
-                      lock:
-                        type: object
-                        properties:
-                          kind:
-                            anyOf:
-                              - type: string
-                                enum:
-                                  - the-compact
-                              - type: string
-                                enum:
-                                  - rhinestone
-                          params:
-                            type: object
-                            additionalProperties:
-                              nullable: true
-                        required:
-                          - kind
-                    required:
-                      - user
-                      - asset
-                      - amount
-                requestedOutputs:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      receiver:
-                        type: string
-                        pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                        description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                      asset:
-                        type: string
-                        pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                        description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                      amount:
-                        type: string
-                        pattern: ^[0-9]+$
-                        description: Integer encoded as a string to preserve precision (e.g., uint256)
-                      calldata:
-                        type: string
-                    required:
-                      - receiver
-                      - asset
-                      - amount
-                orderType:
-                  anyOf:
-                    - type: string
-                      enum:
-                        - swap-buy
-                    - type: string
-                      enum:
-                        - swap-sell
-                  description: Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.
-                minValidUntil:
-                  type: number
-                preference:
-                  anyOf:
-                    - type: string
-                      enum:
-                        - price
-                    - type: string
-                      enum:
-                        - speed
-                    - type: string
-                      enum:
-                        - input-priority
-                    - type: string
-                      enum:
-                        - trust-minimization
-                  description: Quote preference type
-                originSubmission:
+                  pattern: ^0x0001[a-fA-F0-9]+$
+                  description: |-
+                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                    unambiguous cross-chain identification.
+                intent:
                   type: object
                   properties:
-                    mode:
+                    intentType:
+                      type: string
+                      enum:
+                        - oif-swap
+                    inputs:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          user:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: The address providing the input assets
+                          asset:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: The token/asset being provided as input
+                          amount:
+                            type: string
+                            pattern: ^[0-9]+$
+                            description: |-
+                              For quote requests:
+                              - exact-input: The exact amount user will provide
+                              - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
+                              For direct intents: Always specified
+                          lock:
+                            type: object
+                            properties:
+                              kind:
+                                anyOf:
+                                  - type: string
+                                    enum:
+                                      - the-compact
+                                  - type: string
+                                    enum:
+                                      - rhinestone
+                                description: |-
+                                  The locking protocol to use for securing assets
+                                  - "the-compact": The Compact protocol for efficient cross-chain transfers
+                                  - "rhinestone": Rhinestone modular account abstraction framework
+                              params:
+                                type: object
+                                additionalProperties:
+                                  nullable: true
+                                  description: Additional configuration parameters specific to the chosen lock type
+                                description: Additional configuration parameters specific to the chosen lock type
+                            required:
+                              - kind
+                            description: Locking mechanism to use for securing the input assets
+                        required:
+                          - user
+                          - asset
+                    outputs:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          receiver:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: The address that will receive the output assets
+                          asset:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: The token/asset to be received as output
+                          amount:
+                            type: string
+                            pattern: ^[0-9]+$
+                            description: |-
+                              For quote requests:
+                              - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                              - exact-output: The exact amount user wants to receive
+                              For direct intents: Always specified
+                          calldata:
+                            type: string
+                            description: |-
+                              Encoded function call to be executed when delivering the output,
+                              enabling composability with other protocols
+                        required:
+                          - receiver
+                          - asset
+                    swapType:
                       anyOf:
                         - type: string
                           enum:
-                            - user
+                            - exact-input
                         - type: string
                           enum:
-                            - protocol
-                    schemes:
+                            - exact-output
+                      default: exact-input
+                      description: Determines which amounts are fixed vs quoted
+                    minValidUntil:
+                      type: number
+                    preference:
+                      anyOf:
+                        - type: string
+                          enum:
+                            - price
+                        - type: string
+                          enum:
+                            - speed
+                        - type: string
+                          enum:
+                            - input-priority
+                        - type: string
+                          enum:
+                            - trust-minimization
+                      description: |-
+                        Indicates user's priority when selecting between multiple quotes
+                        - "price": Optimize for best exchange rate/lowest cost
+                        - "speed": Optimize for fastest execution time
+                        - "input-priority": Prefer quotes that use inputs in the order specified
+                        - "trust-minimization": Prefer quotes with strongest security guarantees
+                    originSubmission:
+                      type: object
+                      properties:
+                        mode:
+                          anyOf:
+                            - type: string
+                              enum:
+                                - user
+                            - type: string
+                              enum:
+                                - protocol
+                          description: |-
+                            Determines transaction submission responsibility
+                            - "user": User directly submits and pays gas
+                            - "protocol": Protocol/relayer submits on user's behalf (gasless for user)
+                        schemes:
+                          type: array
+                          items:
+                            anyOf:
+                              - type: string
+                                enum:
+                                  - erc-4337
+                              - type: string
+                                enum:
+                                  - permit2
+                              - type: string
+                                enum:
+                                  - erc20-permit
+                              - type: string
+                                enum:
+                                  - eip-3009
+                          description: |-
+                            List of supported authorization methods for the transaction
+                            - "erc-4337": Account abstraction (smart contract wallets)
+                            - "permit2": Uniswap's Permit2 for token approvals
+                            - "erc20-permit": EIP-2612 permit for gasless approvals
+                            - "eip-3009": Transfer with authorization (e.g., USDC)
+                      required:
+                        - mode
+                    failureHandling:
                       type: array
                       items:
                         anyOf:
                           - type: string
                             enum:
-                              - erc-4337
+                              - refund-automatic
                           - type: string
                             enum:
-                              - permit2
+                              - refund-claim
                           - type: string
                             enum:
-                              - erc20-permit
-                          - type: string
-                            enum:
-                              - eip-3009
+                              - needs-new-signature
+                        description: |-
+                          Defines how to handle transaction failures or partial fills
+                          - "refund-automatic": Automatic refund on failure without user action
+                          - "refund-claim": User must claim refund manually after failure
+                          - "needs-new-signature": Requires new user signature to retry or refund
+                    partialFill:
+                      type: boolean
+                    metadata:
+                      type: object
+                      additionalProperties:
+                        nullable: true
                   required:
-                    - mode
+                    - intentType
+                    - inputs
+                    - outputs
+                supportedTypes:
+                  type: array
+                  items:
+                    type: string
               required:
                 - user
-                - availableInputs
-                - requestedOutputs
+                - intent
+                - supportedTypes
       responses:
-        "200":
+        '200':
           description: Quotes successfully generated
           content:
             application/json:
@@ -908,79 +1508,122 @@ paths:
                     items:
                       type: object
                       properties:
-                        orders:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              domain:
-                                type: string
-                                pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                                description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                              primaryType:
-                                type: string
-                              message:
-                                type: object
-                                additionalProperties:
-                                  nullable: true
-                            required:
-                              - domain
-                              - primaryType
-                              - message
-                        details:
-                          type: object
-                          properties:
-                            requestedOutputs:
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  user:
-                                    type: string
-                                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                                    description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                                  asset:
-                                    type: string
-                                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                                    description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                                  amount:
-                                    type: string
-                                    pattern: ^[0-9]+$
-                                    description: Integer encoded as a string to preserve precision (e.g., uint256)
-                                  calldata:
-                                    type: string
-                                required:
-                                  - user
-                                  - asset
-                                  - amount
-                            availableInputs:
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  user:
-                                    type: string
-                                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                                    description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                                  asset:
-                                    type: string
-                                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                                    description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
-                                  amount:
-                                    type: string
-                                    pattern: ^[0-9]+$
-                                    description: Integer encoded as a string to preserve precision (e.g., uint256)
-                                  lockType:
-                                    type: string
-                                    enum:
-                                      - the-compact
-                                required:
-                                  - user
-                                  - asset
-                                  - amount
-                          required:
-                            - requestedOutputs
-                            - availableInputs
+                        order:
+                          anyOf:
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - oif-escrow-v0
+                                payload:
+                                  type: object
+                                  properties:
+                                    signatureType:
+                                      type: string
+                                      enum:
+                                        - eip712
+                                    domain:
+                                      type: object
+                                      additionalProperties:
+                                        nullable: true
+                                    primaryType:
+                                      type: string
+                                    message:
+                                      type: object
+                                      additionalProperties:
+                                        nullable: true
+                                  required:
+                                    - signatureType
+                                    - domain
+                                    - primaryType
+                                    - message
+                              required:
+                                - type
+                                - payload
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - oif-resource-lock-v0
+                                payload:
+                                  type: object
+                                  properties:
+                                    signatureType:
+                                      type: string
+                                      enum:
+                                        - eip712
+                                    domain:
+                                      type: object
+                                      additionalProperties:
+                                        nullable: true
+                                    primaryType:
+                                      type: string
+                                    message:
+                                      type: object
+                                      additionalProperties:
+                                        nullable: true
+                                  required:
+                                    - signatureType
+                                    - domain
+                                    - primaryType
+                                    - message
+                              required:
+                                - type
+                                - payload
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - oif-3009-v0
+                                payload:
+                                  type: object
+                                  properties:
+                                    signatureType:
+                                      type: string
+                                      enum:
+                                        - eip712
+                                    domain:
+                                      type: object
+                                      additionalProperties:
+                                        nullable: true
+                                    primaryType:
+                                      type: string
+                                    message:
+                                      type: object
+                                      additionalProperties:
+                                        nullable: true
+                                  required:
+                                    - signatureType
+                                    - domain
+                                    - primaryType
+                                    - message
+                                metadata:
+                                  type: object
+                                  additionalProperties:
+                                    nullable: true
+                              required:
+                                - type
+                                - payload
+                                - metadata
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - oif-generic-v0
+                                payload:
+                                  type: object
+                                  additionalProperties:
+                                    nullable: true
+                              required:
+                                - type
+                                - payload
+                          description: |-
+                            Represents all possible order types supported by the OIF protocol.
+                            Each order type has different security and execution characteristics.
                         validUntil:
                           type: number
                         eta:
@@ -989,16 +1632,38 @@ paths:
                           type: string
                         provider:
                           type: string
+                        failureHandling:
+                          anyOf:
+                            - type: string
+                              enum:
+                                - refund-automatic
+                            - type: string
+                              enum:
+                                - refund-claim
+                            - type: string
+                              enum:
+                                - needs-new-signature
+                          description: |-
+                            Defines how to handle transaction failures or partial fills
+                            - "refund-automatic": Automatic refund on failure without user action
+                            - "refund-claim": User must claim refund manually after failure
+                            - "needs-new-signature": Requires new user signature to retry or refund
+                        partialFill:
+                          type: boolean
+                        metadata:
+                          type: object
+                          additionalProperties:
+                            nullable: true
                       required:
-                        - orders
-                        - details
-                        - quoteId
-                        - provider
+                        - order
+                        - failureHandling
+                        - partialFill
+                    description: List of available quotes, may be empty if no quotes are available
                 required:
                   - quotes
-        "400":
+        '400':
           description: Malformed request
-        "422":
+        '422':
           description: Inputs cannot satisfy requested outputs
   /v1/orders:
     post:
@@ -1013,51 +1678,127 @@ paths:
               type: object
               properties:
                 order:
-                  type: object
-                  additionalProperties:
-                    nullable: true
-                signature:
-                  type: object
-                  additionalProperties:
-                    nullable: true
-                quoteId:
-                  type: string
-                provider:
-                  type: string
-                failureHandling:
                   anyOf:
-                    - type: string
-                      enum:
-                        - retry
-                    - type: string
-                      enum:
-                        - refund-instant
-                    - type: string
-                      enum:
-                        - refund-claim
-                    - type: string
-                      enum:
-                        - needs-new-signature
                     - type: object
                       properties:
-                        partialFill:
-                          type: boolean
-                        remainder:
-                          anyOf:
-                            - type: string
+                        type:
+                          type: string
+                          enum:
+                            - oif-escrow-v0
+                        payload:
+                          type: object
+                          properties:
+                            signatureType:
+                              type: string
                               enum:
-                                - retry
-                            - type: string
-                              enum:
-                                - refund-instant
-                            - type: string
-                              enum:
-                                - refund-claim
-                            - type: string
-                              enum:
-                                - needs-new-signature
+                                - eip712
+                            domain:
+                              type: object
+                              additionalProperties:
+                                nullable: true
+                            primaryType:
+                              type: string
+                            message:
+                              type: object
+                              additionalProperties:
+                                nullable: true
+                          required:
+                            - signatureType
+                            - domain
+                            - primaryType
+                            - message
                       required:
-                        - remainder
+                        - type
+                        - payload
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - oif-resource-lock-v0
+                        payload:
+                          type: object
+                          properties:
+                            signatureType:
+                              type: string
+                              enum:
+                                - eip712
+                            domain:
+                              type: object
+                              additionalProperties:
+                                nullable: true
+                            primaryType:
+                              type: string
+                            message:
+                              type: object
+                              additionalProperties:
+                                nullable: true
+                          required:
+                            - signatureType
+                            - domain
+                            - primaryType
+                            - message
+                      required:
+                        - type
+                        - payload
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - oif-3009-v0
+                        payload:
+                          type: object
+                          properties:
+                            signatureType:
+                              type: string
+                              enum:
+                                - eip712
+                            domain:
+                              type: object
+                              additionalProperties:
+                                nullable: true
+                            primaryType:
+                              type: string
+                            message:
+                              type: object
+                              additionalProperties:
+                                nullable: true
+                          required:
+                            - signatureType
+                            - domain
+                            - primaryType
+                            - message
+                        metadata:
+                          type: object
+                          additionalProperties:
+                            nullable: true
+                      required:
+                        - type
+                        - payload
+                        - metadata
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - oif-generic-v0
+                        payload:
+                          type: object
+                          additionalProperties:
+                            nullable: true
+                      required:
+                        - type
+                        - payload
+                  description: EIP-712 typed data for a gasless cross-chain order
+                signature:
+                  type: array
+                  items:
+                    type: number
+                  description: EIP-712 signature or equivalent as array of bytes
+                quoteId:
+                  type: string
+                  description: Optional quote identifier from a prior Get Quote response
                 originSubmission:
                   type: object
                   properties:
@@ -1069,6 +1810,10 @@ paths:
                         - type: string
                           enum:
                             - protocol
+                      description: |-
+                        Determines transaction submission responsibility
+                        - "user": User directly submits and pays gas
+                        - "protocol": Protocol/relayer submits on user's behalf (gasless for user)
                     schemes:
                       type: array
                       items:
@@ -1085,15 +1830,20 @@ paths:
                           - type: string
                             enum:
                               - eip-3009
+                      description: |-
+                        List of supported authorization methods for the transaction
+                        - "erc-4337": Account abstraction (smart contract wallets)
+                        - "permit2": Uniswap's Permit2 for token approvals
+                        - "erc20-permit": EIP-2612 permit for gasless approvals
+                        - "eip-3009": Transfer with authorization (e.g., USDC)
                   required:
                     - mode
+                  description: Optional preference mirrored from quote about who submits and acceptable schemes
               required:
                 - order
                 - signature
-                - provider
-                - failureHandling
       responses:
-        "200":
+        '200':
           description: Order accepted
           content:
             application/json:
@@ -1116,9 +1866,9 @@ paths:
                       nullable: true
                 required:
                   - status
-        "400":
+        '400':
           description: Malformed request
-        "422":
+        '422':
           description: Invalid signature or order
   /v1/orders/{id}:
     get:
@@ -1134,7 +1884,7 @@ paths:
           name: id
           in: path
       responses:
-        "200":
+        '200':
           description: Order details retrieved successfully
           content:
             application/json:
@@ -1150,8 +1900,11 @@ paths:
                       - pending
                       - executed
                       - settled
+                      - executing
+                      - settling
                       - finalized
                       - failed
+                      - refunded
                   createdAt:
                     type: number
                   updatedAt:
@@ -1163,29 +1916,27 @@ paths:
                     properties:
                       asset:
                         type: string
-                        pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                        description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+                        pattern: ^0x0001[a-fA-F0-9]+$
+                        description: The token/asset identifier, may include chain information
                       amount:
                         type: string
                         pattern: ^[0-9]+$
-                        description: Integer encoded as a string to preserve precision (e.g., uint256)
+                        description: Token amount in smallest unit (wei, satoshi, etc.)
                     required:
                       - asset
-                      - amount
                   outputAmount:
                     type: object
                     properties:
                       asset:
                         type: string
-                        pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
-                        description: EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)
+                        pattern: ^0x0001[a-fA-F0-9]+$
+                        description: The token/asset identifier, may include chain information
                       amount:
                         type: string
                         pattern: ^[0-9]+$
-                        description: Integer encoded as a string to preserve precision (e.g., uint256)
+                        description: Token amount in smallest unit (wei, satoshi, etc.)
                     required:
                       - asset
-                      - amount
                   settlement:
                     type: object
                     properties:
@@ -1194,10 +1945,13 @@ paths:
                         enum:
                           - escrow
                           - resourceLock
+                        description: The type of settlement mechanism used for this order
                       data:
                         type: object
                         additionalProperties:
                           nullable: true
+                          description: Additional parameters specific to the settlement type
+                        description: Additional parameters specific to the settlement type
                     required:
                       - type
                       - data
@@ -1213,5 +1967,5 @@ paths:
                   - inputAmount
                   - outputAmount
                   - settlement
-        "404":
+        '404':
           description: Order not found

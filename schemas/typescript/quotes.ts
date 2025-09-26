@@ -4,18 +4,28 @@
  */
 
 export {
+  // Common types
   Address,
   Amount,
-  OrderType,
-  OriginSubmission,
+  SwapType,
+  
+  // Quote request types
+  Input,
+  Output,
   AssetLockReference,
-  AvailableInput,
-  RequestedOutput,
-  RequestedOutputDetails,
+  OriginSubmission,
   QuotePreference,
+  FailureHandlingMode,
   GetQuoteRequest,
-  GetQuoteResponse,
-  Eip712Order,
-  QuoteDetails,
+  
+  // Quote response types
   Quote,
+  GetQuoteResponse,
+  
+  // Order types used in quotes
+  Order,
+  OifEscrowOrder,
+  OifResourceLockOrder,
+  Oif3009Order,
+  OifGenericOrder,
 } from "./types";

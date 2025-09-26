@@ -4,31 +4,51 @@ import { PostOrderResponseStatus, OrderStatus, SettlementType } from "./types";
 
 export const addressSchema = z
   .string()
-  .regex(/^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$/)
+  .regex(/^0x0001[a-fA-F0-9]+$/)
   .describe(
-    "EIP-7930 interoperable address - plain Ethereum address (0x + 40 hex) or version 1 encoded format (0x0001... with chain+address)"
+    "Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for\nunambiguous cross-chain identification.",
   );
 
 export const amountSchema = z
   .string()
   .regex(/^[0-9]+$/)
   .describe(
-    "Integer encoded as a string to preserve precision (e.g., uint256)"
+    "Token amounts are encoded as decimal strings to preserve precision for large integers\n(e.g., uint256). Always represents the smallest unit of the token (wei for ETH,\nsatoshi for BTC, etc.). No decimals or scientific notation allowed.",
   );
 
-export const orderTypeSchema = z
-  .union([z.literal("swap-buy"), z.literal("swap-sell")])
+export const swapTypeSchema = z
+  .union([z.literal("exact-input"), z.literal("exact-output")])
   .describe(
-    'Closed list defining how providers must interpret amounts for swaps. "swap-sell" means exact-input (spend exactly the input amounts). "swap-buy" means exact-output (receive exactly the output amounts). To include more options the API will be extended in the future.'
-  );
+    'Defines which amount is fixed in a quote request when one amount is undefined.\n- "exact-input": User specifies exact input amount, provider quotes the output amount\n- "exact-output": User specifies exact output amount, provider quotes the input amount needed',
+  )
+  .default("exact-input");
 
 export const assetLockReferenceSchema = z.object({
-  kind: z.union([z.literal("the-compact"), z.literal("rhinestone")]),
-  params: z.record(z.unknown()).optional(),
+  kind: z
+    .union([z.literal("the-compact"), z.literal("rhinestone")])
+    .describe(
+      'The locking protocol to use for securing assets\n- "the-compact": The Compact protocol for efficient cross-chain transfers\n- "rhinestone": Rhinestone modular account abstraction framework',
+    ),
+  params: z
+    .record(
+      z
+        .unknown()
+        .describe(
+          "Additional configuration parameters specific to the chosen lock type",
+        ),
+    )
+    .optional()
+    .describe(
+      "Additional configuration parameters specific to the chosen lock type",
+    ),
 });
 
 export const originSubmissionSchema = z.object({
-  mode: z.union([z.literal("user"), z.literal("protocol")]),
+  mode: z
+    .union([z.literal("user"), z.literal("protocol")])
+    .describe(
+      'Determines transaction submission responsibility\n- "user": User directly submits and pays gas\n- "protocol": Protocol/relayer submits on user\'s behalf (gasless for user)',
+    ),
   schemes: z
     .array(
       z.union([
@@ -36,30 +56,43 @@ export const originSubmissionSchema = z.object({
         z.literal("permit2"),
         z.literal("erc20-permit"),
         z.literal("eip-3009"),
-      ])
+      ]),
     )
-    .optional(),
+    .optional()
+    .describe(
+      'List of supported authorization methods for the transaction\n- "erc-4337": Account abstraction (smart contract wallets)\n- "permit2": Uniswap\'s Permit2 for token approvals\n- "erc20-permit": EIP-2612 permit for gasless approvals\n- "eip-3009": Transfer with authorization (e.g., USDC)',
+    ),
 });
 
-export const availableInputSchema = z.object({
-  user: addressSchema,
-  asset: addressSchema,
-  amount: amountSchema,
-  lock: assetLockReferenceSchema.optional(),
+export const inputSchema = z.object({
+  user: addressSchema.describe("The address providing the input assets"),
+  asset: addressSchema.describe("The token/asset being provided as input"),
+  amount: amountSchema
+    .optional()
+    .describe(
+      "For quote requests:\n- exact-input: The exact amount user will provide\n- exact-output: minimum amount user will provide. Optional in request for open discovery of the quote\nFor direct intents: Always specified",
+    ),
+  lock: assetLockReferenceSchema
+    .optional()
+    .describe("Locking mechanism to use for securing the input assets"),
 });
 
-export const requestedOutputSchema = z.object({
-  receiver: addressSchema,
-  asset: addressSchema,
-  amount: amountSchema,
-  calldata: z.string().optional(),
-});
-
-export const requestedOutputDetailsSchema = z.object({
-  user: addressSchema,
-  asset: addressSchema,
-  amount: amountSchema,
-  calldata: z.string().optional(),
+export const outputSchema = z.object({
+  receiver: addressSchema.describe(
+    "The address that will receive the output assets",
+  ),
+  asset: addressSchema.describe("The token/asset to be received as output"),
+  amount: amountSchema
+    .optional()
+    .describe(
+      "For quote requests:\n- exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote\n- exact-output: The exact amount user wants to receive\nFor direct intents: Always specified",
+    ),
+  calldata: z
+    .string()
+    .optional()
+    .describe(
+      "Encoded function call to be executed when delivering the output,\nenabling composability with other protocols",
+    ),
 });
 
 export const quotePreferenceSchema = z
@@ -69,75 +102,73 @@ export const quotePreferenceSchema = z
     z.literal("input-priority"),
     z.literal("trust-minimization"),
   ])
-  .describe("Quote preference type");
+  .describe(
+    'Indicates user\'s priority when selecting between multiple quotes\n- "price": Optimize for best exchange rate/lowest cost\n- "speed": Optimize for fastest execution time\n- "input-priority": Prefer quotes that use inputs in the order specified\n- "trust-minimization": Prefer quotes with strongest security guarantees',
+  );
 
-export const failureHandlingModeSchema = z.union([
-  z.literal("retry"),
-  z.literal("refund-instant"),
-  z.literal("refund-claim"),
-  z.literal("needs-new-signature"),
-]);
-
-export const failureHandlingSchema = z.union([
-  failureHandlingModeSchema,
-  z.object({
-    partialFill: z.boolean().optional(),
-    remainder: failureHandlingModeSchema,
-  }),
-]);
+export const failureHandlingModeSchema = z
+  .union([
+    z.literal("refund-automatic"),
+    z.literal("refund-claim"),
+    z.literal("needs-new-signature"),
+  ])
+  .describe(
+    'Defines how to handle transaction failures or partial fills\n- "refund-automatic": Automatic refund on failure without user action\n- "refund-claim": User must claim refund manually after failure\n- "needs-new-signature": Requires new user signature to retry or refund',
+  );
 
 export const getQuoteRequestSchema = z.object({
   user: addressSchema,
-  availableInputs: z.array(availableInputSchema),
-  requestedOutputs: z.array(requestedOutputSchema),
-  orderType: orderTypeSchema.optional(),
-  minValidUntil: z.number().optional(),
-  preference: quotePreferenceSchema.optional(),
-  originSubmission: originSubmissionSchema.optional(),
+  intent: z.object({
+    intentType: z.literal("oif-swap"),
+    inputs: z.array(inputSchema),
+    outputs: z.array(outputSchema),
+    swapType: swapTypeSchema
+      .optional()
+      .describe("Determines which amounts are fixed vs quoted")
+      .default("exact-input"),
+    minValidUntil: z.number().optional(),
+    preference: quotePreferenceSchema.optional(),
+    originSubmission: originSubmissionSchema.optional(),
+    failureHandling: z.array(failureHandlingModeSchema).optional(),
+    partialFill: z.boolean().optional(),
+    metadata: z.record(z.any()).optional(),
+  }),
+  supportedTypes: z.array(z.string()),
 });
 
-export const eip712OrderSchema = z.object({
-  domain: addressSchema,
-  primaryType: z.string(),
-  message: z.record(z.unknown()),
+export const oifEscrowOrderSchema = z.object({
+  type: z.literal("oif-escrow-v0"),
+  payload: z.object({
+    signatureType: z.literal("eip712"),
+    domain: z.record(z.any()),
+    primaryType: z.string(),
+    message: z.record(z.any()),
+  }),
 });
 
-export const quoteDetailsSchema = z.object({
-  requestedOutputs: z.array(requestedOutputDetailsSchema),
-  availableInputs: z.array(
-    z.object({
-      user: addressSchema,
-      asset: addressSchema,
-      amount: amountSchema,
-      lockType: z.literal("the-compact").optional(),
-    })
-  ),
+export const oifResourceLockOrderSchema = z.object({
+  type: z.literal("oif-resource-lock-v0"),
+  payload: z.object({
+    signatureType: z.literal("eip712"),
+    domain: z.record(z.any()),
+    primaryType: z.string(),
+    message: z.record(z.any()),
+  }),
 });
 
-export const quoteSchema = z.object({
-  orders: z.array(eip712OrderSchema),
-  details: quoteDetailsSchema,
-  validUntil: z.number().optional(),
-  eta: z.number().optional(),
-  quoteId: z.string(),
-  provider: z.string(),
-});
-
-export const getQuoteResponseSchema = z.object({
-  quotes: z.array(quoteSchema),
-});
-
-export const postOrderRequestSchema = z.object({
-  order: z.record(z.unknown()),
-  signature: z.record(z.unknown()),
-  quoteId: z.string().optional(),
-  provider: z.string(),
-  failureHandling: failureHandlingSchema,
-  originSubmission: originSubmissionSchema.optional(),
+export const oif3009OrderSchema = z.object({
+  type: z.literal("oif-3009-v0"),
+  payload: z.object({
+    signatureType: z.literal("eip712"),
+    domain: z.record(z.any()),
+    primaryType: z.string(),
+    message: z.record(z.any()),
+  }),
+  metadata: z.record(z.any()),
 });
 
 export const postOrderResponseStatusSchema = z.nativeEnum(
-  PostOrderResponseStatus
+  PostOrderResponseStatus,
 );
 
 export const postOrderResponseSchema = z.object({
@@ -150,19 +181,31 @@ export const postOrderResponseSchema = z.object({
 export const orderStatusSchema = z.nativeEnum(OrderStatus);
 
 export const assetAmountSchema = z.object({
-  asset: addressSchema,
-  amount: amountSchema,
+  asset: addressSchema.describe(
+    "The token/asset identifier, may include chain information",
+  ),
+  amount: amountSchema
+    .optional()
+    .describe("Token amount in smallest unit (wei, satoshi, etc.)"),
 });
 
 export const settlementTypeSchema = z.nativeEnum(SettlementType);
 
 export const settlementSchema = z.object({
-  type: settlementTypeSchema,
-  data: z.record(z.unknown()),
+  type: settlementTypeSchema.describe(
+    "The type of settlement mechanism used for this order",
+  ),
+  data: z
+    .record(
+      z
+        .unknown()
+        .describe("Additional parameters specific to the settlement type"),
+    )
+    .describe("Additional parameters specific to the settlement type"),
 });
 
 export const getOrderRequestSchema = z.object({
-  id: z.string(),
+  id: z.string().describe("Unique ID assigned to the order upon submission"),
 });
 
 export const getOrderResponseSchema = z.object({
