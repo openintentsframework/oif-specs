@@ -16,10 +16,9 @@ components:
   schemas:
     Address:
       type: string
-      pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+      pattern: ^0x0001[a-fA-F0-9]+$
       description: |-
-        Cross-chain compatible address format per EIP-7930. Supports both plain Ethereum addresses
-        (0x + 40 hex chars) and version 1 encoded format (0x0001 + chain ID + address) for
+        Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
         unambiguous cross-chain identification.
     Amount:
       type: string
@@ -108,19 +107,19 @@ components:
       properties:
         user:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: The address providing the input assets
         asset:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: The token/asset being provided as input
         amount:
           type: string
           pattern: ^[0-9]+$
           description: |-
             For quote requests:
-            - exact-input: The exact amount user will provide (output amount undefined in request)
-            - exact-output: Undefined in request (provider quotes required input amount)
+            - exact-input: The exact amount user will provide
+            - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
             For direct intents: Always specified
         lock:
           type: object
@@ -154,19 +153,19 @@ components:
       properties:
         receiver:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: The address that will receive the output assets
         asset:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: The token/asset to be received as output
         amount:
           type: string
           pattern: ^[0-9]+$
           description: |-
             For quote requests:
-            - exact-input: Undefined in request (provider quotes output amount)
-            - exact-output: The exact amount user wants to receive (input amount undefined in request)
+            - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+            - exact-output: The exact amount user wants to receive
             For direct intents: Always specified
         calldata:
           type: string
@@ -217,10 +216,9 @@ components:
       properties:
         user:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: |-
-            Cross-chain compatible address format per EIP-7930. Supports both plain Ethereum addresses
-            (0x + 40 hex chars) and version 1 encoded format (0x0001 + chain ID + address) for
+            Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
             unambiguous cross-chain identification.
         intent:
           type: object
@@ -236,19 +234,19 @@ components:
                 properties:
                   user:
                     type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                    pattern: ^0x0001[a-fA-F0-9]+$
                     description: The address providing the input assets
                   asset:
                     type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                    pattern: ^0x0001[a-fA-F0-9]+$
                     description: The token/asset being provided as input
                   amount:
                     type: string
                     pattern: ^[0-9]+$
                     description: |-
                       For quote requests:
-                      - exact-input: The exact amount user will provide (output amount undefined in request)
-                      - exact-output: Undefined in request (provider quotes required input amount)
+                      - exact-input: The exact amount user will provide
+                      - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
                       For direct intents: Always specified
                   lock:
                     type: object
@@ -284,19 +282,19 @@ components:
                 properties:
                   receiver:
                     type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                    pattern: ^0x0001[a-fA-F0-9]+$
                     description: The address that will receive the output assets
                   asset:
                     type: string
-                    pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                    pattern: ^0x0001[a-fA-F0-9]+$
                     description: The token/asset to be received as output
                   amount:
                     type: string
                     pattern: ^[0-9]+$
                     description: |-
                       For quote requests:
-                      - exact-input: Undefined in request (provider quotes output amount)
-                      - exact-output: The exact amount user wants to receive (input amount undefined in request)
+                      - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                      - exact-output: The exact amount user wants to receive
                       For direct intents: Always specified
                   calldata:
                     type: string
@@ -1568,14 +1566,17 @@ components:
         - pending
         - executed
         - settled
+        - executing
+        - settling
         - finalized
         - failed
+        - refunded
     AssetAmount:
       type: object
       properties:
         asset:
           type: string
-          pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+          pattern: ^0x0001[a-fA-F0-9]+$
           description: The token/asset identifier, may include chain information
         amount:
           type: string
@@ -1626,8 +1627,11 @@ components:
             - pending
             - executed
             - settled
+            - executing
+            - settling
             - finalized
             - failed
+            - refunded
         createdAt:
           type: number
         updatedAt:
@@ -1639,7 +1643,7 @@ components:
           properties:
             asset:
               type: string
-              pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+              pattern: ^0x0001[a-fA-F0-9]+$
               description: The token/asset identifier, may include chain information
             amount:
               type: string
@@ -1652,7 +1656,7 @@ components:
           properties:
             asset:
               type: string
-              pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+              pattern: ^0x0001[a-fA-F0-9]+$
               description: The token/asset identifier, may include chain information
             amount:
               type: string
@@ -1706,10 +1710,9 @@ paths:
               properties:
                 user:
                   type: string
-                  pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                  pattern: ^0x0001[a-fA-F0-9]+$
                   description: |-
-                    Cross-chain compatible address format per EIP-7930. Supports both plain Ethereum addresses
-                    (0x + 40 hex chars) and version 1 encoded format (0x0001 + chain ID + address) for
+                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
                     unambiguous cross-chain identification.
                 intent:
                   type: object
@@ -1725,19 +1728,19 @@ paths:
                         properties:
                           user:
                             type: string
-                            pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                            pattern: ^0x0001[a-fA-F0-9]+$
                             description: The address providing the input assets
                           asset:
                             type: string
-                            pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                            pattern: ^0x0001[a-fA-F0-9]+$
                             description: The token/asset being provided as input
                           amount:
                             type: string
                             pattern: ^[0-9]+$
                             description: |-
                               For quote requests:
-                              - exact-input: The exact amount user will provide (output amount undefined in request)
-                              - exact-output: Undefined in request (provider quotes required input amount)
+                              - exact-input: The exact amount user will provide
+                              - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
                               For direct intents: Always specified
                           lock:
                             type: object
@@ -1773,19 +1776,19 @@ paths:
                         properties:
                           receiver:
                             type: string
-                            pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                            pattern: ^0x0001[a-fA-F0-9]+$
                             description: The address that will receive the output assets
                           asset:
                             type: string
-                            pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                            pattern: ^0x0001[a-fA-F0-9]+$
                             description: The token/asset to be received as output
                           amount:
                             type: string
                             pattern: ^[0-9]+$
                             description: |-
                               For quote requests:
-                              - exact-input: Undefined in request (provider quotes output amount)
-                              - exact-output: The exact amount user wants to receive (input amount undefined in request)
+                              - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                              - exact-output: The exact amount user wants to receive
                               For direct intents: Always specified
                           calldata:
                             type: string
@@ -2471,8 +2474,11 @@ paths:
                       - pending
                       - executed
                       - settled
+                      - executing
+                      - settling
                       - finalized
                       - failed
+                      - refunded
                   createdAt:
                     type: number
                   updatedAt:
@@ -2484,7 +2490,7 @@ paths:
                     properties:
                       asset:
                         type: string
-                        pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                        pattern: ^0x0001[a-fA-F0-9]+$
                         description: The token/asset identifier, may include chain information
                       amount:
                         type: string
@@ -2497,7 +2503,7 @@ paths:
                     properties:
                       asset:
                         type: string
-                        pattern: ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
+                        pattern: ^0x0001[a-fA-F0-9]+$
                         description: The token/asset identifier, may include chain information
                       amount:
                         type: string

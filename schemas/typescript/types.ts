@@ -7,11 +7,9 @@
 
 /**
  * EIP-7930 interoperable address format
- * @description Cross-chain compatible address format per EIP-7930. Supports both plain Ethereum addresses 
- *              (0x + 40 hex chars) and version 1 encoded format (0x0001 + chain ID + address) for 
+ * @description Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for 
  *              unambiguous cross-chain identification.
- * @pattern ^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$
- * @example Plain Ethereum: "0x14D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
+ * @pattern ^0x0001[a-fA-F0-9]+$
  * @example Cross-chain (Ethereum mainnet): "0x00010000010114D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
  * @example Cross-chain (Polygon): "0x0001000001890314D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
  * @see https://eips.ethereum.org/EIPS/eip-7930
@@ -125,8 +123,8 @@ export interface Input {
   /** 
    * Amount available
    * @description For quote requests:
-   *              - exact-input: The exact amount user will provide (output amount undefined in request)
-   *              - exact-output: Undefined in request (provider quotes required input amount)
+   *              - exact-input: The exact amount user will provide
+   *              - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
    *              For direct intents: Always specified
    * @example "4000000000" - 4000 USDC for exact-input quote
    */
@@ -171,8 +169,8 @@ export interface Output {
   /** 
    * Amount requested
    * @description For quote requests:
-   *              - exact-input: Undefined in request (provider quotes output amount)
-   *              - exact-output: The exact amount user wants to receive (input amount undefined in request)
+   *              - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+   *              - exact-output: The exact amount user wants to receive
    *              For direct intents: Always specified
    * @example "2000000000000000000" - 2 ETH for exact-output quote
    */
@@ -264,7 +262,7 @@ export type FailureHandlingMode =
  * }
  */
 export interface GetQuoteRequest {
-  /** User requesting the quote */
+  /** User requesting the quote and recipient of refund inputs in case of failures */
   user: Address;
 
   intent: {
@@ -285,7 +283,6 @@ export interface GetQuoteRequest {
     preference?: QuotePreference;
     /**
      * Explicit preference for submission responsibility and acceptable auth schemes.
-     * If provided, takes precedence over the legacy boolean.
      */
     originSubmission?: OriginSubmission;
 
@@ -293,7 +290,7 @@ export interface GetQuoteRequest {
     failureHandling?: FailureHandlingMode[];
     /** Whether the integrator supports partial fills */
     partialFill?: boolean;
-    /** Metadata for the order, never required, potentiallycontains provider specific data */
+    /** Metadata for the order, never required, potentially contains provider specific data */
     metadata?: object;
   }
   supportedTypes: string[]; // Order types supported by the provider
@@ -305,7 +302,7 @@ export interface GetQuoteRequest {
  * @description Represents all possible order types supported by the OIF protocol.
  *              Each order type has different security and execution characteristics.
  */
-export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order | OifGenericOrder
+export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order | OifUserOpenIntentOrder
 
 /**
  * Escrow-based order
@@ -468,12 +465,13 @@ export interface Oif3009Order {
   metadata: object;
 }
 
+
 /**
- * Generic order type
- * @description Flexible order format that can accommodate various signature schemes and
- *              order structures. Expects a similar structure to other order types with
- *              signatureType and associated EIP-712 or other signature data.
- * @example With EIP-712:
+ * User open intent order
+ * @description Order that carries a user-submitted open intent transaction for execution by a
+ *              settlement/settler contract. Includes safety checks such as required allowances
+ *              that must be satisfied prior to execution.
+ * @example
  * {
  *   type: "oif-generic-v0",
  *   payload: {
@@ -509,6 +507,65 @@ export interface OifGenericOrder {
     types?: EIP712Types;
     /** Allow any additional properties for flexibility */
     [key: string]: unknown;
+  }
+}
+
+/**
+ * User open intent order
+ * @description Order that carries a user-submitted open intent transaction for execution by a
+ *              settlement/settler contract. Includes safety checks such as required allowances
+ *              that must be satisfied prior to execution.
+ * @example
+ * {
+ *   type: "oif-user-open-v0",
+ *   openIntentTx: {
+ *     to: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *     data: "0xaaaaaaaa....", // bytes in solidity
+ *     gasRequired: "250000"
+ *   },
+ *   checks: {
+ *     allowances: [{
+ *       token: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *       user: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       spender: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *       required: "1000000000"
+ *     }]
+ *   }
+ * }
+ */
+export interface OifUserOpenIntentOrder {
+  /** Order type identifier for user open intent execution */
+  type: "oif-user-open-v0";
+  /**
+   * Open intent transaction to be executed by the settlement contract
+   * @description Encoded call with destination using EIP-7930 address format and raw calldata bytes
+   */
+  openIntentTx: {
+    /** Destination contract in EIP-7930 address format */
+    to: Address;
+    /** Raw calldata bytes for the transaction */
+    data: Uint8Array; 
+    /** Gas required for execution as a decimal string */
+    gasRequired: string;
+  };
+  /**
+   * Allowance and balance checks that must hold prior to execution
+   */
+  checks: {
+    /**
+     * Required allowances and balances
+     * @description Each item asserts that `user` has at least `required` balance andallowance for `spender` on `token`.
+     */
+    allowances: Array<{
+      /** Token address in EIP-7930 format */
+      token: Address;
+      /** User address in EIP-7930 format */
+      user: Address;
+      /** Spender/settlement contract address in EIP-7930 format */
+      spender: Address;
+      /** Required allowance amount as string-encoded integer */
+      required: Amount;
+    }>;
   };
 }
 
@@ -544,7 +601,7 @@ export interface Quote {
   failureHandling: FailureHandlingMode;
   /** Whether the quote supports partial fills */
   partialFill: boolean;
-  /** Metadata for the order, never required, potentiallycontains provider specific data */
+  /** Metadata for the order, never required, potentially contains provider specific data */
   metadata?: object;
 }
 
@@ -691,7 +748,17 @@ export enum OrderStatus {
    */
   Settled = "settled",
   /** 
-   * Order is finalized and complete (after claim confirmation)
+   * Order is partially executed
+   * @description Some transactions has been submitted to the blockchain
+   */
+  Executing = "executing",
+  /** 
+   * Order is settling and is ready to be claimed
+   * @description Some assets are available for claiming by the receiver
+   */
+  Settling = "settling",
+  /** 
+   * Order is finalized and complete (after all claims are confirmed)
    * @description All aspects of the order are complete, including claims
    */
   Finalized = "finalized",
@@ -700,17 +767,17 @@ export enum OrderStatus {
    * @description Order could not be executed due to errors or conditions not met
    */
   Failed = "failed",
+  /** 
+   * Order execution failed and inputs have been refunded
+   * @description Order was not filled and assets have been refunded
+   */
+   Refunded = "refunded",
 }
 
 /**
  * Asset amount representation
  * @description Combines an asset identifier with an amount, using EIP-7930 addresses for
  *              cross-chain compatibility.
- * @example
- * {
- *   asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
- *   amount: "1000000000" // 1000 USDC (6 decimals)
- * }
  * @example Cross-chain:
  * {
  *   asset: "0x00010000018903A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Polygon (chain 137 = 0x89 in hex, 0x8903 in EIP-7930)
@@ -805,22 +872,22 @@ export interface GetOrderRequest {
  *   createdAt: 1699900000,
  *   updatedAt: 1699900100,
  *   quoteId: "quote-123-abc",
- *   inputAmount: {
- *     asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *   inputAmount: [{
+ *     asset: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
  *     amount: "1000000000"
- *   },
- *   outputAmount: {
- *     asset: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+ *   }],
+ *   outputAmount: [{
+ *     asset: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb9",
  *     amount: "500000000000000000"
- *   },
+ *   }],
  *   settlement: {
  *     type: SettlementType.Escrow,
  *     data: { escrowContract: "0x123...", claimable: true }
  *   },
- *   fillTransaction: {
+ *   fillTransaction:[ {
  *     hash: "0xabc...",
  *     blockNumber: 18500000
- *   }
+ *   }]
  * }
  */
 export interface GetOrderResponse {

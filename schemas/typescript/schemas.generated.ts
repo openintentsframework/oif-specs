@@ -4,9 +4,9 @@ import { PostOrderResponseStatus, OrderStatus, SettlementType } from "./types";
 
 export const addressSchema = z
   .string()
-  .regex(/^0x([a-fA-F0-9]{40}|0001[a-fA-F0-9]+)$/)
+  .regex(/^0x0001[a-fA-F0-9]+$/)
   .describe(
-    "Cross-chain compatible address format per EIP-7930. Supports both plain Ethereum addresses\n(0x + 40 hex chars) and version 1 encoded format (0x0001 + chain ID + address) for\nunambiguous cross-chain identification.",
+    "Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for\nunambiguous cross-chain identification.",
   );
 
 export const amountSchema = z
@@ -70,7 +70,7 @@ export const inputSchema = z.object({
   amount: amountSchema
     .optional()
     .describe(
-      "For quote requests:\n- exact-input: The exact amount user will provide (output amount undefined in request)\n- exact-output: Undefined in request (provider quotes required input amount)\nFor direct intents: Always specified",
+      "For quote requests:\n- exact-input: The exact amount user will provide\n- exact-output: minimum amount user will provide. Optional in request for open discovery of the quote\nFor direct intents: Always specified",
     ),
   lock: assetLockReferenceSchema
     .optional()
@@ -85,7 +85,7 @@ export const outputSchema = z.object({
   amount: amountSchema
     .optional()
     .describe(
-      "For quote requests:\n- exact-input: Undefined in request (provider quotes output amount)\n- exact-output: The exact amount user wants to receive (input amount undefined in request)\nFor direct intents: Always specified",
+      "For quote requests:\n- exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote\n- exact-output: The exact amount user wants to receive\nFor direct intents: Always specified",
     ),
   calldata: z
     .string()
