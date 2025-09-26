@@ -9,6 +9,10 @@ export {
   Amount,
   SwapType,
   
+  // EIP-712 types
+  EIP712TypeProperty,
+  EIP712Types,
+  
   // Quote request types
   Input,
   Output,
@@ -27,5 +31,5 @@ export {
   OifEscrowOrder,
   OifResourceLockOrder,
   Oif3009Order,
-  OifGenericOrder,
+  OifUserOpenIntentOrder,
 } from "./types";
