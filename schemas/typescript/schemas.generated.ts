@@ -95,6 +95,11 @@ export const outputSchema = z.object({
     ),
 });
 
+export const quotePreviewSchema = z.object({
+  inputs: z.array(inputSchema),
+  outputs: z.array(outputSchema),
+});
+
 export const quotePreferenceSchema = z
   .union([
     z.literal("price"),
@@ -219,8 +224,8 @@ export const getOrderResponseSchema = z.object({
   createdAt: z.number(),
   updatedAt: z.number(),
   quoteId: z.string().optional(),
-  inputAmount: assetAmountSchema,
-  outputAmount: assetAmountSchema,
+  inputAmounts: z.array(assetAmountSchema),
+  outputAmounts: z.array(assetAmountSchema),
   settlement: settlementSchema,
   fillTransaction: z.record(z.unknown()).optional(),
 });
