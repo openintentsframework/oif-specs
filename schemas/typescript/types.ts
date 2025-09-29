@@ -351,6 +351,8 @@ export interface OifEscrowOrder {
     domain: object;
     primaryType: string;
     message: object;
+    /** EIP-712 types used to construct the digest */
+    types: EIP712Types;
   }
 }
 
@@ -378,6 +380,40 @@ export interface OifEscrowOrder {
  *   }
  * }
  */
+/**
+ * EIP-712 type property
+ * @description Single field definition used inside the EIP-712 `types` map
+ * @example { name: "amount", type: "uint256" }
+ */
+export interface EIP712TypeProperty {
+  /** Field name */
+  name: string;
+  /** Solidity/EVM type */
+  type: string;
+}
+
+/**
+ * EIP-712 types mapping
+ * @description Map from type name to its field definitions, per EIP-712
+ * @example {
+ *   EIP712Domain: [
+ *     { name: "name", type: "string" },
+ *     { name: "version", type: "string" },
+ *     { name: "chainId", type: "uint256" },
+ *     { name: "verifyingContract", type: "address" }
+ *   ],
+ *   BatchCompact: [
+ *     { name: "arbiter", type: "address" },
+ *     { name: "sponsor", type: "address" },
+ *     { name: "nonce", type: "uint256" },
+ *     { name: "expires", type: "uint256" },
+ *     { name: "commitments", type: "Lock[]" },
+ *     { name: "mandate", type: "Mandate" }
+ *   ]
+ * }
+ */
+export type EIP712Types = Record<string, EIP712TypeProperty[]>;
+
 export interface OifResourceLockOrder {
   /** Order type identifier for resource lock-based execution */
   type: "oif-resource-lock-v0";
@@ -386,6 +422,8 @@ export interface OifResourceLockOrder {
     domain: object;
     primaryType: string;
     message: object;
+    /** EIP-712 types used to construct the digest */
+    types: EIP712Types;
   }
 }
 
@@ -429,6 +467,8 @@ export interface Oif3009Order {
     primaryType: string;
     /** The transfer authorization message */
     message: object;
+    /** EIP-712 types used to construct the digest */
+    types: EIP712Types;
   };
   /** Additional metadata for nonce verification and order tracking */
   metadata: object;

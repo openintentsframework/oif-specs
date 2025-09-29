@@ -141,15 +141,18 @@ export const getQuoteRequestSchema = z.object({
   supportedTypes: z.array(z.string()),
 });
 
-export const oifEscrowOrderSchema = z.object({
-  type: z.literal("oif-escrow-v0"),
-  payload: z.object({
-    signatureType: z.literal("eip712"),
-    domain: z.record(z.any()),
-    primaryType: z.string(),
-    message: z.record(z.any()),
-  }),
+export const eIP712TypePropertySchema = z.object({
+  name: z.string(),
+  type: z.string(),
 });
+
+export const eIP712TypesSchema = z
+  .record(
+    z
+      .array(eIP712TypePropertySchema)
+      .describe("Map from type name to its field definitions, per EIP-712"),
+  )
+  .describe("Map from type name to its field definitions, per EIP-712");
 
 export const oifResourceLockOrderSchema = z.object({
   type: z.literal("oif-resource-lock-v0"),
@@ -158,6 +161,7 @@ export const oifResourceLockOrderSchema = z.object({
     domain: z.record(z.any()),
     primaryType: z.string(),
     message: z.record(z.any()),
+    types: eIP712TypesSchema,
   }),
 });
 
@@ -168,6 +172,7 @@ export const oif3009OrderSchema = z.object({
     domain: z.record(z.any()),
     primaryType: z.string(),
     message: z.record(z.any()),
+    types: eIP712TypesSchema,
   }),
   metadata: z.record(z.any()),
 });
@@ -223,4 +228,15 @@ export const getOrderResponseSchema = z.object({
   outputAmounts: z.array(assetAmountSchema),
   settlement: settlementSchema,
   fillTransaction: z.record(z.unknown()).optional(),
+});
+
+export const oifEscrowOrderSchema = z.object({
+  type: z.literal("oif-escrow-v0"),
+  payload: z.object({
+    signatureType: z.literal("eip712"),
+    domain: z.record(z.any()),
+    primaryType: z.string(),
+    message: z.record(z.any()),
+    types: eIP712TypesSchema,
+  }),
 });

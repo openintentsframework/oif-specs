@@ -435,11 +435,28 @@ components:
               type: object
               additionalProperties:
                 nullable: true
+            types:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                    - name
+                    - type
+                description: Map from type name to its field definitions, per EIP-712
+              description: Map from type name to its field definitions, per EIP-712
           required:
             - signatureType
             - domain
             - primaryType
             - message
+            - types
       required:
         - type
         - payload
@@ -467,11 +484,28 @@ components:
               type: object
               additionalProperties:
                 nullable: true
+            types:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                    - name
+                    - type
+                description: Map from type name to its field definitions, per EIP-712
+              description: Map from type name to its field definitions, per EIP-712
           required:
             - signatureType
             - domain
             - primaryType
             - message
+            - types
       required:
         - type
         - payload
@@ -499,11 +533,28 @@ components:
               type: object
               additionalProperties:
                 nullable: true
+            types:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                    - name
+                    - type
+                description: Map from type name to its field definitions, per EIP-712
+              description: Map from type name to its field definitions, per EIP-712
           required:
             - signatureType
             - domain
             - primaryType
             - message
+            - types
         metadata:
           type: object
           additionalProperties:
@@ -537,11 +588,28 @@ components:
                   type: object
                   additionalProperties:
                     nullable: true
+                types:
+                  type: object
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        type:
+                          type: string
+                      required:
+                        - name
+                        - type
+                    description: Map from type name to its field definitions, per EIP-712
+                  description: Map from type name to its field definitions, per EIP-712
               required:
                 - signatureType
                 - domain
                 - primaryType
                 - message
+                - types
           required:
             - type
             - payload
@@ -568,11 +636,28 @@ components:
                   type: object
                   additionalProperties:
                     nullable: true
+                types:
+                  type: object
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        type:
+                          type: string
+                      required:
+                        - name
+                        - type
+                    description: Map from type name to its field definitions, per EIP-712
+                  description: Map from type name to its field definitions, per EIP-712
               required:
                 - signatureType
                 - domain
                 - primaryType
                 - message
+                - types
           required:
             - type
             - payload
@@ -599,11 +684,28 @@ components:
                   type: object
                   additionalProperties:
                     nullable: true
+                types:
+                  type: object
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        type:
+                          type: string
+                      required:
+                        - name
+                        - type
+                    description: Map from type name to its field definitions, per EIP-712
+                  description: Map from type name to its field definitions, per EIP-712
               required:
                 - signatureType
                 - domain
                 - primaryType
                 - message
+                - types
             metadata:
               type: object
               additionalProperties:
@@ -710,11 +812,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
               required:
                 - type
                 - payload
@@ -741,11 +860,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
               required:
                 - type
                 - payload
@@ -772,11 +908,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
                 metadata:
                   type: object
                   additionalProperties:
@@ -1090,11 +1243,28 @@ components:
                             type: object
                             additionalProperties:
                               nullable: true
+                          types:
+                            type: object
+                            additionalProperties:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  type:
+                                    type: string
+                                required:
+                                  - name
+                                  - type
+                              description: Map from type name to its field definitions, per EIP-712
+                            description: Map from type name to its field definitions, per EIP-712
                         required:
                           - signatureType
                           - domain
                           - primaryType
                           - message
+                          - types
                     required:
                       - type
                       - payload
@@ -1121,11 +1291,28 @@ components:
                             type: object
                             additionalProperties:
                               nullable: true
+                          types:
+                            type: object
+                            additionalProperties:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  type:
+                                    type: string
+                                required:
+                                  - name
+                                  - type
+                              description: Map from type name to its field definitions, per EIP-712
+                            description: Map from type name to its field definitions, per EIP-712
                         required:
                           - signatureType
                           - domain
                           - primaryType
                           - message
+                          - types
                     required:
                       - type
                       - payload
@@ -1152,11 +1339,28 @@ components:
                             type: object
                             additionalProperties:
                               nullable: true
+                          types:
+                            type: object
+                            additionalProperties:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  type:
+                                    type: string
+                                required:
+                                  - name
+                                  - type
+                              description: Map from type name to its field definitions, per EIP-712
+                            description: Map from type name to its field definitions, per EIP-712
                         required:
                           - signatureType
                           - domain
                           - primaryType
                           - message
+                          - types
                       metadata:
                         type: object
                         additionalProperties:
@@ -1384,11 +1588,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
               required:
                 - type
                 - payload
@@ -1415,11 +1636,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
               required:
                 - type
                 - payload
@@ -1446,11 +1684,28 @@ components:
                       type: object
                       additionalProperties:
                         nullable: true
+                    types:
+                      type: object
+                      additionalProperties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                            - name
+                            - type
+                        description: Map from type name to its field definitions, per EIP-712
+                      description: Map from type name to its field definitions, per EIP-712
                   required:
                     - signatureType
                     - domain
                     - primaryType
                     - message
+                    - types
                 metadata:
                   type: object
                   additionalProperties:
@@ -1996,11 +2251,28 @@ paths:
                                       type: object
                                       additionalProperties:
                                         nullable: true
+                                    types:
+                                      type: object
+                                      additionalProperties:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            name:
+                                              type: string
+                                            type:
+                                              type: string
+                                          required:
+                                            - name
+                                            - type
+                                        description: Map from type name to its field definitions, per EIP-712
+                                      description: Map from type name to its field definitions, per EIP-712
                                   required:
                                     - signatureType
                                     - domain
                                     - primaryType
                                     - message
+                                    - types
                               required:
                                 - type
                                 - payload
@@ -2027,11 +2299,28 @@ paths:
                                       type: object
                                       additionalProperties:
                                         nullable: true
+                                    types:
+                                      type: object
+                                      additionalProperties:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            name:
+                                              type: string
+                                            type:
+                                              type: string
+                                          required:
+                                            - name
+                                            - type
+                                        description: Map from type name to its field definitions, per EIP-712
+                                      description: Map from type name to its field definitions, per EIP-712
                                   required:
                                     - signatureType
                                     - domain
                                     - primaryType
                                     - message
+                                    - types
                               required:
                                 - type
                                 - payload
@@ -2058,11 +2347,28 @@ paths:
                                       type: object
                                       additionalProperties:
                                         nullable: true
+                                    types:
+                                      type: object
+                                      additionalProperties:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            name:
+                                              type: string
+                                            type:
+                                              type: string
+                                          required:
+                                            - name
+                                            - type
+                                        description: Map from type name to its field definitions, per EIP-712
+                                      description: Map from type name to its field definitions, per EIP-712
                                   required:
                                     - signatureType
                                     - domain
                                     - primaryType
                                     - message
+                                    - types
                                 metadata:
                                   type: object
                                   additionalProperties:
@@ -2303,11 +2609,28 @@ paths:
                               type: object
                               additionalProperties:
                                 nullable: true
+                            types:
+                              type: object
+                              additionalProperties:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    type:
+                                      type: string
+                                  required:
+                                    - name
+                                    - type
+                                description: Map from type name to its field definitions, per EIP-712
+                              description: Map from type name to its field definitions, per EIP-712
                           required:
                             - signatureType
                             - domain
                             - primaryType
                             - message
+                            - types
                       required:
                         - type
                         - payload
@@ -2334,11 +2657,28 @@ paths:
                               type: object
                               additionalProperties:
                                 nullable: true
+                            types:
+                              type: object
+                              additionalProperties:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    type:
+                                      type: string
+                                  required:
+                                    - name
+                                    - type
+                                description: Map from type name to its field definitions, per EIP-712
+                              description: Map from type name to its field definitions, per EIP-712
                           required:
                             - signatureType
                             - domain
                             - primaryType
                             - message
+                            - types
                       required:
                         - type
                         - payload
@@ -2365,11 +2705,28 @@ paths:
                               type: object
                               additionalProperties:
                                 nullable: true
+                            types:
+                              type: object
+                              additionalProperties:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    type:
+                                      type: string
+                                  required:
+                                    - name
+                                    - type
+                                description: Map from type name to its field definitions, per EIP-712
+                              description: Map from type name to its field definitions, per EIP-712
                           required:
                             - signatureType
                             - domain
                             - primaryType
                             - message
+                            - types
                         metadata:
                           type: object
                           additionalProperties:
