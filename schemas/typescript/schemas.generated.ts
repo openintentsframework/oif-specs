@@ -214,8 +214,8 @@ export const getOrderResponseSchema = z.object({
   createdAt: z.number(),
   updatedAt: z.number(),
   quoteId: z.string().optional(),
-  inputAmount: assetAmountSchema,
-  outputAmount: assetAmountSchema,
+  inputAmount: z.array(assetAmountSchema),
+  outputAmount: z.array(assetAmountSchema),
   settlement: settlementSchema,
   fillTransaction: z.record(z.unknown()).optional(),
 });

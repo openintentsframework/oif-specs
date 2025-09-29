@@ -510,6 +510,10 @@ export interface Quote {
   quoteId?: string;
   /** Provider identifier */
   provider?: string;
+  /** Inputs for the quote. Apps might want to validate the amounts with the Order data*/
+  inputs: Input[];
+  /** Outputs for the quote. Apps might want to validate the amounts with the Order data */
+  outputs: Output[];
   /** Failure handling policy for execution*/
   failureHandling: FailureHandlingMode;
   /** Whether the quote supports partial fills */
@@ -814,10 +818,10 @@ export interface GetOrderResponse {
   updatedAt: number;
   /** Associated quote ID if available */
   quoteId?: string;
-  /** Input asset and amount */
-  inputAmount: AssetAmount;
-  /** Output asset and amount */
-  outputAmount: AssetAmount;
+  /** Input assets and amounts */
+  inputAmount: AssetAmount[];
+  /** Output assets and amounts */
+  outputAmount: AssetAmount[];
   /** Settlement information */
   settlement: Settlement;
   /** Transaction details if order has been executed */
