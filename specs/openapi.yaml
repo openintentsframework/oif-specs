@@ -512,20 +512,6 @@ components:
         - type
         - payload
         - metadata
-    OifGenericOrder:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - oif-generic-v0
-        payload:
-          type: object
-          additionalProperties:
-            nullable: true
-      required:
-        - type
-        - payload
     Order:
       anyOf:
         - type: object
@@ -631,17 +617,71 @@ components:
             type:
               type: string
               enum:
-                - oif-generic-v0
-            payload:
+                - oif-user-open-v0
+            openIntentTx:
               type: object
-              additionalProperties:
-                nullable: true
+              properties:
+                to:
+                  type: string
+                  pattern: ^0x0001[a-fA-F0-9]+$
+                  description: |-
+                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                    unambiguous cross-chain identification.
+                data:
+                  type: array
+                  items:
+                    type: number
+                  description: Raw calldata bytes for the transaction
+                gasRequired:
+                  type: string
+              required:
+                - to
+                - data
+                - gasRequired
+            checks:
+              type: object
+              properties:
+                allowances:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        pattern: ^0x0001[a-fA-F0-9]+$
+                        description: |-
+                          Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                          unambiguous cross-chain identification.
+                      user:
+                        type: string
+                        pattern: ^0x0001[a-fA-F0-9]+$
+                        description: |-
+                          Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                          unambiguous cross-chain identification.
+                      spender:
+                        type: string
+                        pattern: ^0x0001[a-fA-F0-9]+$
+                        description: |-
+                          Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                          unambiguous cross-chain identification.
+                      required:
+                        type: string
+                        pattern: ^[0-9]+$
+                        description: |-
+                          Token amounts are encoded as decimal strings to preserve precision for large integers
+                          (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
+                          satoshi for BTC, etc.). No decimals or scientific notation allowed.
+                    required:
+                      - token
+                      - user
+                      - spender
+                      - required
+              required:
+                - allowances
           required:
             - type
-            - payload
-      description: |-
-        Represents all possible order types supported by the OIF protocol.
-        Each order type has different security and execution characteristics.
+            - openIntentTx
+            - checks
     Quote:
       type: object
       properties:
@@ -750,17 +790,71 @@ components:
                 type:
                   type: string
                   enum:
-                    - oif-generic-v0
-                payload:
+                    - oif-user-open-v0
+                openIntentTx:
                   type: object
-                  additionalProperties:
-                    nullable: true
+                  properties:
+                    to:
+                      type: string
+                      pattern: ^0x0001[a-fA-F0-9]+$
+                      description: |-
+                        Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                        unambiguous cross-chain identification.
+                    data:
+                      type: array
+                      items:
+                        type: number
+                      description: Raw calldata bytes for the transaction
+                    gasRequired:
+                      type: string
+                  required:
+                    - to
+                    - data
+                    - gasRequired
+                checks:
+                  type: object
+                  properties:
+                    allowances:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: |-
+                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                              unambiguous cross-chain identification.
+                          user:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: |-
+                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                              unambiguous cross-chain identification.
+                          spender:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: |-
+                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                              unambiguous cross-chain identification.
+                          required:
+                            type: string
+                            pattern: ^[0-9]+$
+                            description: |-
+                              Token amounts are encoded as decimal strings to preserve precision for large integers
+                              (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
+                              satoshi for BTC, etc.). No decimals or scientific notation allowed.
+                        required:
+                          - token
+                          - user
+                          - spender
+                          - required
+                  required:
+                    - allowances
               required:
                 - type
-                - payload
-          description: |-
-            Represents all possible order types supported by the OIF protocol.
-            Each order type has different security and execution characteristics.
+                - openIntentTx
+                - checks
         validUntil:
           type: number
         eta:
@@ -769,6 +863,90 @@ components:
           type: string
         provider:
           type: string
+        preview:
+          type: object
+          properties:
+            inputs:
+              type: array
+              items:
+                type: object
+                properties:
+                  user:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The address providing the input assets
+                  asset:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The token/asset being provided as input
+                  amount:
+                    type: string
+                    pattern: ^[0-9]+$
+                    description: |-
+                      For quote requests:
+                      - exact-input: The exact amount user will provide
+                      - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
+                      For direct intents: Always specified
+                  lock:
+                    type: object
+                    properties:
+                      kind:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - the-compact
+                          - type: string
+                            enum:
+                              - rhinestone
+                        description: |-
+                          The locking protocol to use for securing assets
+                          - "the-compact": The Compact protocol for efficient cross-chain transfers
+                          - "rhinestone": Rhinestone modular account abstraction framework
+                      params:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                          description: Additional configuration parameters specific to the chosen lock type
+                        description: Additional configuration parameters specific to the chosen lock type
+                    required:
+                      - kind
+                    description: Locking mechanism to use for securing the input assets
+                required:
+                  - user
+                  - asset
+            outputs:
+              type: array
+              items:
+                type: object
+                properties:
+                  receiver:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The address that will receive the output assets
+                  asset:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The token/asset to be received as output
+                  amount:
+                    type: string
+                    pattern: ^[0-9]+$
+                    description: |-
+                      For quote requests:
+                      - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                      - exact-output: The exact amount user wants to receive
+                      For direct intents: Always specified
+                  calldata:
+                    type: string
+                    description: |-
+                      Encoded function call to be executed when delivering the output,
+                      enabling composability with other protocols
+                required:
+                  - receiver
+                  - asset
+          required:
+            - inputs
+            - outputs
+          description: Informational amounts for UX/display, must be verified against the order
         failureHandling:
           anyOf:
             - type: string
@@ -793,8 +971,92 @@ components:
             nullable: true
       required:
         - order
+        - preview
         - failureHandling
         - partialFill
+    QuotePreview:
+      type: object
+      properties:
+        inputs:
+          type: array
+          items:
+            type: object
+            properties:
+              user:
+                type: string
+                pattern: ^0x0001[a-fA-F0-9]+$
+                description: The address providing the input assets
+              asset:
+                type: string
+                pattern: ^0x0001[a-fA-F0-9]+$
+                description: The token/asset being provided as input
+              amount:
+                type: string
+                pattern: ^[0-9]+$
+                description: |-
+                  For quote requests:
+                  - exact-input: The exact amount user will provide
+                  - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
+                  For direct intents: Always specified
+              lock:
+                type: object
+                properties:
+                  kind:
+                    anyOf:
+                      - type: string
+                        enum:
+                          - the-compact
+                      - type: string
+                        enum:
+                          - rhinestone
+                    description: |-
+                      The locking protocol to use for securing assets
+                      - "the-compact": The Compact protocol for efficient cross-chain transfers
+                      - "rhinestone": Rhinestone modular account abstraction framework
+                  params:
+                    type: object
+                    additionalProperties:
+                      nullable: true
+                      description: Additional configuration parameters specific to the chosen lock type
+                    description: Additional configuration parameters specific to the chosen lock type
+                required:
+                  - kind
+                description: Locking mechanism to use for securing the input assets
+            required:
+              - user
+              - asset
+        outputs:
+          type: array
+          items:
+            type: object
+            properties:
+              receiver:
+                type: string
+                pattern: ^0x0001[a-fA-F0-9]+$
+                description: The address that will receive the output assets
+              asset:
+                type: string
+                pattern: ^0x0001[a-fA-F0-9]+$
+                description: The token/asset to be received as output
+              amount:
+                type: string
+                pattern: ^[0-9]+$
+                description: |-
+                  For quote requests:
+                  - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                  - exact-output: The exact amount user wants to receive
+                  For direct intents: Always specified
+              calldata:
+                type: string
+                description: |-
+                  Encoded function call to be executed when delivering the output,
+                  enabling composability with other protocols
+            required:
+              - receiver
+              - asset
+      required:
+        - inputs
+        - outputs
     GetQuoteResponse:
       type: object
       properties:
@@ -908,17 +1170,71 @@ components:
                       type:
                         type: string
                         enum:
-                          - oif-generic-v0
-                      payload:
+                          - oif-user-open-v0
+                      openIntentTx:
                         type: object
-                        additionalProperties:
-                          nullable: true
+                        properties:
+                          to:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: |-
+                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                              unambiguous cross-chain identification.
+                          data:
+                            type: array
+                            items:
+                              type: number
+                            description: Raw calldata bytes for the transaction
+                          gasRequired:
+                            type: string
+                        required:
+                          - to
+                          - data
+                          - gasRequired
+                      checks:
+                        type: object
+                        properties:
+                          allowances:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                token:
+                                  type: string
+                                  pattern: ^0x0001[a-fA-F0-9]+$
+                                  description: |-
+                                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                    unambiguous cross-chain identification.
+                                user:
+                                  type: string
+                                  pattern: ^0x0001[a-fA-F0-9]+$
+                                  description: |-
+                                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                    unambiguous cross-chain identification.
+                                spender:
+                                  type: string
+                                  pattern: ^0x0001[a-fA-F0-9]+$
+                                  description: |-
+                                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                    unambiguous cross-chain identification.
+                                required:
+                                  type: string
+                                  pattern: ^[0-9]+$
+                                  description: |-
+                                    Token amounts are encoded as decimal strings to preserve precision for large integers
+                                    (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
+                                    satoshi for BTC, etc.). No decimals or scientific notation allowed.
+                              required:
+                                - token
+                                - user
+                                - spender
+                                - required
+                        required:
+                          - allowances
                     required:
                       - type
-                      - payload
-                description: |-
-                  Represents all possible order types supported by the OIF protocol.
-                  Each order type has different security and execution characteristics.
+                      - openIntentTx
+                      - checks
               validUntil:
                 type: number
               eta:
@@ -927,6 +1243,90 @@ components:
                 type: string
               provider:
                 type: string
+              preview:
+                type: object
+                properties:
+                  inputs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user:
+                          type: string
+                          pattern: ^0x0001[a-fA-F0-9]+$
+                          description: The address providing the input assets
+                        asset:
+                          type: string
+                          pattern: ^0x0001[a-fA-F0-9]+$
+                          description: The token/asset being provided as input
+                        amount:
+                          type: string
+                          pattern: ^[0-9]+$
+                          description: |-
+                            For quote requests:
+                            - exact-input: The exact amount user will provide
+                            - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
+                            For direct intents: Always specified
+                        lock:
+                          type: object
+                          properties:
+                            kind:
+                              anyOf:
+                                - type: string
+                                  enum:
+                                    - the-compact
+                                - type: string
+                                  enum:
+                                    - rhinestone
+                              description: |-
+                                The locking protocol to use for securing assets
+                                - "the-compact": The Compact protocol for efficient cross-chain transfers
+                                - "rhinestone": Rhinestone modular account abstraction framework
+                            params:
+                              type: object
+                              additionalProperties:
+                                nullable: true
+                                description: Additional configuration parameters specific to the chosen lock type
+                              description: Additional configuration parameters specific to the chosen lock type
+                          required:
+                            - kind
+                          description: Locking mechanism to use for securing the input assets
+                      required:
+                        - user
+                        - asset
+                  outputs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        receiver:
+                          type: string
+                          pattern: ^0x0001[a-fA-F0-9]+$
+                          description: The address that will receive the output assets
+                        asset:
+                          type: string
+                          pattern: ^0x0001[a-fA-F0-9]+$
+                          description: The token/asset to be received as output
+                        amount:
+                          type: string
+                          pattern: ^[0-9]+$
+                          description: |-
+                            For quote requests:
+                            - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                            - exact-output: The exact amount user wants to receive
+                            For direct intents: Always specified
+                        calldata:
+                          type: string
+                          description: |-
+                            Encoded function call to be executed when delivering the output,
+                            enabling composability with other protocols
+                      required:
+                        - receiver
+                        - asset
+                required:
+                  - inputs
+                  - outputs
+                description: Informational amounts for UX/display, must be verified against the order
               failureHandling:
                 anyOf:
                   - type: string
@@ -951,9 +1351,9 @@ components:
                   nullable: true
             required:
               - order
+              - preview
               - failureHandling
               - partialFill
-          description: List of available quotes, may be empty if no quotes are available
       required:
         - quotes
     PostOrderRequest:
@@ -1064,20 +1464,79 @@ components:
                 type:
                   type: string
                   enum:
-                    - oif-generic-v0
-                payload:
+                    - oif-user-open-v0
+                openIntentTx:
                   type: object
-                  additionalProperties:
-                    nullable: true
+                  properties:
+                    to:
+                      type: string
+                      pattern: ^0x0001[a-fA-F0-9]+$
+                      description: |-
+                        Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                        unambiguous cross-chain identification.
+                    data:
+                      type: array
+                      items:
+                        type: number
+                      description: Raw calldata bytes for the transaction
+                    gasRequired:
+                      type: string
+                  required:
+                    - to
+                    - data
+                    - gasRequired
+                checks:
+                  type: object
+                  properties:
+                    allowances:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: |-
+                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                              unambiguous cross-chain identification.
+                          user:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: |-
+                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                              unambiguous cross-chain identification.
+                          spender:
+                            type: string
+                            pattern: ^0x0001[a-fA-F0-9]+$
+                            description: |-
+                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                              unambiguous cross-chain identification.
+                          required:
+                            type: string
+                            pattern: ^[0-9]+$
+                            description: |-
+                              Token amounts are encoded as decimal strings to preserve precision for large integers
+                              (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
+                              satoshi for BTC, etc.). No decimals or scientific notation allowed.
+                        required:
+                          - token
+                          - user
+                          - spender
+                          - required
+                  required:
+                    - allowances
               required:
                 - type
-                - payload
+                - openIntentTx
+                - checks
           description: EIP-712 typed data for a gasless cross-chain order
         signature:
           type: array
           items:
-            type: number
-          description: EIP-712 signature or equivalent as array of bytes
+            type: array
+            items:
+              type: number
+          description: EIP-712 signature or equivalent as array of byte arrays
         quoteId:
           type: string
           description: Optional quote identifier from a prior Get Quote response
@@ -1228,32 +1687,36 @@ components:
           type: number
         quoteId:
           type: string
-        inputAmount:
-          type: object
-          properties:
-            asset:
-              type: string
-              pattern: ^0x0001[a-fA-F0-9]+$
-              description: The token/asset identifier, may include chain information
-            amount:
-              type: string
-              pattern: ^[0-9]+$
-              description: Token amount in smallest unit (wei, satoshi, etc.)
-          required:
-            - asset
-        outputAmount:
-          type: object
-          properties:
-            asset:
-              type: string
-              pattern: ^0x0001[a-fA-F0-9]+$
-              description: The token/asset identifier, may include chain information
-            amount:
-              type: string
-              pattern: ^[0-9]+$
-              description: Token amount in smallest unit (wei, satoshi, etc.)
-          required:
-            - asset
+        inputAmounts:
+          type: array
+          items:
+            type: object
+            properties:
+              asset:
+                type: string
+                pattern: ^0x0001[a-fA-F0-9]+$
+                description: The token/asset identifier, may include chain information
+              amount:
+                type: string
+                pattern: ^[0-9]+$
+                description: Token amount in smallest unit (wei, satoshi, etc.)
+            required:
+              - asset
+        outputAmounts:
+          type: array
+          items:
+            type: object
+            properties:
+              asset:
+                type: string
+                pattern: ^0x0001[a-fA-F0-9]+$
+                description: The token/asset identifier, may include chain information
+              amount:
+                type: string
+                pattern: ^[0-9]+$
+                description: Token amount in smallest unit (wei, satoshi, etc.)
+            required:
+              - asset
         settlement:
           type: object
           properties:
@@ -1281,8 +1744,8 @@ components:
         - status
         - createdAt
         - updatedAt
-        - inputAmount
-        - outputAmount
+        - inputAmounts
+        - outputAmounts
         - settlement
   parameters: {}
 paths:
@@ -1613,17 +2076,71 @@ paths:
                                 type:
                                   type: string
                                   enum:
-                                    - oif-generic-v0
-                                payload:
+                                    - oif-user-open-v0
+                                openIntentTx:
                                   type: object
-                                  additionalProperties:
-                                    nullable: true
+                                  properties:
+                                    to:
+                                      type: string
+                                      pattern: ^0x0001[a-fA-F0-9]+$
+                                      description: |-
+                                        Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                        unambiguous cross-chain identification.
+                                    data:
+                                      type: array
+                                      items:
+                                        type: number
+                                      description: Raw calldata bytes for the transaction
+                                    gasRequired:
+                                      type: string
+                                  required:
+                                    - to
+                                    - data
+                                    - gasRequired
+                                checks:
+                                  type: object
+                                  properties:
+                                    allowances:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          token:
+                                            type: string
+                                            pattern: ^0x0001[a-fA-F0-9]+$
+                                            description: |-
+                                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                              unambiguous cross-chain identification.
+                                          user:
+                                            type: string
+                                            pattern: ^0x0001[a-fA-F0-9]+$
+                                            description: |-
+                                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                              unambiguous cross-chain identification.
+                                          spender:
+                                            type: string
+                                            pattern: ^0x0001[a-fA-F0-9]+$
+                                            description: |-
+                                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                              unambiguous cross-chain identification.
+                                          required:
+                                            type: string
+                                            pattern: ^[0-9]+$
+                                            description: |-
+                                              Token amounts are encoded as decimal strings to preserve precision for large integers
+                                              (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
+                                              satoshi for BTC, etc.). No decimals or scientific notation allowed.
+                                        required:
+                                          - token
+                                          - user
+                                          - spender
+                                          - required
+                                  required:
+                                    - allowances
                               required:
                                 - type
-                                - payload
-                          description: |-
-                            Represents all possible order types supported by the OIF protocol.
-                            Each order type has different security and execution characteristics.
+                                - openIntentTx
+                                - checks
                         validUntil:
                           type: number
                         eta:
@@ -1632,6 +2149,90 @@ paths:
                           type: string
                         provider:
                           type: string
+                        preview:
+                          type: object
+                          properties:
+                            inputs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  user:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: The address providing the input assets
+                                  asset:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: The token/asset being provided as input
+                                  amount:
+                                    type: string
+                                    pattern: ^[0-9]+$
+                                    description: |-
+                                      For quote requests:
+                                      - exact-input: The exact amount user will provide
+                                      - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
+                                      For direct intents: Always specified
+                                  lock:
+                                    type: object
+                                    properties:
+                                      kind:
+                                        anyOf:
+                                          - type: string
+                                            enum:
+                                              - the-compact
+                                          - type: string
+                                            enum:
+                                              - rhinestone
+                                        description: |-
+                                          The locking protocol to use for securing assets
+                                          - "the-compact": The Compact protocol for efficient cross-chain transfers
+                                          - "rhinestone": Rhinestone modular account abstraction framework
+                                      params:
+                                        type: object
+                                        additionalProperties:
+                                          nullable: true
+                                          description: Additional configuration parameters specific to the chosen lock type
+                                        description: Additional configuration parameters specific to the chosen lock type
+                                    required:
+                                      - kind
+                                    description: Locking mechanism to use for securing the input assets
+                                required:
+                                  - user
+                                  - asset
+                            outputs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  receiver:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: The address that will receive the output assets
+                                  asset:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: The token/asset to be received as output
+                                  amount:
+                                    type: string
+                                    pattern: ^[0-9]+$
+                                    description: |-
+                                      For quote requests:
+                                      - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                                      - exact-output: The exact amount user wants to receive
+                                      For direct intents: Always specified
+                                  calldata:
+                                    type: string
+                                    description: |-
+                                      Encoded function call to be executed when delivering the output,
+                                      enabling composability with other protocols
+                                required:
+                                  - receiver
+                                  - asset
+                          required:
+                            - inputs
+                            - outputs
+                          description: Informational amounts for UX/display, must be verified against the order
                         failureHandling:
                           anyOf:
                             - type: string
@@ -1656,9 +2257,9 @@ paths:
                             nullable: true
                       required:
                         - order
+                        - preview
                         - failureHandling
                         - partialFill
-                    description: List of available quotes, may be empty if no quotes are available
                 required:
                   - quotes
         '400':
@@ -1782,20 +2383,79 @@ paths:
                         type:
                           type: string
                           enum:
-                            - oif-generic-v0
-                        payload:
+                            - oif-user-open-v0
+                        openIntentTx:
                           type: object
-                          additionalProperties:
-                            nullable: true
+                          properties:
+                            to:
+                              type: string
+                              pattern: ^0x0001[a-fA-F0-9]+$
+                              description: |-
+                                Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                unambiguous cross-chain identification.
+                            data:
+                              type: array
+                              items:
+                                type: number
+                              description: Raw calldata bytes for the transaction
+                            gasRequired:
+                              type: string
+                          required:
+                            - to
+                            - data
+                            - gasRequired
+                        checks:
+                          type: object
+                          properties:
+                            allowances:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  token:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: |-
+                                      Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                      unambiguous cross-chain identification.
+                                  user:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: |-
+                                      Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                      unambiguous cross-chain identification.
+                                  spender:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: |-
+                                      Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
+                                      unambiguous cross-chain identification.
+                                  required:
+                                    type: string
+                                    pattern: ^[0-9]+$
+                                    description: |-
+                                      Token amounts are encoded as decimal strings to preserve precision for large integers
+                                      (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
+                                      satoshi for BTC, etc.). No decimals or scientific notation allowed.
+                                required:
+                                  - token
+                                  - user
+                                  - spender
+                                  - required
+                          required:
+                            - allowances
                       required:
                         - type
-                        - payload
+                        - openIntentTx
+                        - checks
                   description: EIP-712 typed data for a gasless cross-chain order
                 signature:
                   type: array
                   items:
-                    type: number
-                  description: EIP-712 signature or equivalent as array of bytes
+                    type: array
+                    items:
+                      type: number
+                  description: EIP-712 signature or equivalent as array of byte arrays
                 quoteId:
                   type: string
                   description: Optional quote identifier from a prior Get Quote response
@@ -1911,32 +2571,36 @@ paths:
                     type: number
                   quoteId:
                     type: string
-                  inputAmount:
-                    type: object
-                    properties:
-                      asset:
-                        type: string
-                        pattern: ^0x0001[a-fA-F0-9]+$
-                        description: The token/asset identifier, may include chain information
-                      amount:
-                        type: string
-                        pattern: ^[0-9]+$
-                        description: Token amount in smallest unit (wei, satoshi, etc.)
-                    required:
-                      - asset
-                  outputAmount:
-                    type: object
-                    properties:
-                      asset:
-                        type: string
-                        pattern: ^0x0001[a-fA-F0-9]+$
-                        description: The token/asset identifier, may include chain information
-                      amount:
-                        type: string
-                        pattern: ^[0-9]+$
-                        description: Token amount in smallest unit (wei, satoshi, etc.)
-                    required:
-                      - asset
+                  inputAmounts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        asset:
+                          type: string
+                          pattern: ^0x0001[a-fA-F0-9]+$
+                          description: The token/asset identifier, may include chain information
+                        amount:
+                          type: string
+                          pattern: ^[0-9]+$
+                          description: Token amount in smallest unit (wei, satoshi, etc.)
+                      required:
+                        - asset
+                  outputAmounts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        asset:
+                          type: string
+                          pattern: ^0x0001[a-fA-F0-9]+$
+                          description: The token/asset identifier, may include chain information
+                        amount:
+                          type: string
+                          pattern: ^[0-9]+$
+                          description: Token amount in smallest unit (wei, satoshi, etc.)
+                      required:
+                        - asset
                   settlement:
                     type: object
                     properties:
@@ -1964,8 +2628,8 @@ paths:
                   - status
                   - createdAt
                   - updatedAt
-                  - inputAmount
-                  - outputAmount
+                  - inputAmounts
+                  - outputAmounts
                   - settlement
         '404':
           description: Order not found
