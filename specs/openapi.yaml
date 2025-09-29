@@ -863,6 +863,120 @@ components:
           type: string
         provider:
           type: string
+        preview:
+          type: object
+          properties:
+            inputs:
+              type: array
+              items:
+                type: object
+                properties:
+                  user:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The address providing the input assets
+                  asset:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The token/asset being provided as input
+                  amount:
+                    type: string
+                    pattern: ^[0-9]+$
+                    description: |-
+                      For quote requests:
+                      - exact-input: The exact amount user will provide
+                      - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
+                      For direct intents: Always specified
+                  lock:
+                    type: object
+                    properties:
+                      kind:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - the-compact
+                          - type: string
+                            enum:
+                              - rhinestone
+                        description: |-
+                          The locking protocol to use for securing assets
+                          - "the-compact": The Compact protocol for efficient cross-chain transfers
+                          - "rhinestone": Rhinestone modular account abstraction framework
+                      params:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                          description: Additional configuration parameters specific to the chosen lock type
+                        description: Additional configuration parameters specific to the chosen lock type
+                    required:
+                      - kind
+                    description: Locking mechanism to use for securing the input assets
+                required:
+                  - user
+                  - asset
+            outputs:
+              type: array
+              items:
+                type: object
+                properties:
+                  receiver:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The address that will receive the output assets
+                  asset:
+                    type: string
+                    pattern: ^0x0001[a-fA-F0-9]+$
+                    description: The token/asset to be received as output
+                  amount:
+                    type: string
+                    pattern: ^[0-9]+$
+                    description: |-
+                      For quote requests:
+                      - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                      - exact-output: The exact amount user wants to receive
+                      For direct intents: Always specified
+                  calldata:
+                    type: string
+                    description: |-
+                      Encoded function call to be executed when delivering the output,
+                      enabling composability with other protocols
+                required:
+                  - receiver
+                  - asset
+          required:
+            - inputs
+            - outputs
+          description: Informational amounts for UX/display, must be verified against the order
+        failureHandling:
+          anyOf:
+            - type: string
+              enum:
+                - refund-automatic
+            - type: string
+              enum:
+                - refund-claim
+            - type: string
+              enum:
+                - needs-new-signature
+          description: |-
+            Defines how to handle transaction failures or partial fills
+            - "refund-automatic": Automatic refund on failure without user action
+            - "refund-claim": User must claim refund manually after failure
+            - "needs-new-signature": Requires new user signature to retry or refund
+        partialFill:
+          type: boolean
+        metadata:
+          type: object
+          additionalProperties:
+            nullable: true
+      required:
+        - order
+        - preview
+        - failureHandling
+        - partialFill
+    QuotePreview:
+      type: object
+      properties:
         inputs:
           type: array
           items:
@@ -940,34 +1054,9 @@ components:
             required:
               - receiver
               - asset
-        failureHandling:
-          anyOf:
-            - type: string
-              enum:
-                - refund-automatic
-            - type: string
-              enum:
-                - refund-claim
-            - type: string
-              enum:
-                - needs-new-signature
-          description: |-
-            Defines how to handle transaction failures or partial fills
-            - "refund-automatic": Automatic refund on failure without user action
-            - "refund-claim": User must claim refund manually after failure
-            - "needs-new-signature": Requires new user signature to retry or refund
-        partialFill:
-          type: boolean
-        metadata:
-          type: object
-          additionalProperties:
-            nullable: true
       required:
-        - order
         - inputs
         - outputs
-        - failureHandling
-        - partialFill
     GetQuoteResponse:
       type: object
       properties:
@@ -1154,83 +1243,90 @@ components:
                 type: string
               provider:
                 type: string
-              inputs:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    user:
-                      type: string
-                      pattern: ^0x0001[a-fA-F0-9]+$
-                      description: The address providing the input assets
-                    asset:
-                      type: string
-                      pattern: ^0x0001[a-fA-F0-9]+$
-                      description: The token/asset being provided as input
-                    amount:
-                      type: string
-                      pattern: ^[0-9]+$
-                      description: |-
-                        For quote requests:
-                        - exact-input: The exact amount user will provide
-                        - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
-                        For direct intents: Always specified
-                    lock:
+              preview:
+                type: object
+                properties:
+                  inputs:
+                    type: array
+                    items:
                       type: object
                       properties:
-                        kind:
-                          anyOf:
-                            - type: string
-                              enum:
-                                - the-compact
-                            - type: string
-                              enum:
-                                - rhinestone
+                        user:
+                          type: string
+                          pattern: ^0x0001[a-fA-F0-9]+$
+                          description: The address providing the input assets
+                        asset:
+                          type: string
+                          pattern: ^0x0001[a-fA-F0-9]+$
+                          description: The token/asset being provided as input
+                        amount:
+                          type: string
+                          pattern: ^[0-9]+$
                           description: |-
-                            The locking protocol to use for securing assets
-                            - "the-compact": The Compact protocol for efficient cross-chain transfers
-                            - "rhinestone": Rhinestone modular account abstraction framework
-                        params:
+                            For quote requests:
+                            - exact-input: The exact amount user will provide
+                            - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
+                            For direct intents: Always specified
+                        lock:
                           type: object
-                          additionalProperties:
-                            nullable: true
-                            description: Additional configuration parameters specific to the chosen lock type
-                          description: Additional configuration parameters specific to the chosen lock type
+                          properties:
+                            kind:
+                              anyOf:
+                                - type: string
+                                  enum:
+                                    - the-compact
+                                - type: string
+                                  enum:
+                                    - rhinestone
+                              description: |-
+                                The locking protocol to use for securing assets
+                                - "the-compact": The Compact protocol for efficient cross-chain transfers
+                                - "rhinestone": Rhinestone modular account abstraction framework
+                            params:
+                              type: object
+                              additionalProperties:
+                                nullable: true
+                                description: Additional configuration parameters specific to the chosen lock type
+                              description: Additional configuration parameters specific to the chosen lock type
+                          required:
+                            - kind
+                          description: Locking mechanism to use for securing the input assets
                       required:
-                        - kind
-                      description: Locking mechanism to use for securing the input assets
-                  required:
-                    - user
-                    - asset
-              outputs:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    receiver:
-                      type: string
-                      pattern: ^0x0001[a-fA-F0-9]+$
-                      description: The address that will receive the output assets
-                    asset:
-                      type: string
-                      pattern: ^0x0001[a-fA-F0-9]+$
-                      description: The token/asset to be received as output
-                    amount:
-                      type: string
-                      pattern: ^[0-9]+$
-                      description: |-
-                        For quote requests:
-                        - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
-                        - exact-output: The exact amount user wants to receive
-                        For direct intents: Always specified
-                    calldata:
-                      type: string
-                      description: |-
-                        Encoded function call to be executed when delivering the output,
-                        enabling composability with other protocols
-                  required:
-                    - receiver
-                    - asset
+                        - user
+                        - asset
+                  outputs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        receiver:
+                          type: string
+                          pattern: ^0x0001[a-fA-F0-9]+$
+                          description: The address that will receive the output assets
+                        asset:
+                          type: string
+                          pattern: ^0x0001[a-fA-F0-9]+$
+                          description: The token/asset to be received as output
+                        amount:
+                          type: string
+                          pattern: ^[0-9]+$
+                          description: |-
+                            For quote requests:
+                            - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                            - exact-output: The exact amount user wants to receive
+                            For direct intents: Always specified
+                        calldata:
+                          type: string
+                          description: |-
+                            Encoded function call to be executed when delivering the output,
+                            enabling composability with other protocols
+                      required:
+                        - receiver
+                        - asset
+                required:
+                  - inputs
+                  - outputs
+                description: Informational amounts for UX/display, must be verified against the order
               failureHandling:
                 anyOf:
                   - type: string
@@ -1255,8 +1351,7 @@ components:
                   nullable: true
             required:
               - order
-              - inputs
-              - outputs
+              - preview
               - failureHandling
               - partialFill
       required:
@@ -1592,7 +1687,7 @@ components:
           type: number
         quoteId:
           type: string
-        inputAmount:
+        inputAmounts:
           type: array
           items:
             type: object
@@ -1607,7 +1702,7 @@ components:
                 description: Token amount in smallest unit (wei, satoshi, etc.)
             required:
               - asset
-        outputAmount:
+        outputAmounts:
           type: array
           items:
             type: object
@@ -1649,8 +1744,8 @@ components:
         - status
         - createdAt
         - updatedAt
-        - inputAmount
-        - outputAmount
+        - inputAmounts
+        - outputAmounts
         - settlement
   parameters: {}
 paths:
@@ -2054,83 +2149,90 @@ paths:
                           type: string
                         provider:
                           type: string
-                        inputs:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              user:
-                                type: string
-                                pattern: ^0x0001[a-fA-F0-9]+$
-                                description: The address providing the input assets
-                              asset:
-                                type: string
-                                pattern: ^0x0001[a-fA-F0-9]+$
-                                description: The token/asset being provided as input
-                              amount:
-                                type: string
-                                pattern: ^[0-9]+$
-                                description: |-
-                                  For quote requests:
-                                  - exact-input: The exact amount user will provide
-                                  - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
-                                  For direct intents: Always specified
-                              lock:
+                        preview:
+                          type: object
+                          properties:
+                            inputs:
+                              type: array
+                              items:
                                 type: object
                                 properties:
-                                  kind:
-                                    anyOf:
-                                      - type: string
-                                        enum:
-                                          - the-compact
-                                      - type: string
-                                        enum:
-                                          - rhinestone
+                                  user:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: The address providing the input assets
+                                  asset:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: The token/asset being provided as input
+                                  amount:
+                                    type: string
+                                    pattern: ^[0-9]+$
                                     description: |-
-                                      The locking protocol to use for securing assets
-                                      - "the-compact": The Compact protocol for efficient cross-chain transfers
-                                      - "rhinestone": Rhinestone modular account abstraction framework
-                                  params:
+                                      For quote requests:
+                                      - exact-input: The exact amount user will provide
+                                      - exact-output: minimum amount user will provide. Optional in request for open discovery of the quote
+                                      For direct intents: Always specified
+                                  lock:
                                     type: object
-                                    additionalProperties:
-                                      nullable: true
-                                      description: Additional configuration parameters specific to the chosen lock type
-                                    description: Additional configuration parameters specific to the chosen lock type
+                                    properties:
+                                      kind:
+                                        anyOf:
+                                          - type: string
+                                            enum:
+                                              - the-compact
+                                          - type: string
+                                            enum:
+                                              - rhinestone
+                                        description: |-
+                                          The locking protocol to use for securing assets
+                                          - "the-compact": The Compact protocol for efficient cross-chain transfers
+                                          - "rhinestone": Rhinestone modular account abstraction framework
+                                      params:
+                                        type: object
+                                        additionalProperties:
+                                          nullable: true
+                                          description: Additional configuration parameters specific to the chosen lock type
+                                        description: Additional configuration parameters specific to the chosen lock type
+                                    required:
+                                      - kind
+                                    description: Locking mechanism to use for securing the input assets
                                 required:
-                                  - kind
-                                description: Locking mechanism to use for securing the input assets
-                            required:
-                              - user
-                              - asset
-                        outputs:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              receiver:
-                                type: string
-                                pattern: ^0x0001[a-fA-F0-9]+$
-                                description: The address that will receive the output assets
-                              asset:
-                                type: string
-                                pattern: ^0x0001[a-fA-F0-9]+$
-                                description: The token/asset to be received as output
-                              amount:
-                                type: string
-                                pattern: ^[0-9]+$
-                                description: |-
-                                  For quote requests:
-                                  - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
-                                  - exact-output: The exact amount user wants to receive
-                                  For direct intents: Always specified
-                              calldata:
-                                type: string
-                                description: |-
-                                  Encoded function call to be executed when delivering the output,
-                                  enabling composability with other protocols
-                            required:
-                              - receiver
-                              - asset
+                                  - user
+                                  - asset
+                            outputs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  receiver:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: The address that will receive the output assets
+                                  asset:
+                                    type: string
+                                    pattern: ^0x0001[a-fA-F0-9]+$
+                                    description: The token/asset to be received as output
+                                  amount:
+                                    type: string
+                                    pattern: ^[0-9]+$
+                                    description: |-
+                                      For quote requests:
+                                      - exact-input: minimum amount user wants to receive. Optional in request for open discovery of the quote
+                                      - exact-output: The exact amount user wants to receive
+                                      For direct intents: Always specified
+                                  calldata:
+                                    type: string
+                                    description: |-
+                                      Encoded function call to be executed when delivering the output,
+                                      enabling composability with other protocols
+                                required:
+                                  - receiver
+                                  - asset
+                          required:
+                            - inputs
+                            - outputs
+                          description: Informational amounts for UX/display, must be verified against the order
                         failureHandling:
                           anyOf:
                             - type: string
@@ -2155,8 +2257,7 @@ paths:
                             nullable: true
                       required:
                         - order
-                        - inputs
-                        - outputs
+                        - preview
                         - failureHandling
                         - partialFill
                 required:
@@ -2470,7 +2571,7 @@ paths:
                     type: number
                   quoteId:
                     type: string
-                  inputAmount:
+                  inputAmounts:
                     type: array
                     items:
                       type: object
@@ -2485,7 +2586,7 @@ paths:
                           description: Token amount in smallest unit (wei, satoshi, etc.)
                       required:
                         - asset
-                  outputAmount:
+                  outputAmounts:
                     type: array
                     items:
                       type: object
@@ -2527,8 +2628,8 @@ paths:
                   - status
                   - createdAt
                   - updatedAt
-                  - inputAmount
-                  - outputAmount
+                  - inputAmounts
+                  - outputAmounts
                   - settlement
         '404':
           description: Order not found

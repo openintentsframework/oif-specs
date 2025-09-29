@@ -186,6 +186,18 @@ export interface Output {
 
 
 /**
+ * Quote preview amounts
+ * @description Informational amounts for UX/display. These values are not authoritative and
+ *              MUST be verified against the signed `order` before execution.
+ */
+export interface QuotePreview {
+  /** Inputs for the preview */
+  inputs: Input[];
+  /** Outputs for the preview */
+  outputs: Output[];
+}
+
+/**
  * Quote preference type
  * @description Indicates user's priority when selecting between multiple quotes
  * - "price": Optimize for best exchange rate/lowest cost
@@ -510,10 +522,10 @@ export interface Quote {
   quoteId?: string;
   /** Provider identifier */
   provider?: string;
-  /** Inputs for the quote. Apps might want to validate the amounts with the Order data*/
-  inputs: Input[];
-  /** Outputs for the quote. Apps might want to validate the amounts with the Order data */
-  outputs: Output[];
+  /**
+   * Informational amounts for UX/display, must be verified against the order
+   */
+  preview: QuotePreview;
   /** Failure handling policy for execution*/
   failureHandling: FailureHandlingMode;
   /** Whether the quote supports partial fills */

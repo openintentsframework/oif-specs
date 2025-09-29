@@ -47,14 +47,21 @@ const orderSchema = z.union([
   oifUserOpenIntentOrderSchema,
 ]);
 
+// Quote preview wrapper for informational amounts
+const quotePreviewSchema = z.object({
+  inputs: z.array(schemas.inputSchema),
+  outputs: z.array(schemas.outputSchema),
+});
+
 const quoteSchema = z.object({
   order: orderSchema,
   validUntil: z.number().optional(),
   eta: z.number().optional(),
   quoteId: z.string().optional(),
   provider: z.string().optional(),
-  inputs: z.array(schemas.inputSchema),
-  outputs: z.array(schemas.outputSchema),
+  preview: quotePreviewSchema.describe(
+    'Informational amounts for UX/display, must be verified against the order',
+  ),
   failureHandling: schemas.failureHandlingModeSchema,
   partialFill: z.boolean(),
   metadata: z.record(z.unknown()).optional(),
@@ -98,6 +105,7 @@ registry.register("OifResourceLockOrder", schemas.oifResourceLockOrderSchema);
 registry.register("Oif3009Order", schemas.oif3009OrderSchema);
 registry.register("Order", orderSchema);
 registry.register("Quote", quoteSchema);
+registry.register("QuotePreview", quotePreviewSchema);
 registry.register("GetQuoteResponse", getQuoteResponseSchema);
 // Register the manually defined PostOrderRequest schema
 registry.register("PostOrderRequest", postOrderRequestSchema);
