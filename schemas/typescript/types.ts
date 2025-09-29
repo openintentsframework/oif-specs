@@ -819,9 +819,9 @@ export interface GetOrderResponse {
   /** Associated quote ID if available */
   quoteId?: string;
   /** Input assets and amounts */
-  inputAmount: AssetAmount[];
+  inputAmounts: AssetAmount[];
   /** Output assets and amounts */
-  outputAmount: AssetAmount[];
+  outputAmounts: AssetAmount[];
   /** Settlement information */
   settlement: Settlement;
   /** Transaction details if order has been executed */
