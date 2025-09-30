@@ -619,7 +619,7 @@ export interface GetQuoteResponse {
  * @example
  * {
  *   order: { type: "oif-escrow-v0", payload: { ... } },
- *   signature: [0x12, 0x34, 0x56, ...],
+ *   signature: 0x12345678,
  *   quoteId: "quote-123-abc",
  *   originSubmission: { mode: "protocol", schemes: ["permit2"] }
  * }
@@ -628,7 +628,7 @@ export interface PostOrderRequest {
   /** EIP-712 typed data for a gasless cross-chain order */
   order: Order;
   /** EIP-712 signature or equivalent */
-  signature: Uint8Array[]; // bytes array in solidity
+  signature: Uint8Array; // bytes in solidity
   /** Optional quote identifier from a prior Get Quote response */
   quoteId?: string;
   /** Optional preference mirrored from quote about who submits and acceptable schemes */
