@@ -18,7 +18,6 @@ export {
   OifEscrowOrder,
   OifResourceLockOrder,
   Oif3009Order,
-  OifGenericOrder,
   
   // Order status and details
   OrderStatus,

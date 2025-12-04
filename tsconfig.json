@@ -13,6 +13,6 @@
     "resolveJsonModule": true,
     "moduleResolution": "node"
   },
-  "include": ["schemas/**/*", "scripts/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["schemas/**/*", "index.ts"],
+  "exclude": ["node_modules", "dist", "scripts"]
 }
