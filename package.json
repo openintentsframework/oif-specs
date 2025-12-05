@@ -1,18 +1,44 @@
 {
-  "name": "oif-specs",
-  "version": "0.1.0",
-  "description": "OIF protocol standards and specifications",
+  "name": "@openintentsframework/oif-specs",
+  "version": "1.0.0",
+  "description": "OIF API standards and specifications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./openapi": "./specs/openapi.yaml"
+  },
+  "files": [
+    "dist",
+    "specs/openapi.yaml",
+    "LICENSE",
+    "README.md"
+  ],
+  "license": "MIT",
+  "publishConfig": { "access": "public" },
+  "repository": { "type": "git", "url": "git+https://github.com/openintentsframework/oif-specs.git" },
+  "bugs": { "url": "https://github.com/openintentsframework/oif-specs/issues" },
+  "homepage": "https://github.com/openintentsframework/oif-specs#readme",
+
   "scripts": {
     "generate:zod": "ts-to-zod schemas/typescript/types.ts schemas/typescript/schemas.generated.ts",
     "generate:openapi": "npm run generate:zod && ts-node scripts/generate-openapi.ts",
-    "build": "npm run generate:openapi"
+    "build": "npm run generate:openapi && tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0",
     "ts-to-zod": "^3.1.0",
-    "zod": "^3.22.0",
     "@asteasolutions/zod-to-openapi": "^7.0.0",
     "js-yaml": "^4.1.0",
     "@types/js-yaml": "^4.0.5"
