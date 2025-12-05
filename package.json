@@ -1,5 +1,5 @@
 {
-  "name": "openintentsframework/oif-specs",
+  "name": "@openintentsframework/oif-specs",
   "version": "1.0.0",
   "description": "OIF API standards and specifications",
   "main": "dist/index.js",
