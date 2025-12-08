@@ -230,6 +230,43 @@ export const getOrderResponseSchema = z.object({
   fillTransaction: z.record(z.unknown()).optional(),
 });
 
+export const assetInfoSchema = z.object({
+  address: addressSchema.describe(
+    "Asset address in EIP-7930 interoperable format for cross-chain compatibility.\nAll addresses are formatted with the 0x prefix.",
+  ),
+  symbol: z
+    .string()
+    .describe(
+      'Asset symbol for display purposes (e.g., "USDC", "WETH", "USDT")',
+    ),
+  decimals: z
+    .number()
+    .describe("Asset decimal precision (e.g., 6 for USDC, 18 for WETH)"),
+});
+
+export const networkAssetsSchema = z.object({
+  chain_id: z
+    .number()
+    .describe(
+      "Chain ID for the blockchain network (e.g., 1 for Ethereum, 137 for Polygon, 42161 for Arbitrum)",
+    ),
+  assets: z
+    .array(assetInfoSchema)
+    .describe("Array of assets supported on this network"),
+});
+
+export const getAssetsResponseSchema = z.object({
+  networks: z
+    .record(
+      networkAssetsSchema.describe(
+        'Map where keys are chain IDs as strings (e.g., "1", "137", "42161") and\nvalues are network asset configurations',
+      ),
+    )
+    .describe(
+      'Map where keys are chain IDs as strings (e.g., "1", "137", "42161") and\nvalues are network asset configurations',
+    ),
+});
+
 export const oifEscrowOrderSchema = z.object({
   type: z.literal("oif-escrow-v0"),
   payload: z.object({
