@@ -4,23 +4,26 @@ This repository is the canonical, versioned source of truth for OIF protocol sta
 
 It includes:
 
-- API standards for Quote and Intent submission
+- API standards for Quote, Intent submission, and Asset discovery
 - Machine-readable OpenAPI schemas
 - Language-friendly TypeScript interfaces for client/server implementation
 
 ## Repository structure
 
-- `specs/openapi.yaml`: OpenAPI 3.0 specification covering Quote and Intent endpoints
+- `specs/openapi.yaml`: OpenAPI 3.0 specification covering Quote, Intent, and Asset discovery endpoints
 - `schemas/typescript/types.ts`: TypeScript interfaces for all OIF protocol types
 - `schemas/typescript/schemas.generated.ts`: Auto-generated Zod schemas from TypeScript types
 - `docs/references.md`: Curated external references to related off-chain APIs and intent protocols
 
 ## API standards
 
-This repository defines two endpoints:
+This repository defines the following endpoints:
 
-- Quote: quote generation for requested outputs based on available inputs
-- Intent: submit a previously quoted, signed order for execution
+- **Quote**: quote generation for requested outputs based on available inputs
+- **Intent**: submit a previously quoted, signed order for execution
+- **Asset Discovery**: discover supported assets and chains
+  - `GET /api/tokens`: returns all supported assets across all configured blockchain networks
+  - `GET /api/tokens/{chain_id}`: returns supported assets for a specific blockchain network
 
 Authoritative schema: `specs/openapi.yaml`
 
@@ -45,6 +48,15 @@ To express user preference for gasless execution and who submits the origin tran
 Notes:
 
 - This is orthogonal to `lock` (asset state) and focuses on submission responsibility and signing surface.
+
+### Asset discovery
+
+To discover which assets and chains are supported by a provider, use the asset discovery endpoints:
+
+- `GET /api/tokens`: Returns all supported networks and their assets
+- `GET /api/tokens/{chain_id}`: Returns assets for a specific chain
+
+The response includes asset metadata (address in EIP-7930 format, symbol, and decimals) for each supported network. This enables clients to build asset and chain selection UIs and validate that a provider can theoretically fulfill a given intent before requesting quotes.
 
 ## Generating OpenAPI from TypeScript
 

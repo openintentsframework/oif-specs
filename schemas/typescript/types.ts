@@ -879,3 +879,117 @@ export interface GetOrderResponse {
   /** Transaction details if order has been executed */
   fillTransaction?: Record<string, unknown>;
 }
+
+// ============ Asset Discovery Types ============
+
+/**
+ * Asset metadata information
+ * @description Metadata for a specific asset supported by a provider, including address,
+ *              symbol, and decimal precision.
+ * @example
+ * {
+ *   address: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum (EIP-7930 format)
+ *   symbol: "USDC",
+ *   decimals: 6
+ * }
+ */
+export interface AssetInfo {
+  /** 
+   * Asset contract address
+   * @description Asset address in EIP-7930 interoperable format for cross-chain compatibility.
+   *              All addresses are formatted with the 0x prefix.
+   * @example "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" - USDC on Ethereum
+   */
+  address: Address;
+  /** 
+   * Human-readable asset identifier
+   * @description Asset symbol for display purposes (e.g., "USDC", "WETH", "USDT")
+   * @example "USDC"
+   * @example "WETH"
+   */
+  symbol: string;
+  /** 
+   * Number of decimal places
+   * @description Asset decimal precision (e.g., 6 for USDC, 18 for WETH)
+   * @example 6 - USDC has 6 decimals
+   * @example 18 - WETH has 18 decimals
+   */
+  decimals: number;
+}
+
+/**
+ * Network asset configuration
+ * @description Represents asset support for a single blockchain network.
+ *              Contains the chain identifier and list of supported assets.
+ * @example
+ * {
+ *   chain_id: 1,
+ *   assets: [
+ *     {
+ *       address: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *       symbol: "USDC",
+ *       decimals: 6
+ *     }
+ *   ]
+ * }
+ */
+export interface NetworkAssets {
+  /** 
+   * Blockchain network identifier
+   * @description Chain ID for the blockchain network (e.g., 1 for Ethereum, 137 for Polygon, 42161 for Arbitrum)
+   * @example 1 - Ethereum mainnet
+   * @example 137 - Polygon
+   * @example 42161 - Arbitrum
+   */
+  chain_id: number;
+  /** 
+   * List of supported assets
+   * @description Array of assets supported on this network
+   */
+  assets: AssetInfo[];
+}
+
+/**
+ * Response for GET /api/tokens endpoint
+ * @description Top-level response structure containing all supported networks and their assets.
+ *              Returns comprehensive information about all supported assets across all configured
+ *              blockchain networks.
+ * @example
+ * {
+ *   networks: {
+ *     "1": {
+ *       chain_id: 1,
+ *       assets: [
+ *         {
+ *           address: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *           symbol: "USDC",
+ *           decimals: 6
+ *         },
+ *         {
+ *           address: "0x0001000001010303030303030303030303030303030303030303030303030303",
+ *           symbol: "WETH",
+ *           decimals: 18
+ *         }
+ *       ]
+ *     },
+ *     "137": {
+ *       chain_id: 137,
+ *       assets: [
+ *         {
+ *           address: "0x00010000018903A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *           symbol: "USDC",
+ *           decimals: 6
+ *         }
+ *       ]
+ *     }
+ *   }
+ * }
+ */
+export interface GetAssetsResponse {
+  /** 
+   * Map of chain ID to network configuration
+   * @description Map where keys are chain IDs as strings (e.g., "1", "137", "42161") and
+   *              values are network asset configurations
+   */
+  networks: Record<string, NetworkAssets>;
+}
