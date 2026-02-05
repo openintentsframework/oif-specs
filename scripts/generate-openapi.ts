@@ -23,7 +23,7 @@ const registry = new OpenAPIRegistry();
 const oifUserOpenIntentOrderSchema = z.object({
   type: z.literal("oif-user-open-v0"),
   openIntentTx: z.object({
-    to: schemas.addressSchema,
+    to: schemas.chainAddressSchema.describe("Destination contract in CAIP-350 address format"),
     // Represent bytes as an array of numbers (0-255)
     data: z.array(z.number()).describe("Raw calldata bytes for the transaction"),
     gasRequired: z.string(),
@@ -31,9 +31,9 @@ const oifUserOpenIntentOrderSchema = z.object({
   checks: z.object({
     allowances: z.array(
       z.object({
-        token: schemas.addressSchema,
-        user: schemas.addressSchema,
-        spender: schemas.addressSchema,
+        token: schemas.chainAddressSchema.describe("Token address in CAIP-350 format"),
+        user: schemas.chainAddressSchema.describe("User address in CAIP-350 format"),
+        spender: schemas.chainAddressSchema.describe("Spender/settlement contract address in CAIP-350 format"),
         required: schemas.amountSchema,
       })
     ),
@@ -90,7 +90,9 @@ const postOrderRequestSchema = z.object({
 });
 
 // Register all schemas as components
-registry.register("Address", schemas.addressSchema);
+registry.register("Chain", schemas.chainSchema);
+registry.register("NativeAddress", schemas.nativeAddressSchema);
+registry.register("ChainAddress", schemas.chainAddressSchema);
 registry.register("Amount", schemas.amountSchema);
 registry.register("SwapType", schemas.swapTypeSchema);
 registry.register("AssetLockReference", schemas.assetLockReferenceSchema);

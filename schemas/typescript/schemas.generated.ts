@@ -2,12 +2,26 @@
 import { z } from "zod";
 import { PostOrderResponseStatus, OrderStatus, SettlementType } from "./types";
 
-export const addressSchema = z
+export const chainSchema = z
   .string()
-  .regex(/^0x0001[a-fA-F0-9]+$/)
   .describe(
-    "Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for\nunambiguous cross-chain identification.",
+    "Chain identifier following CAIP-2 standard (namespace:reference format).\nFor EVM chains, uses eip155 namespace with chain ID.",
   );
+
+export const nativeAddressSchema = z
+  .string()
+  .describe(
+    "Native blockchain address in its canonical format for the specified chain.\nFormat varies by chain namespace.",
+  );
+
+export const chainAddressSchema = z.object({
+  chain: chainSchema.describe(
+    "The blockchain network identifier in CAIP-2 format (namespace:reference)",
+  ),
+  address: nativeAddressSchema.describe(
+    "The address in its native format for the specified chain",
+  ),
+});
 
 export const amountSchema = z
   .string()
@@ -65,8 +79,12 @@ export const originSubmissionSchema = z.object({
 });
 
 export const inputSchema = z.object({
-  user: addressSchema.describe("The address providing the input assets"),
-  asset: addressSchema.describe("The token/asset being provided as input"),
+  user: chainAddressSchema.describe(
+    "The CAIP-350 address of the user providing the input assets",
+  ),
+  asset: chainAddressSchema.describe(
+    "The CAIP-350 address of the token/asset being provided as input",
+  ),
   amount: amountSchema
     .optional()
     .describe(
@@ -78,10 +96,12 @@ export const inputSchema = z.object({
 });
 
 export const outputSchema = z.object({
-  receiver: addressSchema.describe(
-    "The address that will receive the output assets",
+  receiver: chainAddressSchema.describe(
+    "The CAIP-350 address that will receive the output assets",
   ),
-  asset: addressSchema.describe("The token/asset to be received as output"),
+  asset: chainAddressSchema.describe(
+    "The CAIP-350 address of the token/asset to be received as output",
+  ),
   amount: amountSchema
     .optional()
     .describe(
@@ -122,7 +142,7 @@ export const failureHandlingModeSchema = z
   );
 
 export const getQuoteRequestSchema = z.object({
-  user: addressSchema,
+  user: chainAddressSchema,
   intent: z.object({
     intentType: z.literal("oif-swap"),
     inputs: z.array(inputSchema),
@@ -191,8 +211,8 @@ export const postOrderResponseSchema = z.object({
 export const orderStatusSchema = z.nativeEnum(OrderStatus);
 
 export const assetAmountSchema = z.object({
-  asset: addressSchema.describe(
-    "The token/asset identifier, may include chain information",
+  asset: chainAddressSchema.describe(
+    "The token/asset identifier with chain information",
   ),
   amount: amountSchema
     .optional()
@@ -231,8 +251,8 @@ export const getOrderResponseSchema = z.object({
 });
 
 export const assetInfoSchema = z.object({
-  address: addressSchema.describe(
-    "Asset address in EIP-7930 interoperable format for cross-chain compatibility.\nAll addresses are formatted with the 0x prefix.",
+  address: chainAddressSchema.describe(
+    "Asset address in CAIP-350 format for cross-chain compatibility.",
   ),
   symbol: z
     .string()
@@ -245,11 +265,9 @@ export const assetInfoSchema = z.object({
 });
 
 export const networkAssetsSchema = z.object({
-  chain_id: z
-    .number()
-    .describe(
-      "Chain ID for the blockchain network (e.g., 1 for Ethereum, 137 for Polygon, 42161 for Arbitrum)",
-    ),
+  chain: chainSchema.describe(
+    "Chain identifier in CAIP-2 format (namespace:reference)",
+  ),
   assets: z
     .array(assetInfoSchema)
     .describe("Array of assets supported on this network"),
@@ -258,12 +276,15 @@ export const networkAssetsSchema = z.object({
 export const getAssetsResponseSchema = z.object({
   networks: z
     .record(
+      chainSchema.describe(
+        'Map where keys are CAIP-2 chain identifiers (e.g., "eip155:1", "eip155:137") and\nvalues are network asset configurations',
+      ),
       networkAssetsSchema.describe(
-        'Map where keys are chain IDs as strings (e.g., "1", "137", "42161") and\nvalues are network asset configurations',
+        'Map where keys are CAIP-2 chain identifiers (e.g., "eip155:1", "eip155:137") and\nvalues are network asset configurations',
       ),
     )
     .describe(
-      'Map where keys are chain IDs as strings (e.g., "1", "137", "42161") and\nvalues are network asset configurations',
+      'Map where keys are CAIP-2 chain identifiers (e.g., "eip155:1", "eip155:137") and\nvalues are network asset configurations',
     ),
 });
 

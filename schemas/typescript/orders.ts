@@ -25,8 +25,10 @@ export {
   Settlement,
   SettlementType,
   
-  // Common types
-  Address,
+  // Common types - CAIP-350 address format
+  Chain,
+  NativeAddress,
+  ChainAddress,
   Amount,
   OriginSubmission,
   FailureHandlingMode,
