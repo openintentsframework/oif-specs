@@ -138,33 +138,41 @@ export interface OriginSubmission {
 /**
  * Available input from a user
  * @description Specifies assets that a user is willing to provide as input for a swap or transfer.
- *              Represents the "from" side of the transaction.
- * @example Exact-input quote (user has 4000 USDC):
+ *              Represents the "from" side of the transaction. The user and asset are always on the
+ *              same chain, so the chain is specified once at the top level.
+ * @example Exact-input quote (user has 4000 USDC on Ethereum):
  * {
- *   user: { chain: "eip155:1", address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045" },
- *   asset: { chain: "eip155:1", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" }, // USDC on Ethereum
+ *   chain: "eip155:1",
+ *   user: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+ *   asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
  *   amount: "4000000000", // Exactly 4000 USDC
  *   lock: { kind: "the-compact" }
  * }
  * @example Exact-output quote (amount undefined, will be quoted):
  * {
- *   user: { chain: "eip155:1", address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045" },
- *   asset: { chain: "eip155:1", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" }, // USDC
+ *   chain: "eip155:1",
+ *   user: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+ *   asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
  *   amount: undefined, // Provider will quote how much USDC needed
  *   lock: { kind: "the-compact" }
  * }
  */
 export interface Input {
+  /**
+   * Chain identifier
+   * @description The chain where the input assets reside
+   */
+  chain: Chain;
   /** 
    * User address 
-   * @description The chain-specific address of the account providing the input assets
+   * @description The address of the account providing the input assets
    */
-  user: ChainAddress;
+  user: NativeAddress;
   /** 
    * Asset address
-   * @description The chain-specific address of the token/asset being provided as input
+   * @description The address of the token/asset being provided as input
    */
-  asset: ChainAddress;
+  asset: NativeAddress;
   /** 
    * Amount available
    * @description For quote requests:
@@ -184,33 +192,41 @@ export interface Input {
 /**
  * Requested output for a receiver
  * @description Specifies the desired assets and destination for a swap or transfer.
- *              Represents the "to" side of the transaction.
+ *              Represents the "to" side of the transaction. The receiver and asset are always on the
+ *              same chain, so the chain is specified once at the top level.
  * @example Exact-input quote (amount undefined, will be quoted):
  * {
- *   receiver: { chain: "eip155:1", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8" },
- *   asset: { chain: "eip155:1", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7" }, // USDT on Ethereum  
+ *   chain: "eip155:1",
+ *   receiver: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *   asset: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT on Ethereum  
  *   amount: undefined, // Provider will quote how much USDT user receives
  *   calldata: "0x095ea7b3..."
  * }
  * @example Exact-output quote (user wants exactly 4000 USDT):
  * {
- *   receiver: { chain: "eip155:1", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8" },
- *   asset: { chain: "eip155:1", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7" }, // USDT
+ *   chain: "eip155:1",
+ *   receiver: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *   asset: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
  *   amount: "4000000000", // Exactly 4000 USDT requested
  *   calldata: null
  * }
  */
 export interface Output {
+  /**
+   * Chain identifier
+   * @description The chain where the output assets will be delivered
+   */
+  chain: Chain;
   /** 
    * Receiver address
-   * @description The chain-specific address of the account that will receive the output assets
+   * @description The address of the account that will receive the output assets
    */
-  receiver: ChainAddress;
+  receiver: NativeAddress;
   /** 
    * Asset address
-   * @description The chain-specific address of the token/asset to be received as output
+   * @description The address of the token/asset to be received as output
    */
-  asset: ChainAddress;
+  asset: NativeAddress;
   /** 
    * Amount requested
    * @description For quote requests:
