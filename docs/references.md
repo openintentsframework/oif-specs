@@ -18,7 +18,7 @@ Below is a curated list of external APIs and docs that are relevant to OIF's quo
 
 - ERC-7930 — Interoperable Addresses: `https://eips.ethereum.org/EIPS/eip-7930`
   - Focus: compact binary chain-specific address format
-  - Note: Used by oif-contracts for on-chain representation; solvers handle conversion from CAIP-350 text format
+  - Note: Used by oif-contracts for on-chain representation; solvers handle conversion between this binary format and the corresponding text representation
 
 ## Intent and Quote APIs
 
