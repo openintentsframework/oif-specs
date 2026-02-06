@@ -7,7 +7,7 @@
 
 /**
  * CAIP-2 chain identifier
- * @description Chain identifier following CAIP-2 standard (namespace:reference format).
+ * @description Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`).
  *              For EVM chains, uses eip155 namespace with chain ID.
  * @example "eip155:1" - Ethereum mainnet
  * @example "eip155:8453" - Base
@@ -19,7 +19,7 @@ export type Chain = string;
 
 /**
  * Native address format
- * @description Native blockchain address in its canonical format for the specified chain.
+ * @description The address in its standard text representation for the specified chain.
  *              Format varies by chain namespace.
  * @example "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" - EVM address
  * @example "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" - Solana address
@@ -48,14 +48,14 @@ export type NativeAddress = string;
 export interface ChainAddress {
   /**
    * CAIP-2 chain identifier
-   * @description The blockchain network identifier in CAIP-2 format (namespace:reference)
+   * @description Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
    * @example "eip155:1" - Ethereum mainnet
    * @example "eip155:8453" - Base
    */
   chain: Chain;
   /**
    * Native address
-   * @description The address in its native format for the specified chain
+   * @description The address in its standard text representation for the specified chain
    * @example "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
    */
   address: NativeAddress;
@@ -157,12 +157,12 @@ export interface OriginSubmission {
 export interface Input {
   /** 
    * User address 
-   * @description The CAIP-350 address of the user providing the input assets
+   * @description The chain-specific address of the account providing the input assets
    */
   user: ChainAddress;
   /** 
    * Asset address
-   * @description The CAIP-350 address of the token/asset being provided as input
+   * @description The chain-specific address of the token/asset being provided as input
    */
   asset: ChainAddress;
   /** 
@@ -203,12 +203,12 @@ export interface Input {
 export interface Output {
   /** 
    * Receiver address
-   * @description The CAIP-350 address that will receive the output assets
+   * @description The chain-specific address of the account that will receive the output assets
    */
   receiver: ChainAddress;
   /** 
    * Asset address
-   * @description The CAIP-350 address of the token/asset to be received as output
+   * @description The chain-specific address of the token/asset to be received as output
    */
   asset: ChainAddress;
   /** 
@@ -803,7 +803,7 @@ export enum OrderStatus {
  */
 export interface AssetAmount {
   /** 
-   * Asset address in CAIP-350 format
+   * Chain-specific address for the asset
    * @description The token/asset identifier with chain information
    */
   asset: ChainAddress;
@@ -944,7 +944,7 @@ export interface GetOrderResponse {
 export interface AssetInfo {
   /** 
    * Asset contract address
-   * @description Asset address in CAIP-350 format for cross-chain compatibility.
+   * @description Chain-specific address for the asset
    * @example { chain: "eip155:1", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" } - USDC on Ethereum
    */
   address: ChainAddress;
@@ -983,7 +983,7 @@ export interface AssetInfo {
 export interface NetworkAssets {
   /** 
    * CAIP-2 chain identifier
-   * @description Chain identifier in CAIP-2 format (namespace:reference)
+   * @description Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
    * @example "eip155:1" - Ethereum mainnet
    * @example "eip155:137" - Polygon
    * @example "eip155:42161" - Arbitrum

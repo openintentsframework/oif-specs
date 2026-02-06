@@ -17,22 +17,22 @@ components:
     Chain:
       type: string
       description: |-
-        Chain identifier following CAIP-2 standard (namespace:reference format).
+        Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`).
         For EVM chains, uses eip155 namespace with chain ID.
     NativeAddress:
       type: string
       description: |-
-        Native blockchain address in its canonical format for the specified chain.
+        The address in its standard text representation for the specified chain.
         Format varies by chain namespace.
     ChainAddress:
       type: object
       properties:
         chain:
           type: string
-          description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+          description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
         address:
           type: string
-          description: The address in its native format for the specified chain
+          description: The address in its standard text representation for the specified chain
       required:
         - chain
         - address
@@ -126,27 +126,27 @@ components:
           properties:
             chain:
               type: string
-              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
             address:
               type: string
-              description: The address in its native format for the specified chain
+              description: The address in its standard text representation for the specified chain
           required:
             - chain
             - address
-          description: The CAIP-350 address of the user providing the input assets
+          description: The chain-specific address of the account providing the input assets
         asset:
           type: object
           properties:
             chain:
               type: string
-              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
             address:
               type: string
-              description: The address in its native format for the specified chain
+              description: The address in its standard text representation for the specified chain
           required:
             - chain
             - address
-          description: The CAIP-350 address of the token/asset being provided as input
+          description: The chain-specific address of the token/asset being provided as input
         amount:
           type: string
           pattern: ^[0-9]+$
@@ -190,27 +190,27 @@ components:
           properties:
             chain:
               type: string
-              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
             address:
               type: string
-              description: The address in its native format for the specified chain
+              description: The address in its standard text representation for the specified chain
           required:
             - chain
             - address
-          description: The CAIP-350 address that will receive the output assets
+          description: The chain-specific address of the account that will receive the output assets
         asset:
           type: object
           properties:
             chain:
               type: string
-              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
             address:
               type: string
-              description: The address in its native format for the specified chain
+              description: The address in its standard text representation for the specified chain
           required:
             - chain
             - address
-          description: The CAIP-350 address of the token/asset to be received as output
+          description: The chain-specific address of the token/asset to be received as output
         amount:
           type: string
           pattern: ^[0-9]+$
@@ -271,10 +271,10 @@ components:
           properties:
             chain:
               type: string
-              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
             address:
               type: string
-              description: The address in its native format for the specified chain
+              description: The address in its standard text representation for the specified chain
           required:
             - chain
             - address
@@ -295,27 +295,27 @@ components:
                     properties:
                       chain:
                         type: string
-                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                       address:
                         type: string
-                        description: The address in its native format for the specified chain
+                        description: The address in its standard text representation for the specified chain
                     required:
                       - chain
                       - address
-                    description: The CAIP-350 address of the user providing the input assets
+                    description: The chain-specific address of the account providing the input assets
                   asset:
                     type: object
                     properties:
                       chain:
                         type: string
-                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                       address:
                         type: string
-                        description: The address in its native format for the specified chain
+                        description: The address in its standard text representation for the specified chain
                     required:
                       - chain
                       - address
-                    description: The CAIP-350 address of the token/asset being provided as input
+                    description: The chain-specific address of the token/asset being provided as input
                   amount:
                     type: string
                     pattern: ^[0-9]+$
@@ -361,27 +361,27 @@ components:
                     properties:
                       chain:
                         type: string
-                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                       address:
                         type: string
-                        description: The address in its native format for the specified chain
+                        description: The address in its standard text representation for the specified chain
                     required:
                       - chain
                       - address
-                    description: The CAIP-350 address that will receive the output assets
+                    description: The chain-specific address of the account that will receive the output assets
                   asset:
                     type: object
                     properties:
                       chain:
                         type: string
-                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                       address:
                         type: string
-                        description: The address in its native format for the specified chain
+                        description: The address in its standard text representation for the specified chain
                     required:
                       - chain
                       - address
-                    description: The CAIP-350 address of the token/asset to be received as output
+                    description: The chain-specific address of the token/asset to be received as output
                   amount:
                     type: string
                     pattern: ^[0-9]+$
@@ -822,10 +822,10 @@ components:
                   properties:
                     chain:
                       type: string
-                      description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                      description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                     address:
                       type: string
-                      description: The address in its native format for the specified chain
+                      description: The address in its standard text representation for the specified chain
                   required:
                     - chain
                     - address
@@ -854,10 +854,10 @@ components:
                         properties:
                           chain:
                             type: string
-                            description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                            description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                           address:
                             type: string
-                            description: The address in its native format for the specified chain
+                            description: The address in its standard text representation for the specified chain
                         required:
                           - chain
                           - address
@@ -867,10 +867,10 @@ components:
                         properties:
                           chain:
                             type: string
-                            description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                            description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                           address:
                             type: string
-                            description: The address in its native format for the specified chain
+                            description: The address in its standard text representation for the specified chain
                         required:
                           - chain
                           - address
@@ -880,10 +880,10 @@ components:
                         properties:
                           chain:
                             type: string
-                            description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                            description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                           address:
                             type: string
-                            description: The address in its native format for the specified chain
+                            description: The address in its standard text representation for the specified chain
                         required:
                           - chain
                           - address
@@ -1074,10 +1074,10 @@ components:
                       properties:
                         chain:
                           type: string
-                          description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                          description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                         address:
                           type: string
-                          description: The address in its native format for the specified chain
+                          description: The address in its standard text representation for the specified chain
                       required:
                         - chain
                         - address
@@ -1106,10 +1106,10 @@ components:
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
@@ -1119,10 +1119,10 @@ components:
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
@@ -1132,10 +1132,10 @@ components:
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
@@ -1179,27 +1179,27 @@ components:
                     properties:
                       chain:
                         type: string
-                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                       address:
                         type: string
-                        description: The address in its native format for the specified chain
+                        description: The address in its standard text representation for the specified chain
                     required:
                       - chain
                       - address
-                    description: The CAIP-350 address of the user providing the input assets
+                    description: The chain-specific address of the account providing the input assets
                   asset:
                     type: object
                     properties:
                       chain:
                         type: string
-                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                       address:
                         type: string
-                        description: The address in its native format for the specified chain
+                        description: The address in its standard text representation for the specified chain
                     required:
                       - chain
                       - address
-                    description: The CAIP-350 address of the token/asset being provided as input
+                    description: The chain-specific address of the token/asset being provided as input
                   amount:
                     type: string
                     pattern: ^[0-9]+$
@@ -1245,27 +1245,27 @@ components:
                     properties:
                       chain:
                         type: string
-                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                       address:
                         type: string
-                        description: The address in its native format for the specified chain
+                        description: The address in its standard text representation for the specified chain
                     required:
                       - chain
                       - address
-                    description: The CAIP-350 address that will receive the output assets
+                    description: The chain-specific address of the account that will receive the output assets
                   asset:
                     type: object
                     properties:
                       chain:
                         type: string
-                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                       address:
                         type: string
-                        description: The address in its native format for the specified chain
+                        description: The address in its standard text representation for the specified chain
                     required:
                       - chain
                       - address
-                    description: The CAIP-350 address of the token/asset to be received as output
+                    description: The chain-specific address of the token/asset to be received as output
                   amount:
                     type: string
                     pattern: ^[0-9]+$
@@ -1326,27 +1326,27 @@ components:
                 properties:
                   chain:
                     type: string
-                    description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                    description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                   address:
                     type: string
-                    description: The address in its native format for the specified chain
+                    description: The address in its standard text representation for the specified chain
                 required:
                   - chain
                   - address
-                description: The CAIP-350 address of the user providing the input assets
+                description: The chain-specific address of the account providing the input assets
               asset:
                 type: object
                 properties:
                   chain:
                     type: string
-                    description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                    description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                   address:
                     type: string
-                    description: The address in its native format for the specified chain
+                    description: The address in its standard text representation for the specified chain
                 required:
                   - chain
                   - address
-                description: The CAIP-350 address of the token/asset being provided as input
+                description: The chain-specific address of the token/asset being provided as input
               amount:
                 type: string
                 pattern: ^[0-9]+$
@@ -1392,27 +1392,27 @@ components:
                 properties:
                   chain:
                     type: string
-                    description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                    description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                   address:
                     type: string
-                    description: The address in its native format for the specified chain
+                    description: The address in its standard text representation for the specified chain
                 required:
                   - chain
                   - address
-                description: The CAIP-350 address that will receive the output assets
+                description: The chain-specific address of the account that will receive the output assets
               asset:
                 type: object
                 properties:
                   chain:
                     type: string
-                    description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                    description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                   address:
                     type: string
-                    description: The address in its native format for the specified chain
+                    description: The address in its standard text representation for the specified chain
                 required:
                   - chain
                   - address
-                description: The CAIP-350 address of the token/asset to be received as output
+                description: The chain-specific address of the token/asset to be received as output
               amount:
                 type: string
                 pattern: ^[0-9]+$
@@ -1605,10 +1605,10 @@ components:
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
@@ -1637,10 +1637,10 @@ components:
                                   properties:
                                     chain:
                                       type: string
-                                      description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                      description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                     address:
                                       type: string
-                                      description: The address in its native format for the specified chain
+                                      description: The address in its standard text representation for the specified chain
                                   required:
                                     - chain
                                     - address
@@ -1650,10 +1650,10 @@ components:
                                   properties:
                                     chain:
                                       type: string
-                                      description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                      description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                     address:
                                       type: string
-                                      description: The address in its native format for the specified chain
+                                      description: The address in its standard text representation for the specified chain
                                   required:
                                     - chain
                                     - address
@@ -1663,10 +1663,10 @@ components:
                                   properties:
                                     chain:
                                       type: string
-                                      description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                      description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                     address:
                                       type: string
-                                      description: The address in its native format for the specified chain
+                                      description: The address in its standard text representation for the specified chain
                                   required:
                                     - chain
                                     - address
@@ -1710,27 +1710,27 @@ components:
                           properties:
                             chain:
                               type: string
-                              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                             address:
                               type: string
-                              description: The address in its native format for the specified chain
+                              description: The address in its standard text representation for the specified chain
                           required:
                             - chain
                             - address
-                          description: The CAIP-350 address of the user providing the input assets
+                          description: The chain-specific address of the account providing the input assets
                         asset:
                           type: object
                           properties:
                             chain:
                               type: string
-                              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                             address:
                               type: string
-                              description: The address in its native format for the specified chain
+                              description: The address in its standard text representation for the specified chain
                           required:
                             - chain
                             - address
-                          description: The CAIP-350 address of the token/asset being provided as input
+                          description: The chain-specific address of the token/asset being provided as input
                         amount:
                           type: string
                           pattern: ^[0-9]+$
@@ -1776,27 +1776,27 @@ components:
                           properties:
                             chain:
                               type: string
-                              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                             address:
                               type: string
-                              description: The address in its native format for the specified chain
+                              description: The address in its standard text representation for the specified chain
                           required:
                             - chain
                             - address
-                          description: The CAIP-350 address that will receive the output assets
+                          description: The chain-specific address of the account that will receive the output assets
                         asset:
                           type: object
                           properties:
                             chain:
                               type: string
-                              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                             address:
                               type: string
-                              description: The address in its native format for the specified chain
+                              description: The address in its standard text representation for the specified chain
                           required:
                             - chain
                             - address
-                          description: The CAIP-350 address of the token/asset to be received as output
+                          description: The chain-specific address of the token/asset to be received as output
                         amount:
                           type: string
                           pattern: ^[0-9]+$
@@ -2014,10 +2014,10 @@ components:
                       properties:
                         chain:
                           type: string
-                          description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                          description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                         address:
                           type: string
-                          description: The address in its native format for the specified chain
+                          description: The address in its standard text representation for the specified chain
                       required:
                         - chain
                         - address
@@ -2046,10 +2046,10 @@ components:
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
@@ -2059,10 +2059,10 @@ components:
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
@@ -2072,10 +2072,10 @@ components:
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
@@ -2197,10 +2197,10 @@ components:
           properties:
             chain:
               type: string
-              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
             address:
               type: string
-              description: The address in its native format for the specified chain
+              description: The address in its standard text representation for the specified chain
           required:
             - chain
             - address
@@ -2275,10 +2275,10 @@ components:
                 properties:
                   chain:
                     type: string
-                    description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                    description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                   address:
                     type: string
-                    description: The address in its native format for the specified chain
+                    description: The address in its standard text representation for the specified chain
                 required:
                   - chain
                   - address
@@ -2299,10 +2299,10 @@ components:
                 properties:
                   chain:
                     type: string
-                    description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                    description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                   address:
                     type: string
-                    description: The address in its native format for the specified chain
+                    description: The address in its standard text representation for the specified chain
                 required:
                   - chain
                   - address
@@ -2362,10 +2362,10 @@ paths:
                   properties:
                     chain:
                       type: string
-                      description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                      description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                     address:
                       type: string
-                      description: The address in its native format for the specified chain
+                      description: The address in its standard text representation for the specified chain
                   required:
                     - chain
                     - address
@@ -2386,27 +2386,27 @@ paths:
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
-                            description: The CAIP-350 address of the user providing the input assets
+                            description: The chain-specific address of the account providing the input assets
                           asset:
                             type: object
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
-                            description: The CAIP-350 address of the token/asset being provided as input
+                            description: The chain-specific address of the token/asset being provided as input
                           amount:
                             type: string
                             pattern: ^[0-9]+$
@@ -2452,27 +2452,27 @@ paths:
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
-                            description: The CAIP-350 address that will receive the output assets
+                            description: The chain-specific address of the account that will receive the output assets
                           asset:
                             type: object
                             properties:
                               chain:
                                 type: string
-                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                               address:
                                 type: string
-                                description: The address in its native format for the specified chain
+                                description: The address in its standard text representation for the specified chain
                             required:
                               - chain
                               - address
-                            description: The CAIP-350 address of the token/asset to be received as output
+                            description: The chain-specific address of the token/asset to be received as output
                           amount:
                             type: string
                             pattern: ^[0-9]+$
@@ -2774,10 +2774,10 @@ paths:
                                       properties:
                                         chain:
                                           type: string
-                                          description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                          description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                         address:
                                           type: string
-                                          description: The address in its native format for the specified chain
+                                          description: The address in its standard text representation for the specified chain
                                       required:
                                         - chain
                                         - address
@@ -2806,10 +2806,10 @@ paths:
                                             properties:
                                               chain:
                                                 type: string
-                                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                               address:
                                                 type: string
-                                                description: The address in its native format for the specified chain
+                                                description: The address in its standard text representation for the specified chain
                                             required:
                                               - chain
                                               - address
@@ -2819,10 +2819,10 @@ paths:
                                             properties:
                                               chain:
                                                 type: string
-                                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                               address:
                                                 type: string
-                                                description: The address in its native format for the specified chain
+                                                description: The address in its standard text representation for the specified chain
                                             required:
                                               - chain
                                               - address
@@ -2832,10 +2832,10 @@ paths:
                                             properties:
                                               chain:
                                                 type: string
-                                                description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                               address:
                                                 type: string
-                                                description: The address in its native format for the specified chain
+                                                description: The address in its standard text representation for the specified chain
                                             required:
                                               - chain
                                               - address
@@ -2879,27 +2879,27 @@ paths:
                                     properties:
                                       chain:
                                         type: string
-                                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                       address:
                                         type: string
-                                        description: The address in its native format for the specified chain
+                                        description: The address in its standard text representation for the specified chain
                                     required:
                                       - chain
                                       - address
-                                    description: The CAIP-350 address of the user providing the input assets
+                                    description: The chain-specific address of the account providing the input assets
                                   asset:
                                     type: object
                                     properties:
                                       chain:
                                         type: string
-                                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                       address:
                                         type: string
-                                        description: The address in its native format for the specified chain
+                                        description: The address in its standard text representation for the specified chain
                                     required:
                                       - chain
                                       - address
-                                    description: The CAIP-350 address of the token/asset being provided as input
+                                    description: The chain-specific address of the token/asset being provided as input
                                   amount:
                                     type: string
                                     pattern: ^[0-9]+$
@@ -2945,27 +2945,27 @@ paths:
                                     properties:
                                       chain:
                                         type: string
-                                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                       address:
                                         type: string
-                                        description: The address in its native format for the specified chain
+                                        description: The address in its standard text representation for the specified chain
                                     required:
                                       - chain
                                       - address
-                                    description: The CAIP-350 address that will receive the output assets
+                                    description: The chain-specific address of the account that will receive the output assets
                                   asset:
                                     type: object
                                     properties:
                                       chain:
                                         type: string
-                                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                       address:
                                         type: string
-                                        description: The address in its native format for the specified chain
+                                        description: The address in its standard text representation for the specified chain
                                     required:
                                       - chain
                                       - address
-                                    description: The CAIP-350 address of the token/asset to be received as output
+                                    description: The chain-specific address of the token/asset to be received as output
                                   amount:
                                     type: string
                                     pattern: ^[0-9]+$
@@ -3196,10 +3196,10 @@ paths:
                               properties:
                                 chain:
                                   type: string
-                                  description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                  description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                 address:
                                   type: string
-                                  description: The address in its native format for the specified chain
+                                  description: The address in its standard text representation for the specified chain
                               required:
                                 - chain
                                 - address
@@ -3228,10 +3228,10 @@ paths:
                                     properties:
                                       chain:
                                         type: string
-                                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                       address:
                                         type: string
-                                        description: The address in its native format for the specified chain
+                                        description: The address in its standard text representation for the specified chain
                                     required:
                                       - chain
                                       - address
@@ -3241,10 +3241,10 @@ paths:
                                     properties:
                                       chain:
                                         type: string
-                                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                       address:
                                         type: string
-                                        description: The address in its native format for the specified chain
+                                        description: The address in its standard text representation for the specified chain
                                     required:
                                       - chain
                                       - address
@@ -3254,10 +3254,10 @@ paths:
                                     properties:
                                       chain:
                                         type: string
-                                        description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                                       address:
                                         type: string
-                                        description: The address in its native format for the specified chain
+                                        description: The address in its standard text representation for the specified chain
                                     required:
                                       - chain
                                       - address
@@ -3413,10 +3413,10 @@ paths:
                           properties:
                             chain:
                               type: string
-                              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                             address:
                               type: string
-                              description: The address in its native format for the specified chain
+                              description: The address in its standard text representation for the specified chain
                           required:
                             - chain
                             - address
@@ -3437,10 +3437,10 @@ paths:
                           properties:
                             chain:
                               type: string
-                              description: The blockchain network identifier in CAIP-2 format (namespace:reference)
+                              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
                             address:
                               type: string
-                              description: The address in its native format for the specified chain
+                              description: The address in its standard text representation for the specified chain
                           required:
                             - chain
                             - address

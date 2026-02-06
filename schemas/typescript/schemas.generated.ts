@@ -5,21 +5,21 @@ import { PostOrderResponseStatus, OrderStatus, SettlementType } from "./types";
 export const chainSchema = z
   .string()
   .describe(
-    "Chain identifier following CAIP-2 standard (namespace:reference format).\nFor EVM chains, uses eip155 namespace with chain ID.",
+    "Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`).\nFor EVM chains, uses eip155 namespace with chain ID.",
   );
 
 export const nativeAddressSchema = z
   .string()
   .describe(
-    "Native blockchain address in its canonical format for the specified chain.\nFormat varies by chain namespace.",
+    "The address in its standard text representation for the specified chain.\nFormat varies by chain namespace.",
   );
 
 export const chainAddressSchema = z.object({
   chain: chainSchema.describe(
-    "The blockchain network identifier in CAIP-2 format (namespace:reference)",
+    "Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)",
   ),
   address: nativeAddressSchema.describe(
-    "The address in its native format for the specified chain",
+    "The address in its standard text representation for the specified chain",
   ),
 });
 
@@ -80,10 +80,10 @@ export const originSubmissionSchema = z.object({
 
 export const inputSchema = z.object({
   user: chainAddressSchema.describe(
-    "The CAIP-350 address of the user providing the input assets",
+    "The chain-specific address of the account providing the input assets",
   ),
   asset: chainAddressSchema.describe(
-    "The CAIP-350 address of the token/asset being provided as input",
+    "The chain-specific address of the token/asset being provided as input",
   ),
   amount: amountSchema
     .optional()
@@ -97,10 +97,10 @@ export const inputSchema = z.object({
 
 export const outputSchema = z.object({
   receiver: chainAddressSchema.describe(
-    "The CAIP-350 address that will receive the output assets",
+    "The chain-specific address of the account that will receive the output assets",
   ),
   asset: chainAddressSchema.describe(
-    "The CAIP-350 address of the token/asset to be received as output",
+    "The chain-specific address of the token/asset to be received as output",
   ),
   amount: amountSchema
     .optional()
@@ -252,7 +252,7 @@ export const getOrderResponseSchema = z.object({
 
 export const assetInfoSchema = z.object({
   address: chainAddressSchema.describe(
-    "Asset address in CAIP-350 format for cross-chain compatibility.",
+    "Chain-specific address for the asset",
   ),
   symbol: z
     .string()
@@ -266,7 +266,7 @@ export const assetInfoSchema = z.object({
 
 export const networkAssetsSchema = z.object({
   chain: chainSchema.describe(
-    "Chain identifier in CAIP-2 format (namespace:reference)",
+    "Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)",
   ),
   assets: z
     .array(assetInfoSchema)
