@@ -14,7 +14,7 @@ Below is a curated list of external APIs and docs that are relevant to OIF's quo
 
 - CAIP-350 — Text Identifiers for Chain-Specific Addresses: `https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-350.md`
   - Focus: specifying deterministic and unambiguous conversions between text and binary formats for Addresses and Chain References across different blockchain ecosystems
-  - Relevance: OIF API uses CAIP-350 format for all addresses (ChainAddress type)
+  - Relevance: OIF API uses CAIP-350's text representations for chain identifiers and addresses to identify tokens and accounts on specific chains
 
 - ERC-7930 — Interoperable Addresses: `https://eips.ethereum.org/EIPS/eip-7930`
   - Focus: compact binary chain-specific address format
