@@ -31,9 +31,10 @@ const oifUserOpenIntentOrderSchema = z.object({
   checks: z.object({
     allowances: z.array(
       z.object({
-        token: schemas.chainAddressSchema.describe("Token address in CAIP-350 format"),
-        user: schemas.chainAddressSchema.describe("User address in CAIP-350 format"),
-        spender: schemas.chainAddressSchema.describe("Spender/settlement contract address in CAIP-350 format"),
+        chain: schemas.chainSchema.describe("The chain where the allowance check applies"),
+        token: schemas.nativeAddressSchema.describe("The address of the token requiring allowance"),
+        user: schemas.nativeAddressSchema.describe("The address of the user granting the allowance"),
+        spender: schemas.nativeAddressSchema.describe("The address of the spender/settlement contract"),
         required: schemas.amountSchema,
       })
     ),

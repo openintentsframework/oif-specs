@@ -79,11 +79,12 @@ export const originSubmissionSchema = z.object({
 });
 
 export const inputSchema = z.object({
-  user: chainAddressSchema.describe(
-    "The chain-specific address of the account providing the input assets",
+  chain: chainSchema.describe("The chain where the input assets reside"),
+  user: nativeAddressSchema.describe(
+    "The address of the account providing the input assets",
   ),
-  asset: chainAddressSchema.describe(
-    "The chain-specific address of the token/asset being provided as input",
+  asset: nativeAddressSchema.describe(
+    "The address of the token/asset being provided as input",
   ),
   amount: amountSchema
     .optional()
@@ -96,11 +97,14 @@ export const inputSchema = z.object({
 });
 
 export const outputSchema = z.object({
-  receiver: chainAddressSchema.describe(
-    "The chain-specific address of the account that will receive the output assets",
+  chain: chainSchema.describe(
+    "The chain where the output assets will be delivered",
   ),
-  asset: chainAddressSchema.describe(
-    "The chain-specific address of the token/asset to be received as output",
+  receiver: nativeAddressSchema.describe(
+    "The address of the account that will receive the output assets",
+  ),
+  asset: nativeAddressSchema.describe(
+    "The address of the token/asset to be received as output",
   ),
   amount: amountSchema
     .optional()
@@ -251,9 +255,7 @@ export const getOrderResponseSchema = z.object({
 });
 
 export const assetInfoSchema = z.object({
-  address: chainAddressSchema.describe(
-    "Chain-specific address for the asset",
-  ),
+  address: chainAddressSchema.describe("Chain-specific address for the asset"),
   symbol: z
     .string()
     .describe(
