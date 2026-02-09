@@ -299,13 +299,15 @@ export type FailureHandlingMode =
  *   intent: {
  *     intentType: "oif-swap",
  *     inputs: [{ 
- *       user: { chain: "eip155:1", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8" },
- *       asset: { chain: "eip155:1", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" }, // USDC
+ *       chain: "eip155:1",
+ *       user: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
  *       amount: "4000000000" // Exact: 4000 USDC
  *     }],
  *     outputs: [{ 
- *       receiver: { chain: "eip155:1", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8" },
- *       asset: { chain: "eip155:1", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7" }, // USDT
+ *       chain: "eip155:1",
+ *       receiver: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       asset: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
  *       amount: undefined // Provider will quote output amount
  *     }],
  *     swapType: "exact-input",
@@ -319,13 +321,15 @@ export type FailureHandlingMode =
  *   intent: {
  *     intentType: "oif-swap",
  *     inputs: [{
- *       user: { chain: "eip155:42161", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8" },
- *       asset: { chain: "eip155:42161", address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" }, // USDC on Arbitrum
+ *       chain: "eip155:42161",
+ *       user: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       asset: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // USDC on Arbitrum
  *       amount: undefined // Provider will quote input amount needed
  *     }],
  *     outputs: [{
- *       receiver: { chain: "eip155:42161", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8" },
- *       asset: { chain: "eip155:42161", address: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1" }, // WETH on Arbitrum
+ *       chain: "eip155:42161",
+ *       receiver: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       asset: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH on Arbitrum
  *       amount: "2000000000000000000" // Exact: 2 WETH
  *     }],
  *     swapType: "exact-output",
@@ -554,9 +558,10 @@ export interface Oif3009Order {
  *   },
  *   checks: {
  *     allowances: [{
- *       token: { chain: "eip155:1", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
- *       user: { chain: "eip155:1", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8" },
- *       spender: { chain: "eip155:1", address: "0x95ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a" },
+ *       chain: "eip155:1",
+ *       token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *       user: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       spender: "0x95ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
  *       required: "1000000000"
  *     }]
  *   }
@@ -586,12 +591,14 @@ export interface OifUserOpenIntentOrder {
      * @description Each item asserts that `user` has at least `required` balance and allowance for `spender` on `token`.
      */
     allowances: Array<{
-      /** Token address in CAIP-350 format */
-      token: ChainAddress;
-      /** User address in CAIP-350 format */
-      user: ChainAddress;
-      /** Spender/settlement contract address in CAIP-350 format */
-      spender: ChainAddress;
+      /** The chain where the allowance check applies */
+      chain: Chain;
+      /** The address of the token requiring allowance */
+      token: NativeAddress;
+      /** The address of the user granting the allowance */
+      user: NativeAddress;
+      /** The address of the spender/settlement contract */
+      spender: NativeAddress;
       /** Required allowance amount as string-encoded integer */
       required: Amount;
     }>;

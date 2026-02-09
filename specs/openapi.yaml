@@ -785,45 +785,18 @@ components:
                   items:
                     type: object
                     properties:
+                      chain:
+                        type: string
+                        description: The chain where the allowance check applies
                       token:
-                        type: object
-                        properties:
-                          chain:
-                            type: string
-                            description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                          address:
-                            type: string
-                            description: The address in its standard text representation for the specified chain
-                        required:
-                          - chain
-                          - address
-                        description: Token address in CAIP-350 format
+                        type: string
+                        description: The address of the token requiring allowance
                       user:
-                        type: object
-                        properties:
-                          chain:
-                            type: string
-                            description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                          address:
-                            type: string
-                            description: The address in its standard text representation for the specified chain
-                        required:
-                          - chain
-                          - address
-                        description: User address in CAIP-350 format
+                        type: string
+                        description: The address of the user granting the allowance
                       spender:
-                        type: object
-                        properties:
-                          chain:
-                            type: string
-                            description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                          address:
-                            type: string
-                            description: The address in its standard text representation for the specified chain
-                        required:
-                          - chain
-                          - address
-                        description: Spender/settlement contract address in CAIP-350 format
+                        type: string
+                        description: The address of the spender/settlement contract
                       required:
                         type: string
                         pattern: ^[0-9]+$
@@ -832,6 +805,7 @@ components:
                           (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                           satoshi for BTC, etc.). No decimals or scientific notation allowed.
                     required:
+                      - chain
                       - token
                       - user
                       - spender
@@ -1037,45 +1011,18 @@ components:
                       items:
                         type: object
                         properties:
+                          chain:
+                            type: string
+                            description: The chain where the allowance check applies
                           token:
-                            type: object
-                            properties:
-                              chain:
-                                type: string
-                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                              address:
-                                type: string
-                                description: The address in its standard text representation for the specified chain
-                            required:
-                              - chain
-                              - address
-                            description: Token address in CAIP-350 format
+                            type: string
+                            description: The address of the token requiring allowance
                           user:
-                            type: object
-                            properties:
-                              chain:
-                                type: string
-                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                              address:
-                                type: string
-                                description: The address in its standard text representation for the specified chain
-                            required:
-                              - chain
-                              - address
-                            description: User address in CAIP-350 format
+                            type: string
+                            description: The address of the user granting the allowance
                           spender:
-                            type: object
-                            properties:
-                              chain:
-                                type: string
-                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                              address:
-                                type: string
-                                description: The address in its standard text representation for the specified chain
-                            required:
-                              - chain
-                              - address
-                            description: Spender/settlement contract address in CAIP-350 format
+                            type: string
+                            description: The address of the spender/settlement contract
                           required:
                             type: string
                             pattern: ^[0-9]+$
@@ -1084,6 +1031,7 @@ components:
                               (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                               satoshi for BTC, etc.). No decimals or scientific notation allowed.
                         required:
+                          - chain
                           - token
                           - user
                           - spender
@@ -1504,45 +1452,18 @@ components:
                             items:
                               type: object
                               properties:
+                                chain:
+                                  type: string
+                                  description: The chain where the allowance check applies
                                 token:
-                                  type: object
-                                  properties:
-                                    chain:
-                                      type: string
-                                      description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                    address:
-                                      type: string
-                                      description: The address in its standard text representation for the specified chain
-                                  required:
-                                    - chain
-                                    - address
-                                  description: Token address in CAIP-350 format
+                                  type: string
+                                  description: The address of the token requiring allowance
                                 user:
-                                  type: object
-                                  properties:
-                                    chain:
-                                      type: string
-                                      description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                    address:
-                                      type: string
-                                      description: The address in its standard text representation for the specified chain
-                                  required:
-                                    - chain
-                                    - address
-                                  description: User address in CAIP-350 format
+                                  type: string
+                                  description: The address of the user granting the allowance
                                 spender:
-                                  type: object
-                                  properties:
-                                    chain:
-                                      type: string
-                                      description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                    address:
-                                      type: string
-                                      description: The address in its standard text representation for the specified chain
-                                  required:
-                                    - chain
-                                    - address
-                                  description: Spender/settlement contract address in CAIP-350 format
+                                  type: string
+                                  description: The address of the spender/settlement contract
                                 required:
                                   type: string
                                   pattern: ^[0-9]+$
@@ -1551,6 +1472,7 @@ components:
                                     (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                                     satoshi for BTC, etc.). No decimals or scientific notation allowed.
                               required:
+                                - chain
                                 - token
                                 - user
                                 - spender
@@ -1881,45 +1803,18 @@ components:
                       items:
                         type: object
                         properties:
+                          chain:
+                            type: string
+                            description: The chain where the allowance check applies
                           token:
-                            type: object
-                            properties:
-                              chain:
-                                type: string
-                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                              address:
-                                type: string
-                                description: The address in its standard text representation for the specified chain
-                            required:
-                              - chain
-                              - address
-                            description: Token address in CAIP-350 format
+                            type: string
+                            description: The address of the token requiring allowance
                           user:
-                            type: object
-                            properties:
-                              chain:
-                                type: string
-                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                              address:
-                                type: string
-                                description: The address in its standard text representation for the specified chain
-                            required:
-                              - chain
-                              - address
-                            description: User address in CAIP-350 format
+                            type: string
+                            description: The address of the user granting the allowance
                           spender:
-                            type: object
-                            properties:
-                              chain:
-                                type: string
-                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                              address:
-                                type: string
-                                description: The address in its standard text representation for the specified chain
-                            required:
-                              - chain
-                              - address
-                            description: Spender/settlement contract address in CAIP-350 format
+                            type: string
+                            description: The address of the spender/settlement contract
                           required:
                             type: string
                             pattern: ^[0-9]+$
@@ -1928,6 +1823,7 @@ components:
                               (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                               satoshi for BTC, etc.). No decimals or scientific notation allowed.
                         required:
+                          - chain
                           - token
                           - user
                           - spender
@@ -2609,45 +2505,18 @@ paths:
                                       items:
                                         type: object
                                         properties:
+                                          chain:
+                                            type: string
+                                            description: The chain where the allowance check applies
                                           token:
-                                            type: object
-                                            properties:
-                                              chain:
-                                                type: string
-                                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                              address:
-                                                type: string
-                                                description: The address in its standard text representation for the specified chain
-                                            required:
-                                              - chain
-                                              - address
-                                            description: Token address in CAIP-350 format
+                                            type: string
+                                            description: The address of the token requiring allowance
                                           user:
-                                            type: object
-                                            properties:
-                                              chain:
-                                                type: string
-                                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                              address:
-                                                type: string
-                                                description: The address in its standard text representation for the specified chain
-                                            required:
-                                              - chain
-                                              - address
-                                            description: User address in CAIP-350 format
+                                            type: string
+                                            description: The address of the user granting the allowance
                                           spender:
-                                            type: object
-                                            properties:
-                                              chain:
-                                                type: string
-                                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                              address:
-                                                type: string
-                                                description: The address in its standard text representation for the specified chain
-                                            required:
-                                              - chain
-                                              - address
-                                            description: Spender/settlement contract address in CAIP-350 format
+                                            type: string
+                                            description: The address of the spender/settlement contract
                                           required:
                                             type: string
                                             pattern: ^[0-9]+$
@@ -2656,6 +2525,7 @@ paths:
                                               (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                                               satoshi for BTC, etc.). No decimals or scientific notation allowed.
                                         required:
+                                          - chain
                                           - token
                                           - user
                                           - spender
@@ -2999,45 +2869,18 @@ paths:
                               items:
                                 type: object
                                 properties:
+                                  chain:
+                                    type: string
+                                    description: The chain where the allowance check applies
                                   token:
-                                    type: object
-                                    properties:
-                                      chain:
-                                        type: string
-                                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                      address:
-                                        type: string
-                                        description: The address in its standard text representation for the specified chain
-                                    required:
-                                      - chain
-                                      - address
-                                    description: Token address in CAIP-350 format
+                                    type: string
+                                    description: The address of the token requiring allowance
                                   user:
-                                    type: object
-                                    properties:
-                                      chain:
-                                        type: string
-                                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                      address:
-                                        type: string
-                                        description: The address in its standard text representation for the specified chain
-                                    required:
-                                      - chain
-                                      - address
-                                    description: User address in CAIP-350 format
+                                    type: string
+                                    description: The address of the user granting the allowance
                                   spender:
-                                    type: object
-                                    properties:
-                                      chain:
-                                        type: string
-                                        description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                      address:
-                                        type: string
-                                        description: The address in its standard text representation for the specified chain
-                                    required:
-                                      - chain
-                                      - address
-                                    description: Spender/settlement contract address in CAIP-350 format
+                                    type: string
+                                    description: The address of the spender/settlement contract
                                   required:
                                     type: string
                                     pattern: ^[0-9]+$
@@ -3046,6 +2889,7 @@ paths:
                                       (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                                       satoshi for BTC, etc.). No decimals or scientific notation allowed.
                                 required:
+                                  - chain
                                   - token
                                   - user
                                   - spender
