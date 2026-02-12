@@ -647,7 +647,7 @@ export interface PostOrderRequest {
    *
    * - **oif-user-open-v0**: No signature required (authorization handled at execution layer)
    */
-  signature: Uint8Array; // bytes in solidity
+  signature?: Uint8Array; // bytes in solidity, optional for oif-user-open-v0
   /** Optional quote identifier from a prior Get Quote response */
   quoteId?: string;
   /** Optional preference mirrored from quote about who submits and acceptable schemes */
