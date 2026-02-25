@@ -12,6 +12,8 @@ tags:
     description: Quote generation
   - name: orders
     description: Order management
+  - name: assets
+    description: Asset discovery
 components:
   schemas:
     Address:
@@ -2002,6 +2004,100 @@ components:
         - inputAmounts
         - outputAmounts
         - settlement
+    AssetInfo:
+      type: object
+      properties:
+        address:
+          type: string
+          pattern: ^0x0001[a-fA-F0-9]+$
+          description: |-
+            Asset address in EIP-7930 interoperable format for cross-chain compatibility.
+            All addresses are formatted with the 0x prefix.
+        symbol:
+          type: string
+          description: Asset symbol for display purposes (e.g., "USDC", "WETH", "USDT")
+        decimals:
+          type: number
+          description: Asset decimal precision (e.g., 6 for USDC, 18 for WETH)
+      required:
+        - address
+        - symbol
+        - decimals
+    NetworkAssets:
+      type: object
+      properties:
+        chain_id:
+          type: number
+          description: Chain ID for the blockchain network (e.g., 1 for Ethereum, 137 for Polygon, 42161 for Arbitrum)
+        assets:
+          type: array
+          items:
+            type: object
+            properties:
+              address:
+                type: string
+                pattern: ^0x0001[a-fA-F0-9]+$
+                description: |-
+                  Asset address in EIP-7930 interoperable format for cross-chain compatibility.
+                  All addresses are formatted with the 0x prefix.
+              symbol:
+                type: string
+                description: Asset symbol for display purposes (e.g., "USDC", "WETH", "USDT")
+              decimals:
+                type: number
+                description: Asset decimal precision (e.g., 6 for USDC, 18 for WETH)
+            required:
+              - address
+              - symbol
+              - decimals
+          description: Array of assets supported on this network
+      required:
+        - chain_id
+        - assets
+    GetAssetsResponse:
+      type: object
+      properties:
+        networks:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              chain_id:
+                type: number
+                description: Chain ID for the blockchain network (e.g., 1 for Ethereum, 137 for Polygon, 42161 for Arbitrum)
+              assets:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                      pattern: ^0x0001[a-fA-F0-9]+$
+                      description: |-
+                        Asset address in EIP-7930 interoperable format for cross-chain compatibility.
+                        All addresses are formatted with the 0x prefix.
+                    symbol:
+                      type: string
+                      description: Asset symbol for display purposes (e.g., "USDC", "WETH", "USDT")
+                    decimals:
+                      type: number
+                      description: Asset decimal precision (e.g., 6 for USDC, 18 for WETH)
+                  required:
+                    - address
+                    - symbol
+                    - decimals
+                description: Array of assets supported on this network
+            required:
+              - chain_id
+              - assets
+            description: |-
+              Map where keys are chain IDs as strings (e.g., "1", "137", "42161") and
+              values are network asset configurations
+          description: |-
+            Map where keys are chain IDs as strings (e.g., "1", "137", "42161") and
+            values are network asset configurations
+      required:
+        - networks
   parameters: {}
 paths:
   /v1/quotes:
@@ -2990,3 +3086,57 @@ paths:
                   - settlement
         '404':
           description: Order not found
+  /v1/assets:
+    get:
+      summary: Get all supported assets across networks.
+      tags:
+        - assets
+      responses:
+        '200':
+          description: Assets retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  networks:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        chain_id:
+                          type: number
+                          description: Chain ID for the blockchain network (e.g., 1 for Ethereum, 137 for Polygon, 42161 for Arbitrum)
+                        assets:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              address:
+                                type: string
+                                pattern: ^0x0001[a-fA-F0-9]+$
+                                description: |-
+                                  Asset address in EIP-7930 interoperable format for cross-chain compatibility.
+                                  All addresses are formatted with the 0x prefix.
+                              symbol:
+                                type: string
+                                description: Asset symbol for display purposes (e.g., "USDC", "WETH", "USDT")
+                              decimals:
+                                type: number
+                                description: Asset decimal precision (e.g., 6 for USDC, 18 for WETH)
+                            required:
+                              - address
+                              - symbol
+                              - decimals
+                          description: Array of assets supported on this network
+                      required:
+                        - chain_id
+                        - assets
+                      description: |-
+                        Map where keys are chain IDs as strings (e.g., "1", "137", "42161") and
+                        values are network asset configurations
+                    description: |-
+                      Map where keys are chain IDs as strings (e.g., "1", "137", "42161") and
+                      values are network asset configurations
+                required:
+                  - networks
