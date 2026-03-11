@@ -255,7 +255,9 @@ export const getOrderResponseSchema = z.object({
 });
 
 export const assetInfoSchema = z.object({
-  address: chainAddressSchema.describe("Chain-specific address for the asset"),
+  address: nativeAddressSchema.describe(
+    "Address for the asset in its standard text representation for the chain",
+  ),
   symbol: z
     .string()
     .describe(

@@ -753,19 +753,12 @@ components:
             openIntentTx:
               type: object
               properties:
+                chain:
+                  type: string
+                  description: Chain where the transaction will be executed
                 to:
-                  type: object
-                  properties:
-                    chain:
-                      type: string
-                      description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                    address:
-                      type: string
-                      description: The address in its standard text representation for the specified chain
-                  required:
-                    - chain
-                    - address
-                  description: Destination contract in CAIP-350 address format
+                  type: string
+                  description: Destination contract address on the specified chain
                 data:
                   type: array
                   items:
@@ -774,6 +767,7 @@ components:
                 gasRequired:
                   type: string
               required:
+                - chain
                 - to
                 - data
                 - gasRequired
@@ -979,19 +973,12 @@ components:
                 openIntentTx:
                   type: object
                   properties:
+                    chain:
+                      type: string
+                      description: Chain where the transaction will be executed
                     to:
-                      type: object
-                      properties:
-                        chain:
-                          type: string
-                          description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                        address:
-                          type: string
-                          description: The address in its standard text representation for the specified chain
-                      required:
-                        - chain
-                        - address
-                      description: Destination contract in CAIP-350 address format
+                      type: string
+                      description: Destination contract address on the specified chain
                     data:
                       type: array
                       items:
@@ -1000,6 +987,7 @@ components:
                     gasRequired:
                       type: string
                   required:
+                    - chain
                     - to
                     - data
                     - gasRequired
@@ -1420,19 +1408,12 @@ components:
                       openIntentTx:
                         type: object
                         properties:
+                          chain:
+                            type: string
+                            description: Chain where the transaction will be executed
                           to:
-                            type: object
-                            properties:
-                              chain:
-                                type: string
-                                description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                              address:
-                                type: string
-                                description: The address in its standard text representation for the specified chain
-                            required:
-                              - chain
-                              - address
-                            description: Destination contract in CAIP-350 address format
+                            type: string
+                            description: Destination contract address on the specified chain
                           data:
                             type: array
                             items:
@@ -1441,6 +1422,7 @@ components:
                           gasRequired:
                             type: string
                         required:
+                          - chain
                           - to
                           - data
                           - gasRequired
@@ -1771,19 +1753,12 @@ components:
                 openIntentTx:
                   type: object
                   properties:
+                    chain:
+                      type: string
+                      description: Chain where the transaction will be executed
                     to:
-                      type: object
-                      properties:
-                        chain:
-                          type: string
-                          description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                        address:
-                          type: string
-                          description: The address in its standard text representation for the specified chain
-                      required:
-                        - chain
-                        - address
-                      description: Destination contract in CAIP-350 address format
+                      type: string
+                      description: Destination contract address on the specified chain
                     data:
                       type: array
                       items:
@@ -1792,6 +1767,7 @@ components:
                     gasRequired:
                       type: string
                   required:
+                    - chain
                     - to
                     - data
                     - gasRequired
@@ -2473,19 +2449,12 @@ paths:
                                 openIntentTx:
                                   type: object
                                   properties:
+                                    chain:
+                                      type: string
+                                      description: Chain where the transaction will be executed
                                     to:
-                                      type: object
-                                      properties:
-                                        chain:
-                                          type: string
-                                          description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                        address:
-                                          type: string
-                                          description: The address in its standard text representation for the specified chain
-                                      required:
-                                        - chain
-                                        - address
-                                      description: Destination contract in CAIP-350 address format
+                                      type: string
+                                      description: Destination contract address on the specified chain
                                     data:
                                       type: array
                                       items:
@@ -2494,6 +2463,7 @@ paths:
                                     gasRequired:
                                       type: string
                                   required:
+                                    - chain
                                     - to
                                     - data
                                     - gasRequired
@@ -2837,19 +2807,12 @@ paths:
                         openIntentTx:
                           type: object
                           properties:
+                            chain:
+                              type: string
+                              description: Chain where the transaction will be executed
                             to:
-                              type: object
-                              properties:
-                                chain:
-                                  type: string
-                                  description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
-                                address:
-                                  type: string
-                                  description: The address in its standard text representation for the specified chain
-                              required:
-                                - chain
-                                - address
-                              description: Destination contract in CAIP-350 address format
+                              type: string
+                              description: Destination contract address on the specified chain
                             data:
                               type: array
                               items:
@@ -2858,6 +2821,7 @@ paths:
                             gasRequired:
                               type: string
                           required:
+                            - chain
                             - to
                             - data
                             - gasRequired

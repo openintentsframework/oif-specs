@@ -572,13 +572,15 @@ export interface OifUserOpenIntentOrder {
   type: "oif-user-open-v0";
   /**
    * Open intent transaction to be executed by the settlement contract
-   * @description Encoded call with destination using CAIP-350 address format and raw calldata bytes
+   * @description Encoded call with destination address and raw calldata bytes
    */
   openIntentTx: {
-    /** Destination contract in CAIP-350 address format */
-    to: ChainAddress;
+    /** Chain where the transaction will be executed */
+    chain: Chain;
+    /** Destination contract address on the specified chain */
+    to: NativeAddress;
     /** Raw calldata bytes for the transaction */
-    data: Uint8Array; 
+    data: Uint8Array;
     /** Gas required for execution as a decimal string */
     gasRequired: string;
   };
@@ -956,21 +958,21 @@ export interface GetOrderResponse {
 /**
  * Asset metadata information
  * @description Metadata for a specific asset supported by a provider, including address,
- *              symbol, and decimal precision.
+ *              symbol, and decimal precision. The chain is determined by the parent NetworkAssets context.
  * @example
  * {
- *   address: { chain: "eip155:1", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" }, // USDC on Ethereum
+ *   address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
  *   symbol: "USDC",
  *   decimals: 6
  * }
  */
 export interface AssetInfo {
-  /** 
+  /**
    * Asset contract address
-   * @description Chain-specific address for the asset
-   * @example { chain: "eip155:1", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" } - USDC on Ethereum
+   * @description Address for the asset in its standard text representation for the chain
+   * @example "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" - USDC on Ethereum
    */
-  address: ChainAddress;
+  address: NativeAddress;
   /** 
    * Human-readable asset identifier
    * @description Asset symbol for display purposes (e.g., "USDC", "WETH", "USDT")
@@ -996,7 +998,7 @@ export interface AssetInfo {
  *   chain: "eip155:1",
  *   assets: [
  *     {
- *       address: { chain: "eip155:1", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
+ *       address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
  *       symbol: "USDC",
  *       decimals: 6
  *     }
@@ -1031,12 +1033,12 @@ export interface NetworkAssets {
  *       chain: "eip155:1",
  *       assets: [
  *         {
- *           address: { chain: "eip155:1", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
+ *           address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
  *           symbol: "USDC",
  *           decimals: 6
  *         },
  *         {
- *           address: { chain: "eip155:1", address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" },
+ *           address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
  *           symbol: "WETH",
  *           decimals: 18
  *         }
@@ -1046,7 +1048,7 @@ export interface NetworkAssets {
  *       chain: "eip155:137",
  *       assets: [
  *         {
- *           address: { chain: "eip155:137", address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359" },
+ *           address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
  *           symbol: "USDC",
  *           decimals: 6
  *         }

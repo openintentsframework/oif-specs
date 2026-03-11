@@ -23,7 +23,8 @@ const registry = new OpenAPIRegistry();
 const oifUserOpenIntentOrderSchema = z.object({
   type: z.literal("oif-user-open-v0"),
   openIntentTx: z.object({
-    to: schemas.chainAddressSchema.describe("Destination contract in CAIP-350 address format"),
+    chain: schemas.chainSchema.describe("Chain where the transaction will be executed"),
+    to: schemas.nativeAddressSchema.describe("Destination contract address on the specified chain"),
     // Represent bytes as an array of numbers (0-255)
     data: z.array(z.number()).describe("Raw calldata bytes for the transaction"),
     gasRequired: z.string(),
