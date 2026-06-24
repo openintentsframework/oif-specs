@@ -124,6 +124,9 @@ registry.register("SettlementType", schemas.settlementTypeSchema);
 registry.register("Settlement", schemas.settlementSchema);
 registry.register("GetOrderRequest", schemas.getOrderRequestSchema);
 registry.register("GetOrderResponse", schemas.getOrderResponseSchema);
+registry.register("AssetInfo", schemas.assetInfoSchema);
+registry.register("NetworkAssets", schemas.networkAssetsSchema);
+registry.register("GetAssetsResponse", schemas.getAssetsResponseSchema);
 
 // Register API endpoints
 registry.registerPath({
@@ -218,6 +221,23 @@ registry.registerPath({
   },
 });
 
+registry.registerPath({
+  method: "get",
+  path: "/v1/assets",
+  summary: "Get all supported assets across networks.",
+  tags: ["assets"],
+  responses: {
+    200: {
+      description: "Assets retrieved successfully",
+      content: {
+        "application/json": {
+          schema: schemas.getAssetsResponseSchema,
+        },
+      },
+    },
+  },
+});
+
 async function main() {
   try {
     console.log("Starting OpenAPI generation from Zod schemas...");
@@ -236,6 +256,7 @@ async function main() {
       tags: [
         { name: "quotes", description: "Quote generation" },
         { name: "orders", description: "Order management" },
+        { name: "assets", description: "Asset discovery" },
       ],
     });
 
