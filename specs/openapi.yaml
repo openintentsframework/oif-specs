@@ -14,12 +14,28 @@ tags:
     description: Order management
 components:
   schemas:
-    Address:
+    Chain:
       type: string
-      pattern: ^0x0001[a-fA-F0-9]+$
       description: |-
-        Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-        unambiguous cross-chain identification.
+        Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`).
+        For EVM chains, uses eip155 namespace with chain ID.
+    NativeAddress:
+      type: string
+      description: |-
+        The address in its standard text representation for the specified chain.
+        Format varies by chain namespace.
+    ChainAddress:
+      type: object
+      properties:
+        chain:
+          type: string
+          description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
+        address:
+          type: string
+          description: The address in its standard text representation for the specified chain
+      required:
+        - chain
+        - address
     Amount:
       type: string
       pattern: ^[0-9]+$
@@ -105,14 +121,15 @@ components:
     Input:
       type: object
       properties:
+        chain:
+          type: string
+          description: The chain where the input assets reside
         user:
           type: string
-          pattern: ^0x0001[a-fA-F0-9]+$
-          description: The address providing the input assets
+          description: The address of the account providing the input assets
         asset:
           type: string
-          pattern: ^0x0001[a-fA-F0-9]+$
-          description: The token/asset being provided as input
+          description: The address of the token/asset being provided as input
         amount:
           type: string
           pattern: ^[0-9]+$
@@ -146,19 +163,21 @@ components:
             - kind
           description: Locking mechanism to use for securing the input assets
       required:
+        - chain
         - user
         - asset
     Output:
       type: object
       properties:
+        chain:
+          type: string
+          description: The chain where the output assets will be delivered
         receiver:
           type: string
-          pattern: ^0x0001[a-fA-F0-9]+$
-          description: The address that will receive the output assets
+          description: The address of the account that will receive the output assets
         asset:
           type: string
-          pattern: ^0x0001[a-fA-F0-9]+$
-          description: The token/asset to be received as output
+          description: The address of the token/asset to be received as output
         amount:
           type: string
           pattern: ^[0-9]+$
@@ -173,6 +192,7 @@ components:
             Encoded function call to be executed when delivering the output,
             enabling composability with other protocols
       required:
+        - chain
         - receiver
         - asset
     QuotePreference:
@@ -215,11 +235,17 @@ components:
       type: object
       properties:
         user:
-          type: string
-          pattern: ^0x0001[a-fA-F0-9]+$
-          description: |-
-            Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-            unambiguous cross-chain identification.
+          type: object
+          properties:
+            chain:
+              type: string
+              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
+            address:
+              type: string
+              description: The address in its standard text representation for the specified chain
+          required:
+            - chain
+            - address
         intent:
           type: object
           properties:
@@ -232,14 +258,15 @@ components:
               items:
                 type: object
                 properties:
+                  chain:
+                    type: string
+                    description: The chain where the input assets reside
                   user:
                     type: string
-                    pattern: ^0x0001[a-fA-F0-9]+$
-                    description: The address providing the input assets
+                    description: The address of the account providing the input assets
                   asset:
                     type: string
-                    pattern: ^0x0001[a-fA-F0-9]+$
-                    description: The token/asset being provided as input
+                    description: The address of the token/asset being provided as input
                   amount:
                     type: string
                     pattern: ^[0-9]+$
@@ -273,6 +300,7 @@ components:
                       - kind
                     description: Locking mechanism to use for securing the input assets
                 required:
+                  - chain
                   - user
                   - asset
             outputs:
@@ -280,14 +308,15 @@ components:
               items:
                 type: object
                 properties:
+                  chain:
+                    type: string
+                    description: The chain where the output assets will be delivered
                   receiver:
                     type: string
-                    pattern: ^0x0001[a-fA-F0-9]+$
-                    description: The address that will receive the output assets
+                    description: The address of the account that will receive the output assets
                   asset:
                     type: string
-                    pattern: ^0x0001[a-fA-F0-9]+$
-                    description: The token/asset to be received as output
+                    description: The address of the token/asset to be received as output
                   amount:
                     type: string
                     pattern: ^[0-9]+$
@@ -302,6 +331,7 @@ components:
                       Encoded function call to be executed when delivering the output,
                       enabling composability with other protocols
                 required:
+                  - chain
                   - receiver
                   - asset
             swapType:
@@ -723,12 +753,12 @@ components:
             openIntentTx:
               type: object
               properties:
+                chain:
+                  type: string
+                  description: Chain where the transaction will be executed
                 to:
                   type: string
-                  pattern: ^0x0001[a-fA-F0-9]+$
-                  description: |-
-                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                    unambiguous cross-chain identification.
+                  description: Destination contract address on the specified chain
                 data:
                   type: array
                   items:
@@ -737,6 +767,7 @@ components:
                 gasRequired:
                   type: string
               required:
+                - chain
                 - to
                 - data
                 - gasRequired
@@ -748,24 +779,18 @@ components:
                   items:
                     type: object
                     properties:
+                      chain:
+                        type: string
+                        description: The chain where the allowance check applies
                       token:
                         type: string
-                        pattern: ^0x0001[a-fA-F0-9]+$
-                        description: |-
-                          Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                          unambiguous cross-chain identification.
+                        description: The address of the token requiring allowance
                       user:
                         type: string
-                        pattern: ^0x0001[a-fA-F0-9]+$
-                        description: |-
-                          Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                          unambiguous cross-chain identification.
+                        description: The address of the user granting the allowance
                       spender:
                         type: string
-                        pattern: ^0x0001[a-fA-F0-9]+$
-                        description: |-
-                          Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                          unambiguous cross-chain identification.
+                        description: The address of the spender/settlement contract
                       required:
                         type: string
                         pattern: ^[0-9]+$
@@ -774,6 +799,7 @@ components:
                           (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                           satoshi for BTC, etc.). No decimals or scientific notation allowed.
                     required:
+                      - chain
                       - token
                       - user
                       - spender
@@ -947,12 +973,12 @@ components:
                 openIntentTx:
                   type: object
                   properties:
+                    chain:
+                      type: string
+                      description: Chain where the transaction will be executed
                     to:
                       type: string
-                      pattern: ^0x0001[a-fA-F0-9]+$
-                      description: |-
-                        Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                        unambiguous cross-chain identification.
+                      description: Destination contract address on the specified chain
                     data:
                       type: array
                       items:
@@ -961,6 +987,7 @@ components:
                     gasRequired:
                       type: string
                   required:
+                    - chain
                     - to
                     - data
                     - gasRequired
@@ -972,24 +999,18 @@ components:
                       items:
                         type: object
                         properties:
+                          chain:
+                            type: string
+                            description: The chain where the allowance check applies
                           token:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: |-
-                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                              unambiguous cross-chain identification.
+                            description: The address of the token requiring allowance
                           user:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: |-
-                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                              unambiguous cross-chain identification.
+                            description: The address of the user granting the allowance
                           spender:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: |-
-                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                              unambiguous cross-chain identification.
+                            description: The address of the spender/settlement contract
                           required:
                             type: string
                             pattern: ^[0-9]+$
@@ -998,6 +1019,7 @@ components:
                               (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                               satoshi for BTC, etc.). No decimals or scientific notation allowed.
                         required:
+                          - chain
                           - token
                           - user
                           - spender
@@ -1024,14 +1046,15 @@ components:
               items:
                 type: object
                 properties:
+                  chain:
+                    type: string
+                    description: The chain where the input assets reside
                   user:
                     type: string
-                    pattern: ^0x0001[a-fA-F0-9]+$
-                    description: The address providing the input assets
+                    description: The address of the account providing the input assets
                   asset:
                     type: string
-                    pattern: ^0x0001[a-fA-F0-9]+$
-                    description: The token/asset being provided as input
+                    description: The address of the token/asset being provided as input
                   amount:
                     type: string
                     pattern: ^[0-9]+$
@@ -1065,6 +1088,7 @@ components:
                       - kind
                     description: Locking mechanism to use for securing the input assets
                 required:
+                  - chain
                   - user
                   - asset
             outputs:
@@ -1072,14 +1096,15 @@ components:
               items:
                 type: object
                 properties:
+                  chain:
+                    type: string
+                    description: The chain where the output assets will be delivered
                   receiver:
                     type: string
-                    pattern: ^0x0001[a-fA-F0-9]+$
-                    description: The address that will receive the output assets
+                    description: The address of the account that will receive the output assets
                   asset:
                     type: string
-                    pattern: ^0x0001[a-fA-F0-9]+$
-                    description: The token/asset to be received as output
+                    description: The address of the token/asset to be received as output
                   amount:
                     type: string
                     pattern: ^[0-9]+$
@@ -1094,6 +1119,7 @@ components:
                       Encoded function call to be executed when delivering the output,
                       enabling composability with other protocols
                 required:
+                  - chain
                   - receiver
                   - asset
           required:
@@ -1135,14 +1161,15 @@ components:
           items:
             type: object
             properties:
+              chain:
+                type: string
+                description: The chain where the input assets reside
               user:
                 type: string
-                pattern: ^0x0001[a-fA-F0-9]+$
-                description: The address providing the input assets
+                description: The address of the account providing the input assets
               asset:
                 type: string
-                pattern: ^0x0001[a-fA-F0-9]+$
-                description: The token/asset being provided as input
+                description: The address of the token/asset being provided as input
               amount:
                 type: string
                 pattern: ^[0-9]+$
@@ -1176,6 +1203,7 @@ components:
                   - kind
                 description: Locking mechanism to use for securing the input assets
             required:
+              - chain
               - user
               - asset
         outputs:
@@ -1183,14 +1211,15 @@ components:
           items:
             type: object
             properties:
+              chain:
+                type: string
+                description: The chain where the output assets will be delivered
               receiver:
                 type: string
-                pattern: ^0x0001[a-fA-F0-9]+$
-                description: The address that will receive the output assets
+                description: The address of the account that will receive the output assets
               asset:
                 type: string
-                pattern: ^0x0001[a-fA-F0-9]+$
-                description: The token/asset to be received as output
+                description: The address of the token/asset to be received as output
               amount:
                 type: string
                 pattern: ^[0-9]+$
@@ -1205,6 +1234,7 @@ components:
                   Encoded function call to be executed when delivering the output,
                   enabling composability with other protocols
             required:
+              - chain
               - receiver
               - asset
       required:
@@ -1378,12 +1408,12 @@ components:
                       openIntentTx:
                         type: object
                         properties:
+                          chain:
+                            type: string
+                            description: Chain where the transaction will be executed
                           to:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: |-
-                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                              unambiguous cross-chain identification.
+                            description: Destination contract address on the specified chain
                           data:
                             type: array
                             items:
@@ -1392,6 +1422,7 @@ components:
                           gasRequired:
                             type: string
                         required:
+                          - chain
                           - to
                           - data
                           - gasRequired
@@ -1403,24 +1434,18 @@ components:
                             items:
                               type: object
                               properties:
+                                chain:
+                                  type: string
+                                  description: The chain where the allowance check applies
                                 token:
                                   type: string
-                                  pattern: ^0x0001[a-fA-F0-9]+$
-                                  description: |-
-                                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                    unambiguous cross-chain identification.
+                                  description: The address of the token requiring allowance
                                 user:
                                   type: string
-                                  pattern: ^0x0001[a-fA-F0-9]+$
-                                  description: |-
-                                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                    unambiguous cross-chain identification.
+                                  description: The address of the user granting the allowance
                                 spender:
                                   type: string
-                                  pattern: ^0x0001[a-fA-F0-9]+$
-                                  description: |-
-                                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                    unambiguous cross-chain identification.
+                                  description: The address of the spender/settlement contract
                                 required:
                                   type: string
                                   pattern: ^[0-9]+$
@@ -1429,6 +1454,7 @@ components:
                                     (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                                     satoshi for BTC, etc.). No decimals or scientific notation allowed.
                               required:
+                                - chain
                                 - token
                                 - user
                                 - spender
@@ -1455,14 +1481,15 @@ components:
                     items:
                       type: object
                       properties:
+                        chain:
+                          type: string
+                          description: The chain where the input assets reside
                         user:
                           type: string
-                          pattern: ^0x0001[a-fA-F0-9]+$
-                          description: The address providing the input assets
+                          description: The address of the account providing the input assets
                         asset:
                           type: string
-                          pattern: ^0x0001[a-fA-F0-9]+$
-                          description: The token/asset being provided as input
+                          description: The address of the token/asset being provided as input
                         amount:
                           type: string
                           pattern: ^[0-9]+$
@@ -1496,6 +1523,7 @@ components:
                             - kind
                           description: Locking mechanism to use for securing the input assets
                       required:
+                        - chain
                         - user
                         - asset
                   outputs:
@@ -1503,14 +1531,15 @@ components:
                     items:
                       type: object
                       properties:
+                        chain:
+                          type: string
+                          description: The chain where the output assets will be delivered
                         receiver:
                           type: string
-                          pattern: ^0x0001[a-fA-F0-9]+$
-                          description: The address that will receive the output assets
+                          description: The address of the account that will receive the output assets
                         asset:
                           type: string
-                          pattern: ^0x0001[a-fA-F0-9]+$
-                          description: The token/asset to be received as output
+                          description: The address of the token/asset to be received as output
                         amount:
                           type: string
                           pattern: ^[0-9]+$
@@ -1525,6 +1554,7 @@ components:
                             Encoded function call to be executed when delivering the output,
                             enabling composability with other protocols
                       required:
+                        - chain
                         - receiver
                         - asset
                 required:
@@ -1723,12 +1753,12 @@ components:
                 openIntentTx:
                   type: object
                   properties:
+                    chain:
+                      type: string
+                      description: Chain where the transaction will be executed
                     to:
                       type: string
-                      pattern: ^0x0001[a-fA-F0-9]+$
-                      description: |-
-                        Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                        unambiguous cross-chain identification.
+                      description: Destination contract address on the specified chain
                     data:
                       type: array
                       items:
@@ -1737,6 +1767,7 @@ components:
                     gasRequired:
                       type: string
                   required:
+                    - chain
                     - to
                     - data
                     - gasRequired
@@ -1748,24 +1779,18 @@ components:
                       items:
                         type: object
                         properties:
+                          chain:
+                            type: string
+                            description: The chain where the allowance check applies
                           token:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: |-
-                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                              unambiguous cross-chain identification.
+                            description: The address of the token requiring allowance
                           user:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: |-
-                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                              unambiguous cross-chain identification.
+                            description: The address of the user granting the allowance
                           spender:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: |-
-                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                              unambiguous cross-chain identification.
+                            description: The address of the spender/settlement contract
                           required:
                             type: string
                             pattern: ^[0-9]+$
@@ -1774,6 +1799,7 @@ components:
                               (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                               satoshi for BTC, etc.). No decimals or scientific notation allowed.
                         required:
+                          - chain
                           - token
                           - user
                           - spender
@@ -1879,9 +1905,18 @@ components:
       type: object
       properties:
         asset:
-          type: string
-          pattern: ^0x0001[a-fA-F0-9]+$
-          description: The token/asset identifier, may include chain information
+          type: object
+          properties:
+            chain:
+              type: string
+              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
+            address:
+              type: string
+              description: The address in its standard text representation for the specified chain
+          required:
+            - chain
+            - address
+          description: The token/asset identifier with chain information
         amount:
           type: string
           pattern: ^[0-9]+$
@@ -1948,9 +1983,18 @@ components:
             type: object
             properties:
               asset:
-                type: string
-                pattern: ^0x0001[a-fA-F0-9]+$
-                description: The token/asset identifier, may include chain information
+                type: object
+                properties:
+                  chain:
+                    type: string
+                    description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
+                  address:
+                    type: string
+                    description: The address in its standard text representation for the specified chain
+                required:
+                  - chain
+                  - address
+                description: The token/asset identifier with chain information
               amount:
                 type: string
                 pattern: ^[0-9]+$
@@ -1963,9 +2007,18 @@ components:
             type: object
             properties:
               asset:
-                type: string
-                pattern: ^0x0001[a-fA-F0-9]+$
-                description: The token/asset identifier, may include chain information
+                type: object
+                properties:
+                  chain:
+                    type: string
+                    description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
+                  address:
+                    type: string
+                    description: The address in its standard text representation for the specified chain
+                required:
+                  - chain
+                  - address
+                description: The token/asset identifier with chain information
               amount:
                 type: string
                 pattern: ^[0-9]+$
@@ -2017,11 +2070,17 @@ paths:
               type: object
               properties:
                 user:
-                  type: string
-                  pattern: ^0x0001[a-fA-F0-9]+$
-                  description: |-
-                    Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                    unambiguous cross-chain identification.
+                  type: object
+                  properties:
+                    chain:
+                      type: string
+                      description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
+                    address:
+                      type: string
+                      description: The address in its standard text representation for the specified chain
+                  required:
+                    - chain
+                    - address
                 intent:
                   type: object
                   properties:
@@ -2034,14 +2093,15 @@ paths:
                       items:
                         type: object
                         properties:
+                          chain:
+                            type: string
+                            description: The chain where the input assets reside
                           user:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: The address providing the input assets
+                            description: The address of the account providing the input assets
                           asset:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: The token/asset being provided as input
+                            description: The address of the token/asset being provided as input
                           amount:
                             type: string
                             pattern: ^[0-9]+$
@@ -2075,6 +2135,7 @@ paths:
                               - kind
                             description: Locking mechanism to use for securing the input assets
                         required:
+                          - chain
                           - user
                           - asset
                     outputs:
@@ -2082,14 +2143,15 @@ paths:
                       items:
                         type: object
                         properties:
+                          chain:
+                            type: string
+                            description: The chain where the output assets will be delivered
                           receiver:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: The address that will receive the output assets
+                            description: The address of the account that will receive the output assets
                           asset:
                             type: string
-                            pattern: ^0x0001[a-fA-F0-9]+$
-                            description: The token/asset to be received as output
+                            description: The address of the token/asset to be received as output
                           amount:
                             type: string
                             pattern: ^[0-9]+$
@@ -2104,6 +2166,7 @@ paths:
                               Encoded function call to be executed when delivering the output,
                               enabling composability with other protocols
                         required:
+                          - chain
                           - receiver
                           - asset
                     swapType:
@@ -2386,12 +2449,12 @@ paths:
                                 openIntentTx:
                                   type: object
                                   properties:
+                                    chain:
+                                      type: string
+                                      description: Chain where the transaction will be executed
                                     to:
                                       type: string
-                                      pattern: ^0x0001[a-fA-F0-9]+$
-                                      description: |-
-                                        Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                        unambiguous cross-chain identification.
+                                      description: Destination contract address on the specified chain
                                     data:
                                       type: array
                                       items:
@@ -2400,6 +2463,7 @@ paths:
                                     gasRequired:
                                       type: string
                                   required:
+                                    - chain
                                     - to
                                     - data
                                     - gasRequired
@@ -2411,24 +2475,18 @@ paths:
                                       items:
                                         type: object
                                         properties:
+                                          chain:
+                                            type: string
+                                            description: The chain where the allowance check applies
                                           token:
                                             type: string
-                                            pattern: ^0x0001[a-fA-F0-9]+$
-                                            description: |-
-                                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                              unambiguous cross-chain identification.
+                                            description: The address of the token requiring allowance
                                           user:
                                             type: string
-                                            pattern: ^0x0001[a-fA-F0-9]+$
-                                            description: |-
-                                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                              unambiguous cross-chain identification.
+                                            description: The address of the user granting the allowance
                                           spender:
                                             type: string
-                                            pattern: ^0x0001[a-fA-F0-9]+$
-                                            description: |-
-                                              Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                              unambiguous cross-chain identification.
+                                            description: The address of the spender/settlement contract
                                           required:
                                             type: string
                                             pattern: ^[0-9]+$
@@ -2437,6 +2495,7 @@ paths:
                                               (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                                               satoshi for BTC, etc.). No decimals or scientific notation allowed.
                                         required:
+                                          - chain
                                           - token
                                           - user
                                           - spender
@@ -2463,14 +2522,15 @@ paths:
                               items:
                                 type: object
                                 properties:
+                                  chain:
+                                    type: string
+                                    description: The chain where the input assets reside
                                   user:
                                     type: string
-                                    pattern: ^0x0001[a-fA-F0-9]+$
-                                    description: The address providing the input assets
+                                    description: The address of the account providing the input assets
                                   asset:
                                     type: string
-                                    pattern: ^0x0001[a-fA-F0-9]+$
-                                    description: The token/asset being provided as input
+                                    description: The address of the token/asset being provided as input
                                   amount:
                                     type: string
                                     pattern: ^[0-9]+$
@@ -2504,6 +2564,7 @@ paths:
                                       - kind
                                     description: Locking mechanism to use for securing the input assets
                                 required:
+                                  - chain
                                   - user
                                   - asset
                             outputs:
@@ -2511,14 +2572,15 @@ paths:
                               items:
                                 type: object
                                 properties:
+                                  chain:
+                                    type: string
+                                    description: The chain where the output assets will be delivered
                                   receiver:
                                     type: string
-                                    pattern: ^0x0001[a-fA-F0-9]+$
-                                    description: The address that will receive the output assets
+                                    description: The address of the account that will receive the output assets
                                   asset:
                                     type: string
-                                    pattern: ^0x0001[a-fA-F0-9]+$
-                                    description: The token/asset to be received as output
+                                    description: The address of the token/asset to be received as output
                                   amount:
                                     type: string
                                     pattern: ^[0-9]+$
@@ -2533,6 +2595,7 @@ paths:
                                       Encoded function call to be executed when delivering the output,
                                       enabling composability with other protocols
                                 required:
+                                  - chain
                                   - receiver
                                   - asset
                           required:
@@ -2744,12 +2807,12 @@ paths:
                         openIntentTx:
                           type: object
                           properties:
+                            chain:
+                              type: string
+                              description: Chain where the transaction will be executed
                             to:
                               type: string
-                              pattern: ^0x0001[a-fA-F0-9]+$
-                              description: |-
-                                Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                unambiguous cross-chain identification.
+                              description: Destination contract address on the specified chain
                             data:
                               type: array
                               items:
@@ -2758,6 +2821,7 @@ paths:
                             gasRequired:
                               type: string
                           required:
+                            - chain
                             - to
                             - data
                             - gasRequired
@@ -2769,24 +2833,18 @@ paths:
                               items:
                                 type: object
                                 properties:
+                                  chain:
+                                    type: string
+                                    description: The chain where the allowance check applies
                                   token:
                                     type: string
-                                    pattern: ^0x0001[a-fA-F0-9]+$
-                                    description: |-
-                                      Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                      unambiguous cross-chain identification.
+                                    description: The address of the token requiring allowance
                                   user:
                                     type: string
-                                    pattern: ^0x0001[a-fA-F0-9]+$
-                                    description: |-
-                                      Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                      unambiguous cross-chain identification.
+                                    description: The address of the user granting the allowance
                                   spender:
                                     type: string
-                                    pattern: ^0x0001[a-fA-F0-9]+$
-                                    description: |-
-                                      Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for
-                                      unambiguous cross-chain identification.
+                                    description: The address of the spender/settlement contract
                                   required:
                                     type: string
                                     pattern: ^[0-9]+$
@@ -2795,6 +2853,7 @@ paths:
                                       (e.g., uint256). Always represents the smallest unit of the token (wei for ETH,
                                       satoshi for BTC, etc.). No decimals or scientific notation allowed.
                                 required:
+                                  - chain
                                   - token
                                   - user
                                   - spender
@@ -2934,9 +2993,18 @@ paths:
                       type: object
                       properties:
                         asset:
-                          type: string
-                          pattern: ^0x0001[a-fA-F0-9]+$
-                          description: The token/asset identifier, may include chain information
+                          type: object
+                          properties:
+                            chain:
+                              type: string
+                              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
+                            address:
+                              type: string
+                              description: The address in its standard text representation for the specified chain
+                          required:
+                            - chain
+                            - address
+                          description: The token/asset identifier with chain information
                         amount:
                           type: string
                           pattern: ^[0-9]+$
@@ -2949,9 +3017,18 @@ paths:
                       type: object
                       properties:
                         asset:
-                          type: string
-                          pattern: ^0x0001[a-fA-F0-9]+$
-                          description: The token/asset identifier, may include chain information
+                          type: object
+                          properties:
+                            chain:
+                              type: string
+                              description: Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
+                            address:
+                              type: string
+                              description: The address in its standard text representation for the specified chain
+                          required:
+                            - chain
+                            - address
+                          description: The token/asset identifier with chain information
                         amount:
                           type: string
                           pattern: ^[0-9]+$

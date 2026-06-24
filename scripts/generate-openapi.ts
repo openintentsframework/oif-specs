@@ -23,7 +23,8 @@ const registry = new OpenAPIRegistry();
 const oifUserOpenIntentOrderSchema = z.object({
   type: z.literal("oif-user-open-v0"),
   openIntentTx: z.object({
-    to: schemas.addressSchema,
+    chain: schemas.chainSchema.describe("Chain where the transaction will be executed"),
+    to: schemas.nativeAddressSchema.describe("Destination contract address on the specified chain"),
     // Represent bytes as an array of numbers (0-255)
     data: z.array(z.number()).describe("Raw calldata bytes for the transaction"),
     gasRequired: z.string(),
@@ -31,9 +32,10 @@ const oifUserOpenIntentOrderSchema = z.object({
   checks: z.object({
     allowances: z.array(
       z.object({
-        token: schemas.addressSchema,
-        user: schemas.addressSchema,
-        spender: schemas.addressSchema,
+        chain: schemas.chainSchema.describe("The chain where the allowance check applies"),
+        token: schemas.nativeAddressSchema.describe("The address of the token requiring allowance"),
+        user: schemas.nativeAddressSchema.describe("The address of the user granting the allowance"),
+        spender: schemas.nativeAddressSchema.describe("The address of the spender/settlement contract"),
         required: schemas.amountSchema,
       })
     ),
@@ -90,7 +92,9 @@ const postOrderRequestSchema = z.object({
 });
 
 // Register all schemas as components
-registry.register("Address", schemas.addressSchema);
+registry.register("Chain", schemas.chainSchema);
+registry.register("NativeAddress", schemas.nativeAddressSchema);
+registry.register("ChainAddress", schemas.chainAddressSchema);
 registry.register("Amount", schemas.amountSchema);
 registry.register("SwapType", schemas.swapTypeSchema);
 registry.register("AssetLockReference", schemas.assetLockReferenceSchema);

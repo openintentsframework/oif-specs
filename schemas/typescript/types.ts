@@ -6,15 +6,60 @@
 // ============ Common Types ============
 
 /**
- * EIP-7930 interoperable address format
- * @description Cross-chain compatible address format per EIP-7930 version 1 encoded format (0x0001 + chain ID + address) for 
- *              unambiguous cross-chain identification.
- * @pattern ^0x0001[a-fA-F0-9]+$
- * @example Cross-chain (Ethereum mainnet): "0x00010000010114D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
- * @example Cross-chain (Polygon): "0x0001000001890314D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
- * @see https://eips.ethereum.org/EIPS/eip-7930
+ * CAIP-2 chain identifier
+ * @description Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`).
+ *              For EVM chains, uses eip155 namespace with chain ID.
+ * @example "eip155:1" - Ethereum mainnet
+ * @example "eip155:8453" - Base
+ * @example "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp" - Solana mainnet
+ * @example "bip122:000000000019d6689c085ae165831e93" - Bitcoin mainnet
+ * @see https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md
  */
-export type Address = string;
+export type Chain = string;
+
+/**
+ * Native address format
+ * @description The address in its standard text representation for the specified chain.
+ *              Format varies by chain namespace.
+ * @example "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" - EVM address
+ * @example "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" - Solana address
+ * @example "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4" - Bitcoin address
+ */
+export type NativeAddress = string;
+
+/**
+ * CAIP-350 chain-specific address
+ * @description Cross-chain compatible address format using CAIP-350 text identifiers.
+ *              Combines a CAIP-2 chain identifier with the native address format.
+ *              This is the canonical way to identify assets and accounts in the OIF API.
+ * @example USDC on Base:
+ * {
+ *   chain: "eip155:8453",
+ *   address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+ * }
+ * @example vitalik.eth on Ethereum mainnet:
+ * {
+ *   chain: "eip155:1",
+ *   address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+ * }
+ * @see https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-350.md
+ * @see https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-10.md
+ */
+export interface ChainAddress {
+  /**
+   * CAIP-2 chain identifier
+   * @description Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
+   * @example "eip155:1" - Ethereum mainnet
+   * @example "eip155:8453" - Base
+   */
+  chain: Chain;
+  /**
+   * Native address
+   * @description The address in its standard text representation for the specified chain
+   * @example "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+   */
+  address: NativeAddress;
+}
 
 /**
  * Token amount as string-encoded integer
@@ -93,33 +138,41 @@ export interface OriginSubmission {
 /**
  * Available input from a user
  * @description Specifies assets that a user is willing to provide as input for a swap or transfer.
- *              Represents the "from" side of the transaction.
- * @example Exact-input quote (user has 4000 USDC):
+ *              Represents the "from" side of the transaction. The user and asset are always on the
+ *              same chain, so the chain is specified once at the top level.
+ * @example Exact-input quote (user has 4000 USDC on Ethereum):
  * {
- *   user: "0x00010000010114D8DA6BF26964AF9D7EED9E03E53415D37AA96045", // Ethereum mainnet
- *   asset: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
+ *   chain: "eip155:1",
+ *   user: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+ *   asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
  *   amount: "4000000000", // Exactly 4000 USDC
  *   lock: { kind: "the-compact" }
  * }
  * @example Exact-output quote (amount undefined, will be quoted):
  * {
- *   user: "0x00010000010114D8DA6BF26964AF9D7EED9E03E53415D37AA96045",
- *   asset: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+ *   chain: "eip155:1",
+ *   user: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+ *   asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
  *   amount: undefined, // Provider will quote how much USDC needed
  *   lock: { kind: "the-compact" }
  * }
  */
 export interface Input {
+  /**
+   * Chain identifier
+   * @description The chain where the input assets reside
+   */
+  chain: Chain;
   /** 
    * User address 
-   * @description The address providing the input assets
+   * @description The address of the account providing the input assets
    */
-  user: Address;
+  user: NativeAddress;
   /** 
    * Asset address
-   * @description The token/asset being provided as input
+   * @description The address of the token/asset being provided as input
    */
-  asset: Address;
+  asset: NativeAddress;
   /** 
    * Amount available
    * @description For quote requests:
@@ -139,33 +192,41 @@ export interface Input {
 /**
  * Requested output for a receiver
  * @description Specifies the desired assets and destination for a swap or transfer.
- *              Represents the "to" side of the transaction.
+ *              Represents the "to" side of the transaction. The receiver and asset are always on the
+ *              same chain, so the chain is specified once at the top level.
  * @example Exact-input quote (amount undefined, will be quoted):
  * {
- *   receiver: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
- *   asset: "0x000100000101dAC17F958D2ee523a2206206994597C13D831ec7", // USDT on Ethereum  
+ *   chain: "eip155:1",
+ *   receiver: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *   asset: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT on Ethereum  
  *   amount: undefined, // Provider will quote how much USDT user receives
  *   calldata: "0x095ea7b3..."
  * }
  * @example Exact-output quote (user wants exactly 4000 USDT):
  * {
- *   receiver: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
- *   asset: "0x000100000101dAC17F958D2ee523a2206206994597C13D831ec7", // USDT
+ *   chain: "eip155:1",
+ *   receiver: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *   asset: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
  *   amount: "4000000000", // Exactly 4000 USDT requested
  *   calldata: null
  * }
  */
 export interface Output {
+  /**
+   * Chain identifier
+   * @description The chain where the output assets will be delivered
+   */
+  chain: Chain;
   /** 
    * Receiver address
-   * @description The address that will receive the output assets
+   * @description The address of the account that will receive the output assets
    */
-  receiver: Address;
+  receiver: NativeAddress;
   /** 
    * Asset address
-   * @description The token/asset to be received as output
+   * @description The address of the token/asset to be received as output
    */
-  asset: Address;
+  asset: NativeAddress;
   /** 
    * Amount requested
    * @description For quote requests:
@@ -234,17 +295,19 @@ export type FailureHandlingMode =
  *              information for providers to calculate and return executable quotes.
  * @example Exact-input quote request (user has 4000 USDC, wants USDT quote):
  * {
- *   user: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *   user: { chain: "eip155:1", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8" },
  *   intent: {
  *     intentType: "oif-swap",
  *     inputs: [{ 
- *       user: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
- *       asset: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+ *       chain: "eip155:1",
+ *       user: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
  *       amount: "4000000000" // Exact: 4000 USDC
  *     }],
  *     outputs: [{ 
- *       receiver: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
- *       asset: "0x000100000101dAC17F958D2ee523a2206206994597C13D831ec7", // USDT
+ *       chain: "eip155:1",
+ *       receiver: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       asset: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
  *       amount: undefined // Provider will quote output amount
  *     }],
  *     swapType: "exact-input",
@@ -254,17 +317,19 @@ export type FailureHandlingMode =
  * }
  * @example Exact-output quote request (user wants exactly 2 ETH, needs USDC quote):
  * {
- *   user: "0x00010000a4b1742d35Cc6634C0532925a3b844Bc9e7595f0bEb8", // Arbitrum
+ *   user: { chain: "eip155:42161", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8" }, // Arbitrum
  *   intent: {
  *     intentType: "oif-swap",
  *     inputs: [{
- *       user: "0x00010000a4b1742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
- *       asset: "0x00010000a4b1af48D7b320B0A4d3233e91B1c865238AE8", // USDC on Arbitrum
+ *       chain: "eip155:42161",
+ *       user: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       asset: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // USDC on Arbitrum
  *       amount: undefined // Provider will quote input amount needed
  *     }],
  *     outputs: [{
- *       receiver: "0x00010000a4b1742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
- *       asset: "0x00010000a4b182e0B297B003493027903951655AF9d0e", // WETH on Arbitrum
+ *       chain: "eip155:42161",
+ *       receiver: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       asset: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH on Arbitrum
  *       amount: "2000000000000000000" // Exact: 2 WETH
  *     }],
  *     swapType: "exact-output",
@@ -275,7 +340,7 @@ export type FailureHandlingMode =
  */
 export interface GetQuoteRequest {
   /** User requesting the quote and recipient of refund inputs in case of failures */
-  user: Address;
+  user: ChainAddress;
 
   intent: {
     intentType: "oif-swap";
@@ -321,6 +386,7 @@ export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order | OifUs
  * @description Order that uses an escrow mechanism for asset custody during cross-chain transfers.
  *              Assets are held in escrow until conditions are met. Uses Permit2's PermitBatchWitnessTransferFrom
  *              for efficient batch transfers with additional witness data.
+ *              Note: The EIP-712 message payload uses native addresses (not CAIP-350) as required by the on-chain contracts.
  * @example
  * {
  *   type: "oif-escrow-v0",
@@ -330,13 +396,13 @@ export type Order = OifEscrowOrder | OifResourceLockOrder | Oif3009Order | OifUs
  *     primaryType: "PermitBatchWitnessTransferFrom",
  *     message: {
  *       permitted: [
- *         { token: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", amount: "1000000000" }
+ *         { token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", amount: "1000000000" }
  *       ],
- *       spender: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *       spender: "0x95ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
  *       nonce: "123",
  *       deadline: 1700000000,
  *       witness: {
- *         recipient: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *         recipient: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
  *         minAmountOut: "990000000"
  *       }
  *     }
@@ -361,6 +427,7 @@ export interface OifEscrowOrder {
  * @description Order that uses resource locking for asset control, typically with The Compact
  *              protocol for efficient batch operations and cross-chain transfers. Uses Compact
  *              signatures (e.g., BatchCompact) for gas-efficient multi-operation authorization.
+ *              Note: The EIP-712 message payload uses native addresses (not CAIP-350) as required by the on-chain contracts.
  * @example With Compact/BatchCompact signature:
  * {
  *   type: "oif-resource-lock-v0",
@@ -369,12 +436,12 @@ export interface OifEscrowOrder {
  *     domain: { name: "The Compact", version: "1", chainId: 1, verifyingContract: "0xabc..." },
  *     primaryType: "BatchCompact",
  *     message: {
- *       arbiter: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
- *       sponsor: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *       arbiter: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       sponsor: "0x95ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
  *       nonce: "123",
  *       expires: 1700000000,
  *       transfers: [
- *         { token: "0x000100000101A0b8...", amount: "1000000000", recipient: "0x..." }
+ *         { token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", amount: "1000000000", recipient: "0x..." }
  *       ]
  *     }
  *   }
@@ -431,16 +498,17 @@ export interface OifResourceLockOrder {
  * EIP-3009 based order
  * @description Order using EIP-3009 Transfer With Authorization standard, commonly used by
  *              stablecoins like USDC. Includes metadata for nonce verification.
+ *              Note: The EIP-712 message payload uses native addresses (not CAIP-350) as required by the on-chain contracts.
  * @example
  * {
  *   type: "oif-3009-v0",
  *   payload: {
  *     signatureType: "eip712",
- *     domain: { name: "USD Coin", version: "2", chainId: 1, verifyingContract: "0xA0b8..." },
+ *     domain: { name: "USD Coin", version: "2", chainId: 1, verifyingContract: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
  *     primaryType: "TransferWithAuthorization",
  *     message: {
- *       from: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
- *       to: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *       from: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       to: "0x95ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
  *       value: "1000000000",
  *       validAfter: 0,
  *       validBefore: 1700000000,
@@ -484,15 +552,16 @@ export interface Oif3009Order {
  * {
  *   type: "oif-user-open-v0",
  *   openIntentTx: {
- *     to: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *     to: { chain: "eip155:1", address: "0x95ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a" },
  *     data: "0xaaaaaaaa....", // bytes in solidity
  *     gasRequired: "250000"
  *   },
  *   checks: {
  *     allowances: [{
- *       token: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
- *       user: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
- *       spender: "0x00010000010195ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
+ *       chain: "eip155:1",
+ *       token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *       user: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *       spender: "0x95ad61b0a150d79219dcf64e1e6cc01f0c0c8a4a",
  *       required: "1000000000"
  *     }]
  *   }
@@ -503,13 +572,15 @@ export interface OifUserOpenIntentOrder {
   type: "oif-user-open-v0";
   /**
    * Open intent transaction to be executed by the settlement contract
-   * @description Encoded call with destination using EIP-7930 address format and raw calldata bytes
+   * @description Encoded call with destination address and raw calldata bytes
    */
   openIntentTx: {
-    /** Destination contract in EIP-7930 address format */
-    to: Address;
+    /** Chain where the transaction will be executed */
+    chain: Chain;
+    /** Destination contract address on the specified chain */
+    to: NativeAddress;
     /** Raw calldata bytes for the transaction */
-    data: Uint8Array; 
+    data: Uint8Array;
     /** Gas required for execution as a decimal string */
     gasRequired: string;
   };
@@ -519,15 +590,17 @@ export interface OifUserOpenIntentOrder {
   checks: {
     /**
      * Required allowances and balances
-     * @description Each item asserts that `user` has at least `required` balance andallowance for `spender` on `token`.
+     * @description Each item asserts that `user` has at least `required` balance and allowance for `spender` on `token`.
      */
     allowances: Array<{
-      /** Token address in EIP-7930 format */
-      token: Address;
-      /** User address in EIP-7930 format */
-      user: Address;
-      /** Spender/settlement contract address in EIP-7930 format */
-      spender: Address;
+      /** The chain where the allowance check applies */
+      chain: Chain;
+      /** The address of the token requiring allowance */
+      token: NativeAddress;
+      /** The address of the user granting the allowance */
+      user: NativeAddress;
+      /** The address of the spender/settlement contract */
+      spender: NativeAddress;
       /** Required allowance amount as string-encoded integer */
       required: Amount;
     }>;
@@ -745,20 +818,20 @@ export enum OrderStatus {
 
 /**
  * Asset amount representation
- * @description Combines an asset identifier with an amount, using EIP-7930 addresses for
+ * @description Combines an asset identifier with an amount, using CAIP-350 addresses for
  *              cross-chain compatibility.
  * @example Cross-chain:
  * {
- *   asset: "0x00010000018903A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Polygon (chain 137 = 0x89 in hex, 0x8903 in EIP-7930)
+ *   asset: { chain: "eip155:137", address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359" }, // USDC on Polygon
  *   amount: "500000000" // 500 USDC (6 decimals)
  * }
  */
 export interface AssetAmount {
   /** 
-   * Asset address in EIP-7930 interoperable format
-   * @description The token/asset identifier, may include chain information
+   * Chain-specific address for the asset
+   * @description The token/asset identifier with chain information
    */
-  asset: Address;
+  asset: ChainAddress;
   /** 
    * Amount as a string-encoded integer
    * @description Token amount in smallest unit (wei, satoshi, etc.)
@@ -841,12 +914,12 @@ export interface GetOrderRequest {
  *   createdAt: 1699900000,
  *   updatedAt: 1699900100,
  *   quoteId: "quote-123-abc",
- *   inputAmount: [{
- *     asset: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb8",
+ *   inputAmounts: [{
+ *     asset: { chain: "eip155:1", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
  *     amount: "1000000000"
  *   }],
- *   outputAmount: [{
- *     asset: "0x000100000101742d35Cc6634C0532925a3b844Bc9e7595f0bEb9",
+ *   outputAmounts: [{
+ *     asset: { chain: "eip155:1", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7" },
  *     amount: "500000000000000000"
  *   }],
  *   settlement: {
@@ -885,22 +958,21 @@ export interface GetOrderResponse {
 /**
  * Asset metadata information
  * @description Metadata for a specific asset supported by a provider, including address,
- *              symbol, and decimal precision.
+ *              symbol, and decimal precision. The chain is determined by the parent NetworkAssets context.
  * @example
  * {
- *   address: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum (EIP-7930 format)
+ *   address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
  *   symbol: "USDC",
  *   decimals: 6
  * }
  */
 export interface AssetInfo {
-  /** 
+  /**
    * Asset contract address
-   * @description Asset address in EIP-7930 interoperable format for cross-chain compatibility.
-   *              All addresses are formatted with the 0x prefix.
-   * @example "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" - USDC on Ethereum
+   * @description Address for the asset in its standard text representation for the chain
+   * @example "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" - USDC on Ethereum
    */
-  address: Address;
+  address: NativeAddress;
   /** 
    * Human-readable asset identifier
    * @description Asset symbol for display purposes (e.g., "USDC", "WETH", "USDT")
@@ -920,13 +992,13 @@ export interface AssetInfo {
 /**
  * Network asset configuration
  * @description Represents asset support for a single blockchain network.
- *              Contains the chain identifier and list of supported assets.
+ *              Contains the CAIP-2 chain identifier and list of supported assets.
  * @example
  * {
- *   chain_id: 1,
+ *   chain: "eip155:1",
  *   assets: [
  *     {
- *       address: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *       address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
  *       symbol: "USDC",
  *       decimals: 6
  *     }
@@ -935,13 +1007,13 @@ export interface AssetInfo {
  */
 export interface NetworkAssets {
   /** 
-   * Blockchain network identifier
-   * @description Chain ID for the blockchain network (e.g., 1 for Ethereum, 137 for Polygon, 42161 for Arbitrum)
-   * @example 1 - Ethereum mainnet
-   * @example 137 - Polygon
-   * @example 42161 - Arbitrum
+   * CAIP-2 chain identifier
+   * @description Chain identifier following the CAIP-350 chain identifier text representation (`<namespace>:<reference>`)
+   * @example "eip155:1" - Ethereum mainnet
+   * @example "eip155:137" - Polygon
+   * @example "eip155:42161" - Arbitrum
    */
-  chain_id: number;
+  chain: Chain;
   /** 
    * List of supported assets
    * @description Array of assets supported on this network
@@ -957,26 +1029,26 @@ export interface NetworkAssets {
  * @example
  * {
  *   networks: {
- *     "1": {
- *       chain_id: 1,
+ *     "eip155:1": {
+ *       chain: "eip155:1",
  *       assets: [
  *         {
- *           address: "0x000100000101A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *           address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
  *           symbol: "USDC",
  *           decimals: 6
  *         },
  *         {
- *           address: "0x0001000001010303030303030303030303030303030303030303030303030303",
+ *           address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
  *           symbol: "WETH",
  *           decimals: 18
  *         }
  *       ]
  *     },
- *     "137": {
- *       chain_id: 137,
+ *     "eip155:137": {
+ *       chain: "eip155:137",
  *       assets: [
  *         {
- *           address: "0x00010000018903A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+ *           address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
  *           symbol: "USDC",
  *           decimals: 6
  *         }
@@ -987,9 +1059,9 @@ export interface NetworkAssets {
  */
 export interface GetAssetsResponse {
   /** 
-   * Map of chain ID to network configuration
-   * @description Map where keys are chain IDs as strings (e.g., "1", "137", "42161") and
+   * Map of CAIP-2 chain identifier to network configuration
+   * @description Map where keys are CAIP-2 chain identifiers (e.g., "eip155:1", "eip155:137") and
    *              values are network asset configurations
    */
-  networks: Record<string, NetworkAssets>;
+  networks: Record<Chain, NetworkAssets>;
 }

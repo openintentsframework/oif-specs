@@ -15,6 +15,48 @@ It includes:
 - `schemas/typescript/schemas.generated.ts`: Auto-generated Zod schemas from TypeScript types
 - `docs/references.md`: Curated external references to related off-chain APIs and intent protocols
 
+## Address format (CAIP-350)
+
+OIF uses **CAIP-350 text identifiers** for chain-specific addresses in the API. This provides a human-readable, integrator-friendly format that is easy to work with.
+
+### ChainAddress format
+
+All addresses in the API use the `ChainAddress` object format:
+
+```json
+{
+  "chain": "eip155:8453",
+  "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+}
+```
+
+- **chain**: CAIP-2 chain identifier (e.g., `eip155:1` for Ethereum, `eip155:8453` for Base)
+- **address**: Native address format (e.g., `0x...` for EVM chains)
+
+### Examples
+
+```json
+// USDC on Ethereum mainnet
+{
+  "chain": "eip155:1",
+  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+}
+
+// vitalik.eth on Base
+{
+  "chain": "eip155:8453",
+  "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+}
+```
+
+### Related standards
+
+- [CAIP-2](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md): Chain identifier format
+- [CAIP-10](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-10.md): Account identifier format
+- [CAIP-350](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-350.md): Text identifier for chain-specific addresses
+
+> **Note**: On-chain contracts (oif-contracts) continue to use ERC-7930 binary format for gas efficiency. Solvers and tooling handle the conversion between text (API) and binary (on-chain) representations.
+
 ## API standards
 
 This repository defines the following endpoints:
@@ -23,7 +65,7 @@ This repository defines the following endpoints:
 - **Intent**: submit a previously quoted, signed order for execution
 - **Asset Discovery**: discover supported assets and chains
   - `GET /api/tokens`: returns all supported assets across all configured blockchain networks
-  - `GET /api/tokens/{chain_id}`: returns supported assets for a specific blockchain network
+  - `GET /api/tokens/{chain}`: returns supported assets for a specific chain (e.g., `eip155:1`)
 
 Authoritative schema: `specs/openapi.yaml`
 
@@ -54,9 +96,28 @@ Notes:
 To discover which assets and chains are supported by a provider, use the asset discovery endpoints:
 
 - `GET /api/tokens`: Returns all supported networks and their assets
-- `GET /api/tokens/{chain_id}`: Returns assets for a specific chain
+- `GET /api/tokens/{chain}`: Returns assets for a specific chain (e.g., `eip155:1`)
 
-The response includes asset metadata (address in EIP-7930 format, symbol, and decimals) for each supported network. This enables clients to build asset and chain selection UIs and validate that a provider can theoretically fulfill a given intent before requesting quotes.
+The response includes asset metadata (address in CAIP-350 format, symbol, and decimals) for each supported network. This enables clients to build asset and chain selection UIs and validate that a provider can theoretically fulfill a given intent before requesting quotes.
+
+Example response:
+
+```json
+{
+  "networks": {
+    "eip155:1": {
+      "chain": "eip155:1",
+      "assets": [
+        {
+          "address": { "chain": "eip155:1", "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
+          "symbol": "USDC",
+          "decimals": 6
+        }
+      ]
+    }
+  }
+}
+```
 
 ## Generating OpenAPI from TypeScript
 
