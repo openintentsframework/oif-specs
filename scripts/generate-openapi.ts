@@ -73,13 +73,20 @@ const getQuoteResponseSchema = z.object({
   quotes: z.array(quoteSchema),
 });
 
-// Define PostOrderRequest schema manually since it uses Uint8Array[] which ts-to-zod can't handle
+// Define PostOrderRequest schema manually since it uses Uint8Array which ts-to-zod can't handle
 const postOrderRequestSchema = z.object({
   order: orderSchema.describe("EIP-712 typed data for a gasless cross-chain order"),
-  // Uint8Array[] represented as array of byte arrays
+  // Uint8Array represented as array of bytes (numbers 0-255)
   signature: z
-    .array(z.array(z.number()))
-    .describe("EIP-712 signature or equivalent as array of byte arrays"),
+    .array(z.number())
+    .optional()
+    .describe(
+      "Encoded signature for the order. Optional for oif-user-open-v0 (authorization handled at execution layer). " +
+        "Format depends on order type with a prefix byte indicating the scheme: " +
+        "oif-escrow-v0 (0x00 prefix + 65-byte EIP-712 Permit2 signature), " +
+        "oif-3009-v0 (0x01 prefix + 65-byte EIP-3009 signature), " +
+        "oif-resource-lock-v0 (0x02 prefix + 65-byte Compact signature)",
+    ),
   quoteId: z
     .string()
     .optional()

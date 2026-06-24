@@ -700,8 +700,27 @@ export interface GetQuoteResponse {
 export interface PostOrderRequest {
   /** EIP-712 typed data for a gasless cross-chain order */
   order: Order;
-  /** EIP-712 signature or equivalent */
-  signature: Uint8Array; // bytes in solidity
+  /**
+   * Encoded signature for the order.
+   *
+   * The signature format depends on the order type and uses a prefix byte to indicate
+   * the signature scheme:
+   *
+   * - **oif-escrow-v0**: `0x00` prefix + 65-byte EIP-712 signature (Permit2 PermitBatchWitnessTransferFrom)
+   *   - Total length: 66 bytes
+   *   - Format: [0x00, r (32 bytes), s (32 bytes), v (1 byte)]
+   *
+   * - **oif-3009-v0**: `0x01` prefix + 65-byte EIP-712 signature (EIP-3009 TransferWithAuthorization)
+   *   - Total length: 66 bytes
+   *   - Format: [0x01, r (32 bytes), s (32 bytes), v (1 byte)]
+   *
+   * - **oif-resource-lock-v0**: `0x02` prefix + 65-byte EIP-712 signature (Compact BatchCompact)
+   *   - Total length: 66 bytes
+   *   - Format: [0x02, r (32 bytes), s (32 bytes), v (1 byte)]
+   *
+   * - **oif-user-open-v0**: No signature required (authorization handled at execution layer)
+   */
+  signature?: Uint8Array; // bytes in solidity, optional for oif-user-open-v0
   /** Optional quote identifier from a prior Get Quote response */
   quoteId?: string;
   /** Optional preference mirrored from quote about who submits and acceptable schemes */

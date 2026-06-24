@@ -1816,10 +1816,8 @@ components:
         signature:
           type: array
           items:
-            type: array
-            items:
-              type: number
-          description: EIP-712 signature or equivalent as array of byte arrays
+            type: number
+          description: 'Encoded signature for the order. Optional for oif-user-open-v0 (authorization handled at execution layer). Format depends on order type with a prefix byte indicating the scheme: oif-escrow-v0 (0x00 prefix + 65-byte EIP-712 Permit2 signature), oif-3009-v0 (0x01 prefix + 65-byte EIP-3009 signature), oif-resource-lock-v0 (0x02 prefix + 65-byte Compact signature)'
         quoteId:
           type: string
           description: Optional quote identifier from a prior Get Quote response
@@ -1865,7 +1863,6 @@ components:
           description: Optional preference mirrored from quote about who submits and acceptable schemes
       required:
         - order
-        - signature
     PostOrderResponse:
       type: object
       properties:
@@ -2964,10 +2961,8 @@ paths:
                 signature:
                   type: array
                   items:
-                    type: array
-                    items:
-                      type: number
-                  description: EIP-712 signature or equivalent as array of byte arrays
+                    type: number
+                  description: 'Encoded signature for the order. Optional for oif-user-open-v0 (authorization handled at execution layer). Format depends on order type with a prefix byte indicating the scheme: oif-escrow-v0 (0x00 prefix + 65-byte EIP-712 Permit2 signature), oif-3009-v0 (0x01 prefix + 65-byte EIP-3009 signature), oif-resource-lock-v0 (0x02 prefix + 65-byte Compact signature)'
                 quoteId:
                   type: string
                   description: Optional quote identifier from a prior Get Quote response
@@ -3013,7 +3008,6 @@ paths:
                   description: Optional preference mirrored from quote about who submits and acceptable schemes
               required:
                 - order
-                - signature
       responses:
         '200':
           description: Order accepted
